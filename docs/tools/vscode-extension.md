@@ -31,7 +31,7 @@ editorconfig插件，安装后会识别项目中的`.editorconfig`配置，用�
 
 注释中写对应标签时会突出显示，并在左侧todoTree插件栏中添加索引。可以自行设置标签关键字以及颜色
 
-![todo-tree注释样式](/tools/vscode-extension-1.png)
+![todo-tree注释样式](/tools/vscode-extension-2.png)
 
 
 
