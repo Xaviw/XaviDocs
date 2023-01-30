@@ -1,5 +1,5 @@
 import { defineConfig } from 'vitepress';
-import juejin from '../public/juejin';
+import juejin from '../public/svg/juejin';
 
 export default defineConfig({
   lang: 'zh-cmn-Hans',
@@ -34,7 +34,7 @@ export default defineConfig({
       // },
     ],
     // outline: 2,
-    outlineTitle: '大纲',
+    outlineTitle: '目录',
     socialLinks: [
       { icon: 'github', link: 'https://github.com/Xaviw' },
       {

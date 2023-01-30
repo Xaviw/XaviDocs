@@ -1,24 +1,26 @@
-# VSCode插件推荐
+## 简体中文
 
-## MS-CEINTL.vscode-language-pack-zh-hans
+MS-CEINTL.vscode-language-pack-zh-hans
 
-切换为中文
+## 拼写检查
 
-## streetsidesoftware.code-spell-checker
+streetsidesoftware.code-spell-checker
 
 检查单词拼写，错误的拼写会有下划线提示
 
 可以在对应单词的快速修复中选择 `Add: "xxx" to workspace/user settings`，将这个单词添加对应级别设置中，后续该级别下文件不会再提示该单词错误（添加至项目级别方便git同步给团队成员共用）
 
-## EditorConfig.EditorConfig
+## 编辑器配置Editorconfig
+
+EditorConfig.EditorConfig
 
 editorconfig插件，安装后会识别项目中的`.editorconfig`配置，用于覆盖编辑器配置，详见[官方文档](https://editorconfig.org/)
 
-## usernamehw.errorlens
+## 增强异常信息显示
 
-增强异常信息显示
+usernamehw.errorlens
 
-![errorlens增强样式](/tools/vscode-extension-1.png)
+![errorlens效果](/images/tools/vscode-extension-1.png)
 
 可以设置显示级别，和排除部分类型异常
 
@@ -27,54 +29,63 @@ editorconfig插件，安装后会识别项目中的`.editorconfig`配置，用�
 "errorLens.excludeBySource": ["cSpell", "Grammarly", "eslint"], // 排除拼写、语法异常
 ```
 
-## Gruntfuggly.todo-tree
+## 增强注释显示以及索引
+
+Gruntfuggly.todo-tree
 
 注释中写对应标签时会突出显示，并在左侧todoTree插件栏中添加索引。可以自行设置标签关键字以及颜色
 
-![todo-tree注释样式](/tools/vscode-extension-2.png)
+![todo-tree效果](/images/tools/vscode-extension-2.png)
 
 
 
-## WakaTime.vscode-wakatime
+## 编码时长统计
+
+WakaTime.vscode-wakatime
 
 记录编辑器使用时间等信息，可以生成开发统计数据。需要注册账号
 
-## antfu.icons-carbon
+## 修改界面图标
 
-修改VSCode界面图标
+antfu.icons-carbon
 
-## file-icons.file-icons
+## 修改文件图标
 
-修改不同类型文件显示图标
+file-icons.file-icons
 
-## donjayamanne.githistory
+## 增强git能力
 
-## eamodio.gitlens
+donjayamanne.githistory
 
-## eamodio.gitlens
+eamodio.gitlens
 
-上面三个均为添加git辅助功能
+eamodio.gitlens
 
-## dbaeumer.vscode-eslint
+## 语法检查+格式化
 
-## esbenp.prettier-vscode
+dbaeumer.vscode-eslint
 
-eslint+prettier，语法检查+格式化
+esbenp.prettier-vscode
 
-## lokalise.i18n-ally
+## 国际化插件
 
-国际化插件
+lokalise.i18n-ally
 
-## antfu.iconify
+## iconify标签直接显示为对应图标
 
-iconify标签直接显示为对应图标
+antfu.iconify
 
-## richie5um2.vscode-sort-json
+## JSON排序
 
-## unional.vscode-sort-package-json
+richie5um2.vscode-sort-json
+
+unional.vscode-sort-package-json
 
 排序json与排序package.json，package.json有自己推荐的顺序
 
 通过`ctrl + shift + p`调出命令窗口并输入命令执行
 
-## 其他Vetur、Volar、Less、Sass等根据需要，大多数需求都有对应的插件
+## 其他
+
+Vetur、Volar、Less、Sass、Stylelint、PostCss Language Support等根据需要，大多数需求都有对应的插件
+
