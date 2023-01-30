@@ -89,3 +89,7 @@ unional.vscode-sort-package-json
 
 Vetur、Volar、Less、Sass、Stylelint、PostCss Language Support等根据需要，大多数需求都有对应的插件
 
+但不要随意安装插件，插件会占用较多的内存。另外部分插件有重复的功能，互相影响会出现一些意想不到的情况
+
+部分插件功能VSCode已内置，可以参考[这篇文章](https://juejin.cn/post/6844904115798016008)排查是否可以卸载某些插件
+
