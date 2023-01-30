@@ -47,6 +47,42 @@
 
 [点击前往官网](https://docs.volta.sh/guide/getting-started)，通过命令快速安装、切换NODE版本（不支持pnpm）
 
+## Chrome扩展
+
+> 需要梯子或者参考[离线安装方式](https://zhuanlan.zhihu.com/p/80305764)
+
+- Ajax Interceptor
+
+    拦截网络请求并自定义返回值，可以在开发中快速模拟部分情况
+
+- FeHelper(前端助手)
+
+    JSON自动格式化、排序解码等多种实用功能
+
+- Global Speed：视频速度控制
+
+    网页中通用的自由设置音视频播放速度
+
+- Octotree - GitHub code tree
+
+    github项目中添加左侧目录栏，可以快速切换预览文件
+
+- React Developer Tools
+
+- Vue.js devtools
+
+- 视频下载器 - CoCoCut
+
+    免费获取网页中的音视频源，并在线下载
+
+- Tampermonkey
+
+    脚本集合，可以添加多种实用脚本或自行编写脚本
+
+    通过 **点击图标 -> 获取新脚本 -> GreasyFork(推荐)** 进入搜索脚本
+    
+    [点击查看热门脚本](https://greasyfork.org/zh-CN/scripts?sort=total_installs)
+
 ## 常用网页工具
 
 - 免费在线抠图：[https://www.remove.bg/zh](https://www.remove.bg/zh)
