@@ -18,7 +18,7 @@ editorconfig插件，安装后会识别项目中的`.editorconfig`配置，用�
 
 增强异常信息显示
 
-![](https://secure2.wostatic.cn/static/x6tqmp9WNkK5NtMxesQpDC/image.png?auth_key=1675062356-ugy2qYQ6eVBuLk5PDA4S7V-0-2dfe436673030c17332a7cad7997d1f6)
+![errorlens增强样式](/tools/vscode-extension-1.png)
 
 可以设置显示级别，和排除部分类型异常
 
@@ -31,7 +31,7 @@ editorconfig插件，安装后会识别项目中的`.editorconfig`配置，用�
 
 注释中写对应标签时会突出显示，并在左侧todoTree插件栏中添加索引。可以自行设置标签关键字以及颜色
 
-![](https://secure2.wostatic.cn/static/eS9ZNjX1FcSVrM5HTzDAgy/image.png?auth_key=1675062356-jPajfpb1KkvyAihwLM4RG1-0-a6441f188d4f232494051eeee19369bc)
+![todo-tree注释样式](/tools/vscode-extension-1.png)
 
 
 

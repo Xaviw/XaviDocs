@@ -153,7 +153,7 @@ body中每一条字符串为一行，支持使用`\n\t`等转义字符，也可�
 
 资源管理器栏中的NPM脚本栏，会自动读取项目package.json中配置的命令，可以在这里快速查看命令并执行
 
-![](https://secure2.wostatic.cn/static/x6uPF3YKkniGeY2WsNTqr3/image.png?auth_key=1675061544-hyfFtu8syV9CmDtK3Vk5JB-0-f14b8dd265a658af748a13369165af5f)
+![npm脚本栏](/tools/vscode-setting-1.png)
 
 ### 源代码管理
 

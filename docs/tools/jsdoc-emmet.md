@@ -1,80 +1,181 @@
-# VSCode插件推荐
+# 实用语法-JSDoc、Emmet
 
-## MS-CEINTL.vscode-language-pack-zh-hans
+> VSCode、HBuilderX等大部分编辑器均已内置支持，无需额外安装插件
 
-切换为中文
+## JSDoc
 
-## streetsidesoftware.code-spell-checker
+对JS、TS代码添加描述注释，编辑器会识别并在引用处提供代码提示（类似TS类型提示）
 
-检查单词拼写，错误的拼写会有下划线提示
+也可作为TS项目中JS文件的类型补充
 
-可以在对应单词的快速修复中选择 `Add: "xxx" to workspace/user settings`，将这个单词添加对应级别设置中，后续该级别下文件不会再提示该单词错误（添加至项目级别方便git同步给团队成员共用）
+详细查看[文档](https://www.jsdoc.com.cn/)，常用示例如下：
 
-## EditorConfig.EditorConfig
+```TypeScript
+/** 简单描述 */
 
-editorconfig插件，安装后会识别项目中的`.editorconfig`配置，用于覆盖编辑器配置，详见[官方文档](https://editorconfig.org/)
+/**
+ * 文件作者
+ * @author name <email>
+ */
+ 
+/**
+ * 弃用
+ * @deprecated description
+ */
+ 
+/**
+ * 函数示例，可以有多个
+ * @example description
+ * // return x
+ * methodName(args)
+ */
+ 
+/**
+ * 描述函数
+ * @callback 使用后下面参数描述回调函数参数
+ * @param {type} name=default - description
+ * @param {(type1|type2|*)} [name.param] - description
+ * @param {...type} [name[].param] - description
+ * @returns {type} description
+ */
+ 
+/**
+ * 普通类型描述
+ * @type {type}
+ */
+ 
+/**
+ * 描述对象属性
+ * @property {type} defaults - description
+ * @property {type} defaults.param - description
+ */
 
-## usernamehw.errorlens
-
-增强异常信息显示
-
-![](https://secure2.wostatic.cn/static/x6tqmp9WNkK5NtMxesQpDC/image.png?auth_key=1675062356-ugy2qYQ6eVBuLk5PDA4S7V-0-2dfe436673030c17332a7cad7997d1f6)
-
-可以设置显示级别，和排除部分类型异常
-
-```JSON
-"errorLens.enabledDiagnosticLevels": ["warning", "error"], // 仅增强显示警告和错误
-"errorLens.excludeBySource": ["cSpell", "Grammarly", "eslint"], // 排除拼写、语法异常
 ```
 
-## Gruntfuggly.todo-tree
+## Emmet
 
-注释中写对应标签时会突出显示，并在左侧todoTree插件栏中添加索引。可以自行设置标签关键字以及颜色
+快速生成HTML结构与CSS代码块的开发工具
 
-![](https://secure2.wostatic.cn/static/eS9ZNjX1FcSVrM5HTzDAgy/image.png?auth_key=1675062356-jPajfpb1KkvyAihwLM4RG1-0-a6441f188d4f232494051eeee19369bc)
+点击查看[官方文档](https://yanxyz.github.io/emmet-docs/)或[语法速查表](https://yanxyz.github.io/emmet-docs/cheat-sheet/)
 
+语法中html标签、css属性支持缩写，可以在[官方仓库](https://github.com/emmetio/emmet/blob/master/snippets)中查看。也可以在项目根目录中创建snippets.json文件，添加或覆盖代码片段
 
+### HTML语法
 
-## WakaTime.vscode-wakatime
+- 语法支持嵌套
+- 语法不包含空格，会停止解析
+- HTML标签名无需是标准标签
+- a、img等标签生成后会有默认属性，可以手动添加覆盖默认属性
 
-记录编辑器使用时间等信息，可以生成开发统计数据。需要注册账号
+```HTML
+<!-- (>)子元素：div>span -->
+<div>
+  <span></span>
+</div>
 
-## antfu.icons-carbon
+<!-- (+)兄弟元素：div+span -->
+<div></div>
+<span></span>
 
-修改VSCode界面图标
+<!-- (^)返回上一层：div>span>a^span -->
+<!-- 上一层就是前一个标签生成后的结构中父级标签那一层 -->
+<!-- 多个^表示往上多层：^^^返回三层 -->
+<div>
+  <span>
+    <a href=""></a>
+  </span>
+  <span></span>
+</div>
 
-## file-icons.file-icons
+<!-- (*)重复：div>span*2 -->
+<div>
+  <span></span>
+  <span></span>
+</div>
 
-修改不同类型文件显示图标
+<!-- (())分组：div>(header>ul>li*2>a)+footer>p> -->
+<!-- 括号内为一组，后续的操作符相对于组而不是前一个标签 -->
+<div>
+    <header>
+        <ul>
+            <li><a href=""></a></li>
+            <li><a href=""></a></li>
+        </ul>
+    </header>
+    <footer>
+        <p></p>
+    </footer>
+</div>
 
-## donjayamanne.githistory
+<!-- (#)(.)([attr=xxx])属性操作符，同CSS选择器：div#header+div.page+div[attr1=1 attr2='a b']#footer.class1.class2 -->
+<!-- 自定义属性均会转换为字符串 -->
+<!-- 没有空格的自定义属性可以不写引号 -->
+<div id="header"></div>
+<div class="page"></div>
+<div attr1='1' attr2='a b' id="footer" class="class1 class2"></div>
 
-## eamodio.gitlens
+<!-- ($)编号：ul>li.$@--$$@10-$@-20*2 -->
+<!-- 单个$即递增，多个连续$为生成前导0 -->
+<!-- 可以放在元素名、属性名、属性值中 -->
+<!-- (@)改变编号方向及起点，需要跟在$后 -->
+<!-- 不写@即升序，@-即降序 -->
+<!-- @或@-后跟数字即定义起点，@-10即倒序生成，最后一个为10 -->
+<ul>
+  <li class="2-10-21"></li>
+  <li class="1-11-20"></li>
+</ul>
 
-## eamodio.gitlens
+<!-- ({})添加文本： a{Click me}-->
+<!-- 使用a>{xxx}也能达到相同的效果，但需要注意其他嵌套 -->
+<a href="">Click me</a>
 
-上面三个均为添加git辅助功能
+<!-- 隐式标签名：Emmet尝试读取上下文并生成对应的标签 -->
+<!-- ul、ol内生成li -->
+<!-- table、tbody、thead、tfoot内生成 tr-->
+<!-- tr内生成td -->
+<!-- select、optgroup内生成option -->
+<!--
+.wrap>.content            = div.wrap>div.content
+em>.info                  = em>span.info
+ul>.item*3                = ul>li.item*3
+table>#row$*4>[colspan=2] = table>tr#row$*4>td[colspan=2]
+-->
 
-## dbaeumer.vscode-eslint
+<!-- (lorem)生成mock字符串： p*2>lorem -->
+<!-- 默认生成30个单词长的字符串，可以手动指定长度：lorem100 -->
+<p>30个单词...</p>
+<p>...</p>
 
-## esbenp.prettier-vscode
+```
 
-eslint+prettier，语法检查+格式化
+### CSS语法
 
-## lokalise.i18n-ally
+目前的趋势是浏览器在实现新属性时不再使用厂商前缀，而是通过特性开关来启用。这样可以避免厂商前缀带来混乱。
 
-国际化插件
+```CSS
+/** (缩写)缩写生成：提供的CSS片段可以在上方速查表中查看，Emmet提供了模糊查找功能 */
+/** ov会生成： */
+overflow: hidden;
 
-## antfu.iconify
+/** (-缩写)自动添加厂商前缀 */
+/**
+也可以显示添加部分厂商前缀：-wm-bdrs
+w:webkit
+m:moz
+s:ms
+o:o
+*/
+/** -bdrs会生成： */
+-webkit-border-radius: ;
+-moz-border-radius: ;
+border-radius: ;
 
-iconify标签直接显示为对应图标
+/** 生成渐变 */
+/** lg(left, #fc0 30%, red) */
+background-image: -webkit-gradient(linear, 0 0, 100% 0, color-stop(0.3, #fc0), to(red));
+background-image: -webkit-linear-gradient(left, #fc0 30%, red);
+background-image: -moz-linear-gradient(left, #fc0 30%, red);
+background-image: -o-linear-gradient(left, #fc0 30%, red);
+background-image: linear-gradient(left, #fc0 30%, red);
 
-## richie5um2.vscode-sort-json
-
-## unional.vscode-sort-package-json
-
-排序json与排序package.json，package.json有自己推荐的顺序
-
-通过`ctrl + shift + p`调出命令窗口并输入命令执行
-
-## 其他Vetur、Volar、Less、Sass等根据需要，大多数需求都有对应的插件
+```

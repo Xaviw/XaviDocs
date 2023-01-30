@@ -7,7 +7,7 @@ export default defineConfig({
   description: '个人前端技术文档',
   base: '/XaviDocs/',
   lastUpdated: true,
-  outDir: '/dist',
+  // outDir: '/dist',
   themeConfig: {
     // logo: '/xavi-logo.svg',
     // siteTitle:'',
@@ -19,7 +19,7 @@ export default defineConfig({
         items: [
           { text: 'VSCode设置', link: '/tools/vscode-setting' },
           { text: 'VSCode插件推荐', link: '/tools/vscode-extension' },
-          { text: '实用语法-JSDoc\Emmet', link: '/tools/jsdoc-emmet' },
+          { text: '实用语法-JSDoc、Emmet', link: '/tools/jsdoc-emmet' },
           { text: '生产力工具', link: '/tools/tools' },
         ],
       },
