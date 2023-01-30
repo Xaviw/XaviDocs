@@ -5,7 +5,7 @@ export default defineConfig({
   lang: 'zh-cmn-Hans',
   title: 'Xavi的技术文档',
   description: '个人前端技术文档',
-  // base: '/',
+  base: '/XaviDocs/',
   lastUpdated: true,
   outDir: '/dist',
   themeConfig: {
