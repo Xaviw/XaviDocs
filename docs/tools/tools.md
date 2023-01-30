@@ -14,6 +14,8 @@
 
 同国外比较出名的Notion，免费功能够用，[点击前往官网](https://www.wolai.com/)
 
+或直接通过[我的邀请链接](https://www.wolai.com/signup?invitation=366TKSP)注册
+
 类似的工具很多，例如飞书、语雀等，各有优劣，可以自行比较
 
 ## 效率工具-uTools
