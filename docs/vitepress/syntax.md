@@ -4,7 +4,7 @@ title: vitepress扩展md语法
 
 # {{$frontmatter.title}}
 
-## 目录
+## 插入目录
 
 `[[toc]]` 代表插入目录
 
@@ -29,7 +29,7 @@ title: vitepress扩展md语法
 :::
 用于定义页面基础以及样式配置，会覆盖项目基础配置（title、description 定义的是页面 head 标签中的 title 与 meta）
 
-除项目配置项外，话包括 head 配置页面 head 标签
+除项目配置项外，还包括配置页面HTML代码中的 head 标签
 
 ```md
 ---

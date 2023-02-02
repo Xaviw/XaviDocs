@@ -87,7 +87,7 @@ unional.vscode-sort-package-json
 
 ## 其他
 
-Vetur、Volar、Less、Sass、Stylelint、PostCss Language Support等根据需要，大多数需求都有对应的插件
+Vuter、Volar、Less、Sass、Stylelint、PostCss Language Support等根据需要，大多数需求都有对应的插件
 
 但不要随意安装插件，插件会占用较多的内存。另外部分插件有重复的功能，互相影响会出现一些意想不到的情况
 
