@@ -43,7 +43,7 @@
 - 免费在线抠图：[https://www.remove.bg/zh](https://www.remove.bg/zh)
 - 在线绘图（流程图、逻辑图等）：[figjam.new](figjam.new)
 - 破解版软件：[https://foxirj.com/](https://foxirj.com/)
-- OFFICE下载工具：[https://otp.landian.vip/zh-cn/download.html](https://otp.landian.vip/zh-cn/download.html)
+- OFFICE下载工具：[https://otp.landian.vip/zh-cn/download.html](https://otp.landian.vip/zh-cn/download.html)（[windows实用工具](/tools/recommend/windows.html#办公软件-onlyoffice)中还介绍了可以平替的ONLYOFFICE）
 - 系统镜像资源：[https://third.win/](https://third.win/)
 - 临时网盘，无需注册，快速传输文件：[https://www.wenshushu.cn/](https://www.wenshushu.cn/)
 - 在线PS：[https://ps.gaoding.com/#/](https://ps.gaoding.com/#/)

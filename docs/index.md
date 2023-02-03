@@ -9,19 +9,19 @@ hero:
     - text: 开始阅读
       link: /tools/recommend/windows
 
-features:
-  - icon: 🛠️
-    title: Simple and minimal, always
-    details: Lorem ipsum...
-    link: /a
-    linkText: linkText
-  - icon:
-      src: /cool-feature-icon.svg
-    title: Another cool feature
-    details: Lorem ipsum...
-  - icon:
-      dark: /dark-feature-icon.svg
-      light: /light-feature-icon.svg
-    title: Another cool feature
-    details: Lorem ipsum...
+# features:
+#   - icon: 🛠️
+#     title: Simple and minimal, always
+#     details: Lorem ipsum...
+#     link: /a
+#     linkText: linkText
+#   - icon:
+#       src: /cool-feature-icon.svg
+#     title: Another cool feature
+#     details: Lorem ipsum...
+#   - icon:
+#       dark: /dark-feature-icon.svg
+#       light: /light-feature-icon.svg
+#     title: Another cool feature
+#     details: Lorem ipsum...
 ---

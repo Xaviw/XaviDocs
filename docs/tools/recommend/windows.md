@@ -51,6 +51,15 @@
 
 [点击前往官网](https://www.screentogif.com/)，体积小，支持录屏转GIF、APNG、MP4
 
+## 办公软件-ONLYOFFICE
+[点击前往官网](https://www.onlyoffice.com/zh/)，能够平替MS Office的开源免费办公软件
+
+- 支持下载软件或浏览器在线使用
+- 支持文档、表格、幻灯片，还扩展了项目管理系统、创建在线收集表单等功能
+- 注册账号可以使用免费的云空间，支持多人在线协作
+- 软件与在线网页均支持中文，可以在设置中修改
+- 可以集成进自身项目中，详情查看[官网介绍](https://www.onlyoffice.com/zh/developer-edition.aspx)
+
 ## Windows自带能力
 
 - 复制记录

@@ -13,6 +13,10 @@ export default defineConfig({
     // siteTitle:'',
     nav: [
       {
+        text: '前端系列',
+        link: '/frontend/uniapp/intro'
+      },
+      {
         text: '工具系列',
         link: '/tools/recommend/windows',
       },
@@ -22,6 +26,14 @@ export default defineConfig({
       },
     ],
     sidebar: {
+      '/frontend/': [
+        {
+          text: 'UniApp',
+          items: [
+            {text: 'uniapp对比原生小程序', link: '/frontend/uniapp/intro'}
+          ]
+        }
+      ],
       '/tools/': [
         {
           text: '实用工具',
@@ -45,8 +57,8 @@ export default defineConfig({
           text: 'Vitepress搭建',
           collapsible: true,
           items: [
-            { text: '起步', link: '/vitepress/start' },
-            { text: '特有md语法', link: '/vitepress/syntax' },
+            { text: '基础搭建', link: '/vitepress/start' },
+            { text: '进阶语法', link: '/vitepress/syntax' },
             { text: '常用配置', link: '/vitepress/config' },
           ],
         },
@@ -71,13 +83,13 @@ export default defineConfig({
       prev: '上一篇',
       next: '下一篇',
     },
-    algolia: {
-      appId: 'RLQAJPQZRF',
-      apiKey: '057d79f4e978afb00f30aa041ac38324',
-      indexName: 'xaviDocs',
-      placeholder: '请输入关键词',
-      buttonText: '搜索',
-    },
+    // algolia: {
+    //   appId: 'RLQAJPQZRF',
+    //   apiKey: '057d79f4e978afb00f30aa041ac38324',
+    //   indexName: 'xaviDocs',
+    //   placeholder: '请输入关键词',
+    //   buttonText: '搜索',
+    // },
   },
   markdown: {
     lineNumbers: true,
