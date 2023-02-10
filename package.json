@@ -10,7 +10,8 @@
     "docs:build": "vitepress build docs",
     "docs:dev": "vitepress dev docs",
     "docs:preview": "vitepress preview docs",
-    "docs:deploy": "bash deploy.sh"
+    "docs:deploy": "bash deploy.sh",
+    "save": "bash dailySave.sh"
   },
   "devDependencies": {
     "vitepress": "1.0.0-alpha.36",
