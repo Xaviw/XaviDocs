@@ -5,5 +5,5 @@ set -e
 
 git init
 git add -A
-git commit -m 'daily save'
+git commit -m 'daily storage'
 git push
