@@ -32,7 +32,13 @@ export default defineConfig({
           items: [
             {text: 'uniapp对比原生小程序', link: '/frontend/uniapp/intro'}
           ]
-        }
+        },
+        {
+          text: '源码系列',
+          items: [
+            {text: 'Axios', link: '/frontend/sourceCode/axios'}
+          ]
+        },
       ],
       '/tools/': [
         {
