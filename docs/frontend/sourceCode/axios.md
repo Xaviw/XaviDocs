@@ -69,7 +69,7 @@ import axios from 'axios'
 axios的一切操作始于原始类Axios(lib/core/Axios.js)，其中的逻辑比较简单：
 
 1. 将传入的配置存入实例对象的`defaults`属性中
-2. 在实例对象`interceptors`属性中初始化基础的`request`、`response`拦截器
+2. 在实例对象`interceptors`属性中初始化基础的`request`、`response`拦截器管理对象
 3. 定义核心的`request`方法
 4. 定义生成请求地址的辅助方法`getUri`
 5. 基于`request`方法生成`delete`、`get`、`head`、`options`、`post`、`put`、`patch`方法
@@ -166,4 +166,180 @@ utils.forEach(['post', 'put', 'patch'], function forEachMethodWithData(method) {
 
 **此时`contextHeaders`为默认配置中定义的属性，`headers`则为用户传入的属性**
 
-之后通过`AxiosHeaders.concat`静态方法
+之后通过`AxiosHeaders.concat`静态方法将`headers`对象标准化。lib/core/AxiosHeaders.js中的代码较多，但拆分理解每个函数的作用后就能较为容易的读懂整体流程。而且库中函数命名非常直观，**通过命名就能知道函数作用是非常重要的**
+
+```js
+// AxiosHeaders.js
+
+// 规范化header名（去掉首尾空格的全小写字符串）
+function normalizeHeader(header) {...}
+
+// 规范化header值（false、null不变，其余类型转为字符串，数组中的值递归调用格式化）
+function normalizeValue(value) {...}
+
+/*
+匹配 key = value（等号两边可以有任意空白字符，= value这部分可以不存在，value也就是undefined）格式的字符串，并将key、value存储到对象返回
+Object.create(null)创建没有原型的空对象
+https://regexr-cn.com/ 可以帮助理解、学习、测试正则表达式
+
+需要注意这里的while。常规情况下，赋值表达式会返回右边的值，匹配成功时数组作为条件会造成死循环
+但这里情况不一样，属于正则的特性之一（参考：https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/RegExp/exec#%E6%8F%8F%E8%BF%B0）
+
+循环会使用tokensRE的lastIndex属性作为条件
+首次匹配成功返回值为匹配结束字符的下标+1，也就是字符串长度+1，条件成立
+后续匹配因为下标超出文本长度，匹配失败lastIndex为0，条件不成立
+*/
+function parseTokens(str) {...}
+
+// header名是否可用
+function isValidHeaderName(str) {...}
+
+// 判断header值是否匹配filter
+function matchHeaderValue(context, value, header, filter) {...}
+
+// 规范化header名（去掉首尾空格的首字母大写字符串）
+// 注意replace使用函数替换的方法，参考https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/String/replace#%E6%8F%8F%E8%BF%B0
+function formatHeader(header) {...}
+
+// 通过Object.defineProperty向obj中添加请求头操作方法
+// 'get xxx'，'set xxx'，'has xxx'
+// 在下面的accessor静态方法中被调用时，是将AxiosHeaders类原型传入了obj
+// 所以当访问上面三个属性时，相当于调用的AxiosHeaders['get xxx']
+// this是AxiosHeaders，实际也就是执行了AxiosHeaders类中的get、set、has方法
+function buildAccessors(obj, header) {...}
+
+class AxiosHeaders {
+  // 接收header存入实例中，支持对象，字符串
+  // 通过!isValidHeaderName(header)判断字符串不是简单的命名字符串
+  // 通过parseHeaders(lib/helpers/parseHeaders.js)解析字符串，以换行\n分隔数据，每一行以冒号:分隔键值对
+  // set-cookie项存为数组，其余项键同名的以逗号拼接值存储
+  set(header, valueOrRewrite, rewrite) {...}
+}
+```
+
+### 四、处理拦截器
+
+前面提到了`Axios`类初始化时创建了基础的拦截器管理对象`new InterceptorManager()`，内部实现了简单的事件注册、注销机制，查看源码lib/core/interceptorManager.js：
+
+```js
+class InterceptorManager {
+  constructor() {
+    this.handlers = [];
+  }
+
+  // 通过use注册拦截器，也就是将拦截器加入handlers数组
+  // use方法还支持第三个参数，配置拦截器是异步还是同步执行以及执行时机
+  use(fulfilled, rejected, options) {
+    this.handlers.push({
+      fulfilled,
+      rejected,
+      synchronous: options ? options.synchronous : false,
+      runWhen: options ? options.runWhen : null
+    });
+    return this.handlers.length - 1;
+  }
+
+  // use的返回值就是拦截器的下标
+  // 通过设置为null取消拦截器
+  eject(id) {
+    if (this.handlers[id]) {
+      this.handlers[id] = null;
+    }
+  }
+
+  clear() {
+    if (this.handlers) {
+      this.handlers = [];
+    }
+  }
+
+  // 封装遍历方法，跳过被删除的拦截器
+  forEach(fn) {
+    utils.forEach(this.handlers, function forEachHandler(h) {
+      if (h !== null) {
+        fn(h);
+      }
+    });
+  }
+}
+```
+
+回到`request`流程中：
+
+```js
+// ...
+
+// 创建请求拦截队列
+const requestInterceptorChain = [];
+// 同步标记默认true
+let synchronousRequestInterceptors = true;
+// 调用内部遍历方法，跳过已取消的拦截器
+this.interceptors.request.forEach(function unshiftRequestInterceptors(interceptor) {
+  // 有runWhen则执行，根据返回值判断该拦截器是否需要执行
+  if (typeof interceptor.runWhen === 'function' && interceptor.runWhen(config) === false) {
+    return;
+  }
+  // 只要有一个拦截器是异步的，则同步标记设为false
+  synchronousRequestInterceptors = synchronousRequestInterceptors && interceptor.synchronous;
+  // 向请求拦截队列队首添加拦截器
+  requestInterceptorChain.unshift(interceptor.fulfilled, interceptor.rejected);
+});
+
+// 创建响应拦截队列
+const responseInterceptorChain = [];
+this.interceptors.response.forEach(function pushResponseInterceptors(interceptor) {
+  // 向响应拦截队列队首添加拦截器
+  responseInterceptorChain.push(interceptor.fulfilled, interceptor.rejected);
+});
+
+let promise;
+let i = 0;
+let len;
+
+if (!synchronousRequestInterceptors) {
+  const chain = [dispatchRequest.bind(this), undefined];
+  chain.unshift.apply(chain, requestInterceptorChain);
+  chain.push.apply(chain, responseInterceptorChain);
+  len = chain.length;
+
+  promise = Promise.resolve(config);
+
+  while (i < len) {
+    promise = promise.then(chain[i++], chain[i++]);
+  }
+
+  return promise;
+}
+
+len = requestInterceptorChain.length;
+
+let newConfig = config;
+
+i = 0;
+
+while (i < len) {
+  const onFulfilled = requestInterceptorChain[i++];
+  const onRejected = requestInterceptorChain[i++];
+  try {
+    newConfig = onFulfilled(newConfig);
+  } catch (error) {
+    onRejected.call(this, error);
+    break;
+  }
+}
+
+try {
+  promise = dispatchRequest.call(this, newConfig);
+} catch (error) {
+  return Promise.reject(error);
+}
+
+i = 0;
+len = responseInterceptorChain.length;
+
+while (i < len) {
+  promise = promise.then(responseInterceptorChain[i++], responseInterceptorChain[i++]);
+}
+
+return promise;
+```
