@@ -201,11 +201,11 @@ function matchHeaderValue(context, value, header, filter) {...}
 // 注意replace使用函数替换的方法，参考https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/String/replace#%E6%8F%8F%E8%BF%B0
 function formatHeader(header) {...}
 
-// 通过Object.defineProperty向obj中添加请求头操作方法
-// 'get xxx'，'set xxx'，'has xxx'
-// 在下面的accessor静态方法中被调用时，是将AxiosHeaders类原型传入了obj
-// 所以当访问上面三个属性时，相当于调用的AxiosHeaders['get xxx']
-// this是AxiosHeaders，实际也就是执行了AxiosHeaders类中的get、set、has方法
+// utils.toCamelCase(' ' + header)中的空格是因为toCamelCase内部以空格匹配单词分隔
+// 通过Object.defineProperty向obj中添加请求头操作方法：getCamelCase，setCamelCase，hasCamelCase
+// 在AxiosHeaders类中的静态方法accessor中被调用时，是将AxiosHeaders类原型作为obj传入
+// 所以当访问上面三个属性时，相当于调用的AxiosHeaders.getCamelCase，this是AxiosHeaders
+// 所以代码中的 this[methodName].call 实际也是执行了AxiosHeaders类中的get、set、has方法
 function buildAccessors(obj, header) {...}
 
 class AxiosHeaders {
@@ -279,16 +279,16 @@ this.interceptors.request.forEach(function unshiftRequestInterceptors(intercepto
   if (typeof interceptor.runWhen === 'function' && interceptor.runWhen(config) === false) {
     return;
   }
-  // 只要有一个拦截器是异步的，则同步标记设为false
+  // 只要有一个拦截器是异步的(默认异步)，则同步标记设为false
   synchronousRequestInterceptors = synchronousRequestInterceptors && interceptor.synchronous;
-  // 向请求拦截队列队首添加拦截器
+  // 向请求拦截队列队首添加拦截器，也就是说请求拦截器是按添加顺序反向执行的，后添加的先执行
   requestInterceptorChain.unshift(interceptor.fulfilled, interceptor.rejected);
 });
 
 // 创建响应拦截队列
 const responseInterceptorChain = [];
 this.interceptors.response.forEach(function pushResponseInterceptors(interceptor) {
-  // 向响应拦截队列队首添加拦截器
+  // 向响应拦截队列队首添加拦截器，响应拦截器按添加顺序执行
   responseInterceptorChain.push(interceptor.fulfilled, interceptor.rejected);
 });
 
@@ -296,27 +296,31 @@ let promise;
 let i = 0;
 let len;
 
+// 如果存在异步拦截器（默认情况）
 if (!synchronousRequestInterceptors) {
+  // 创建 调度请求 方法，后补undefined是为了长度为2，与拦截器[request,reject]对齐
   const chain = [dispatchRequest.bind(this), undefined];
+  // 将请求拦截器添加至队首
   chain.unshift.apply(chain, requestInterceptorChain);
+  // 将响应拦截器添加至队尾
   chain.push.apply(chain, responseInterceptorChain);
   len = chain.length;
-
+  // 将config作为promise链的参数，这也是为什么请求拦截器中每一次都需要return config
   promise = Promise.resolve(config);
-
+  // 遍历执行整个队列，通过promise链式调用（按顺序执行，不是异步字面意思的异步执行）
+  // 执行顺序：请求拦截器 -> 请求 -> 响应拦截器
+  // 链式调用中的错误能通过后面注册的reject方法修正，也就是不会出错后立马终止请求，
   while (i < len) {
     promise = promise.then(chain[i++], chain[i++]);
   }
-
+  // 返回请求结果promise
   return promise;
 }
-
+// 后续代码为不存在异步拦截器的情况，相当于省略了else（每一个请求拦截器都设置了synchronous:true）
 len = requestInterceptorChain.length;
-
 let newConfig = config;
-
 i = 0;
-
+// 遍历执行请求拦截器，并更新config
 while (i < len) {
   const onFulfilled = requestInterceptorChain[i++];
   const onRejected = requestInterceptorChain[i++];
@@ -324,22 +328,346 @@ while (i < len) {
     newConfig = onFulfilled(newConfig);
   } catch (error) {
     onRejected.call(this, error);
+    // 同步请求拦截器中的错误，会直接终止请求
     break;
   }
 }
-
+// 请求拦截器执行完成后执行调度请求
 try {
   promise = dispatchRequest.call(this, newConfig);
 } catch (error) {
   return Promise.reject(error);
 }
-
+// 遍历执行响应拦截器
 i = 0;
 len = responseInterceptorChain.length;
-
 while (i < len) {
   promise = promise.then(responseInterceptorChain[i++], responseInterceptorChain[i++]);
 }
-
+// 返回最终结果promise
 return promise;
+```
+
+> axios的链式调用模式可以作为常规的前置处理、后置处理方式
+
+上面的代码中需要着重注意下同步拦截器和异步拦截器的差异（需要理解Promise的执行逻辑）：
+
+- 异步拦截器中每一个环节的错误都可以由下一个拦截器的reject方法处理
+   
+   处理后返回的值会作为后续resolve方法的参数，所以极端情况下最后一个执行的请求拦截器出错后，因为请求方法的reject是undefined，所以会直接传递给第一个执行的响应拦截器的reject方法，这回导致实际请求被跳过，得到的结果是响应拦截器reject方法返回的（所以实际项目中往往都是层层传递错误，避免错误发生后仍resolve）
+
+- 同步拦截器中的请求拦截环节只要出错就会终止请求，后续的实际请求和响应拦截环节是通过Promise链
+
+### 五、发起请求
+
+#### 1. dispatchRequest
+
+请求链中的`dispatchRequest`（lib/core/dispatchRequest.js）是实际发起请求的方法
+
+```js
+export default function dispatchRequest(config) {
+  // 如果请求已取消，抛出错误
+  throwIfCancellationRequested(config);
+  // 得到请求头，from方法确保请求头被AxiosHeaders处理过
+  config.headers = AxiosHeaders.from(config.headers);
+
+  // 传入配置中的transformRequest转换请求参数
+  // transformData内部实现并不复杂，可以自行查看
+  config.data = transformData.call(
+    config,
+    config.transformRequest
+  );
+
+  if (['post', 'put', 'patch'].indexOf(config.method) !== -1) {
+    // setContentType源自介绍Headers中提到的buildAccessors方法
+    // 所以这里相当于执行了AxiosHeaders.set('ContentType', 'application/x-www-form-urlencoded', false)
+    config.headers.setContentType('application/x-www-form-urlencoded', false);
+  }
+  // 获取请求适配器，在下文中解读
+  const adapter = adapters.getAdapter(config.adapter || defaults.adapter);
+  // 使用适配器执行请求
+  return adapter(config).then(function onAdapterResolution(response) {
+    throwIfCancellationRequested(config);
+
+    // 调用config中的transformResponse处理响应
+    response.data = transformData.call(
+      config,
+      config.transformResponse,
+      response
+    );
+
+    response.headers = AxiosHeaders.from(response.headers);
+
+    return response;
+  }, function onAdapterRejection(reason) {
+    if (!isCancel(reason)) {
+      throwIfCancellationRequested(config);
+
+      // Transform response data
+      if (reason && reason.response) {
+        reason.response.data = transformData.call(
+          config,
+          config.transformResponse,
+          reason.response
+        );
+        reason.response.headers = AxiosHeaders.from(reason.response.headers);
+      }
+    }
+
+    return Promise.reject(reason);
+  });
+}
+```
+
+#### 2.adapters
+
+lib/adapters/adapters.js中定义了适配器的获取过程
+
+```js
+// 定义内置适配器对象
+const knownAdapters = {...}
+// 向内置适配器对象中添加name、adaptername属性，值为适配器名称
+utils.forEach(knownAdapters, (fn, value) => {...})
+
+export default {
+  getAdapter: (adapters) => {
+    // 规范化参数为数组
+    adapters = utils.isArray(adapters) ? adapters : [adapters];
+    // 结构除数组长度
+    const {length} = adapters;
+    let nameOrAdapter;
+    let adapter;
+
+    for (let i = 0; i < length; i++) {
+      nameOrAdapter = adapters[i];
+      // 当前适配器参数是字符串则从内部适配器对象中获取，否则直接使用适配器参数
+      // 赋值表达式返回值为所赋的值，所以适配器获取成功会终止循环
+      // 从内部适配器获取失败，或适配器参数异常时则会继续尝试数组中的下一项
+      if((adapter = utils.isString(nameOrAdapter) ? knownAdapters[nameOrAdapter.toLowerCase()] : nameOrAdapter)) {
+        break;
+      }
+    }
+    // 循环结束后适配器仍未获取到，抛出错误
+    if (!adapter) {...}
+    // 获取到的适配器不是函数，抛出错误
+    if (!utils.isFunction(adapter)) {...}
+
+    return adapter;
+  },
+  adapters: knownAdapters
+}
+```
+
+#### 3.xhrAdapter
+
+`httpAdapter`是`node`环境中使用的请求方法，本文不做解读，内部封装与`xhr`类似
+
+```js
+// 判断xhr是否可用
+const isXHRAdapterSupported = typeof XMLHttpRequest !== 'undefined';
+// 使用&&短路运算，当xhr不可用时xhrAdapter=false，adapters的匹配循环中会匹配失败，进而匹配下一项
+export default isXHRAdapterSupported && function (config) {
+  return new Promise(function dispatchXhrRequest(resolve, reject) {
+    let requestData = config.data;
+    const requestHeaders = AxiosHeaders.from(config.headers).normalize();
+    const responseType = config.responseType;
+    let onCanceled;
+    // 设置done方法，在请求结束后停止取消请求功能
+    function done() {
+      if (config.cancelToken) {
+        config.cancelToken.unsubscribe(onCanceled);
+      }
+
+      if (config.signal) {
+        config.signal.removeEventListener('abort', onCanceled);
+      }
+    }
+
+    if (utils.isFormData(requestData) && (platform.isStandardBrowserEnv || platform.isStandardBrowserWebWorkerEnv)) {
+      requestHeaders.setContentType(false); // Let the browser set it
+    }
+
+    let request = new XMLHttpRequest();
+
+    // HTTP basic authentication
+    if (config.auth) {
+      const username = config.auth.username || '';
+      const password = config.auth.password ? unescape(encodeURIComponent(config.auth.password)) : '';
+      requestHeaders.set('Authorization', 'Basic ' + btoa(username + ':' + password));
+    }
+
+    const fullPath = buildFullPath(config.baseURL, config.url);
+
+    request.open(config.method.toUpperCase(), buildURL(fullPath, config.params, config.paramsSerializer), true);
+
+    // Set the request timeout in MS
+    request.timeout = config.timeout;
+
+    function onloadend() {
+      if (!request) {
+        return;
+      }
+      // Prepare the response
+      const responseHeaders = AxiosHeaders.from(
+        'getAllResponseHeaders' in request && request.getAllResponseHeaders()
+      );
+      const responseData = !responseType || responseType === 'text' || responseType === 'json' ?
+        request.responseText : request.response;
+      const response = {
+        data: responseData,
+        status: request.status,
+        statusText: request.statusText,
+        headers: responseHeaders,
+        config,
+        request
+      };
+
+      settle(function _resolve(value) {
+        resolve(value);
+        done();
+      }, function _reject(err) {
+        reject(err);
+        done();
+      }, response);
+
+      // Clean up request
+      request = null;
+    }
+
+    if ('onloadend' in request) {
+      // Use onloadend if available
+      request.onloadend = onloadend;
+    } else {
+      // Listen for ready state to emulate onloadend
+      request.onreadystatechange = function handleLoad() {
+        if (!request || request.readyState !== 4) {
+          return;
+        }
+
+        // The request errored out and we didn't get a response, this will be
+        // handled by onerror instead
+        // With one exception: request that using file: protocol, most browsers
+        // will return status as 0 even though it's a successful request
+        if (request.status === 0 && !(request.responseURL && request.responseURL.indexOf('file:') === 0)) {
+          return;
+        }
+        // readystate handler is calling before onerror or ontimeout handlers,
+        // so we should call onloadend on the next 'tick'
+        setTimeout(onloadend);
+      };
+    }
+
+    // Handle browser request cancellation (as opposed to a manual cancellation)
+    request.onabort = function handleAbort() {
+      if (!request) {
+        return;
+      }
+
+      reject(new AxiosError('Request aborted', AxiosError.ECONNABORTED, config, request));
+
+      // Clean up request
+      request = null;
+    };
+
+    // Handle low level network errors
+    request.onerror = function handleError() {
+      // Real errors are hidden from us by the browser
+      // onerror should only fire if it's a network error
+      reject(new AxiosError('Network Error', AxiosError.ERR_NETWORK, config, request));
+
+      // Clean up request
+      request = null;
+    };
+
+    // Handle timeout
+    request.ontimeout = function handleTimeout() {
+      let timeoutErrorMessage = config.timeout ? 'timeout of ' + config.timeout + 'ms exceeded' : 'timeout exceeded';
+      const transitional = config.transitional || transitionalDefaults;
+      if (config.timeoutErrorMessage) {
+        timeoutErrorMessage = config.timeoutErrorMessage;
+      }
+      reject(new AxiosError(
+        timeoutErrorMessage,
+        transitional.clarifyTimeoutError ? AxiosError.ETIMEDOUT : AxiosError.ECONNABORTED,
+        config,
+        request));
+
+      // Clean up request
+      request = null;
+    };
+
+    // Add xsrf header
+    // This is only done if running in a standard browser environment.
+    // Specifically not if we're in a web worker, or react-native.
+    if (platform.isStandardBrowserEnv) {
+      // Add xsrf header
+      const xsrfValue = (config.withCredentials || isURLSameOrigin(fullPath))
+        && config.xsrfCookieName && cookies.read(config.xsrfCookieName);
+
+      if (xsrfValue) {
+        requestHeaders.set(config.xsrfHeaderName, xsrfValue);
+      }
+    }
+
+    // Remove Content-Type if data is undefined
+    requestData === undefined && requestHeaders.setContentType(null);
+
+    // Add headers to the request
+    if ('setRequestHeader' in request) {
+      utils.forEach(requestHeaders.toJSON(), function setRequestHeader(val, key) {
+        request.setRequestHeader(key, val);
+      });
+    }
+
+    // Add withCredentials to request if needed
+    if (!utils.isUndefined(config.withCredentials)) {
+      request.withCredentials = !!config.withCredentials;
+    }
+
+    // Add responseType to request if needed
+    if (responseType && responseType !== 'json') {
+      request.responseType = config.responseType;
+    }
+
+    // Handle progress if needed
+    if (typeof config.onDownloadProgress === 'function') {
+      request.addEventListener('progress', progressEventReducer(config.onDownloadProgress, true));
+    }
+
+    // Not all browsers support upload events
+    if (typeof config.onUploadProgress === 'function' && request.upload) {
+      request.upload.addEventListener('progress', progressEventReducer(config.onUploadProgress));
+    }
+
+    if (config.cancelToken || config.signal) {
+      // Handle cancellation
+      // eslint-disable-next-line func-names
+      onCanceled = cancel => {
+        if (!request) {
+          return;
+        }
+        reject(!cancel || cancel.type ? new CanceledError(null, config, request) : cancel);
+        request.abort();
+        request = null;
+      };
+
+      config.cancelToken && config.cancelToken.subscribe(onCanceled);
+      if (config.signal) {
+        config.signal.aborted ? onCanceled() : config.signal.addEventListener('abort', onCanceled);
+      }
+    }
+
+    const protocol = parseProtocol(fullPath);
+
+    if (protocol && platform.protocols.indexOf(protocol) === -1) {
+      reject(new AxiosError('Unsupported protocol ' + protocol + ':', AxiosError.ERR_BAD_REQUEST, config));
+      return;
+    }
+
+
+    // Send the request
+    request.send(requestData || null);
+  });
+}
+
 ```

@@ -70,7 +70,7 @@ export default defineConfig({
         },
       ],
     },
-    // outline: 2,
+    outline: [1, 3],
     outlineTitle: '目录',
     socialLinks: [
       { icon: 'github', link: 'https://github.com/Xaviw' },
