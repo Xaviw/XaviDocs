@@ -7,7 +7,7 @@ hero:
   tagline: 文档持续搭建中，随便逛逛吧...
   actions: 
     - text: 开始阅读
-      link: /tools/recommend/windows
+      link: /frontend/sourceCode/axios
 
 # features:
 #   - icon: 🛠️

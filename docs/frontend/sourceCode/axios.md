@@ -32,7 +32,9 @@ axios库基于核心类`Axios`，在库中默认导出了一个名为`axios`的�
 
 ### 下载
 
-**深入理解建议对照源码阅读**
+**深入理解建议对照源码以及[官方文档](https://axios-http.com/zh/docs/req_config)阅读**
+
+axios源码分支中有`0.x`，`1.x`(默认)，`2.x`，查看发版`tags`可以看到发版记录。此文章中为最新的`v1.3.3`，也就是基于的`1.x`分支中的源码
 
 ```
 git clone --depth 1 https://github.com/axios/axios.git
@@ -116,20 +118,50 @@ request(configOrUrl, config) {
 
 `transitional`无法在官方文档提供的参数中找到，但通过搜索能在`README.md 546行`中找到说明，这是一个兼容老版本的过渡选项，之后可能会被移除。其作用是定义JSON解析的规则，包括JSON解析错误是否忽略；是否强制通过JSON转换响应；是否修改请求超时抛出的错误。源码中通过`validator.assertOptions`方法检查了该参数属性是否正确
 
-`paramsSerializer`同样检查了内部属性是否正确，其作用是自定义序列化请求参数的方式，例如[官方示例](https://axios-http.com/zh/docs/req_config)中通过Qs库转换数组作为查询参数:
+<hr />
+
+`paramsSerializer`同样检查了内部属性是否正确，其作用是自定义序列化查询参数的方式，主要针对数组查询参数，例如官方文档例子中通过Qs库转换数组作为查询参数:
 
 ```js
 /**
-   get请求方式传参称为query（查询参数），传递数组时有几种不同的转换形式
+   get请求方式传参称为query（查询参数），对应axios中的params，传递数组时有几种不同的转换形式
    例如axios.get('xxx',{arr:[1,2]})时，不同的arrayFormat对应生成的参数为：
-   indices：arr[0]=1&arr[1]=2
-   brackets：arr[]=1&arr[]=2
-   repeat：arr=1&arr=2
+   indices -> xxx?arr[0]=1&arr[1]=2
+   brackets -> xxx?arr[]=1&arr[]=2
+   repeat -> xxx?arr=1&arr=2
  */
   paramsSerializer: function (params) {
     return Qs.stringify(params, {arrayFormat: 'brackets'})
   },
 ```
+
+细心点可以看出`Axios`类源码中校验`paramsSerializer`的格式为一个包含`encode`和`serialize`属性的对象，不同于官方文档中的一个函数。这里确实是官方文档与源码版本的不同步，可以在源码中的`README.md`中看到当前版本的正确文档。
+
+`v1.3.3`中正确的`paramsSerializer`配置应该为：
+
+```js
+{
+  paramsSerializer: {
+    // 此处为源码中默认的encode，一般不用传递，直接使用默认的
+    // encode仅在未配置serialize，且传递的params不是URLSearchParams类型的对象才会执行
+    encode: function encode(val) {
+      return encodeURIComponent(val).
+        replace(/%3A/gi, ':').
+        replace(/%24/g, '$').
+        replace(/%2C/gi, ',').
+        replace(/%20/g, '+').
+        replace(/%5B/gi, '[').
+        replace(/%5D/gi, ']');
+    },
+    // 接收params并处理，若手动处理需要注意params可能是URLSearchParams类型对象，在Qs库中已处理
+    serialize: function (params, options) {
+      return Qs.stringify(params, {arrayFormat: 'brackets'})
+    }
+  }
+}
+```
+
+在`axios 2.x`中此属性已简化为`{indexes: xxx}`，默认`null`对应`arrayFormat`值的`repeat`，`false`对应`brackets`，`true`对应`indices`
 
 ### 三、计算headers
 
@@ -228,7 +260,7 @@ class InterceptorManager {
   }
 
   // 通过use注册拦截器，也就是将拦截器加入handlers数组
-  // use方法还支持第三个参数，配置拦截器是异步还是同步执行以及执行时机
+  // use方法还支持官方文档中未提到的第三个参数，配置拦截器是异步还是同步执行以及执行时机
   use(fulfilled, rejected, options) {
     this.handlers.push({
       fulfilled,
@@ -460,12 +492,22 @@ export default {
 
 #### 3.xhrAdapter
 
-`httpAdapter`是`node`环境中使用的请求方法，本文不做解读，内部封装与`xhr`类似
+`httpAdapter`是`node`环境中使用的请求方法，本文不做解读，内部封装与`xhr`类似。阅读之前需要先熟悉`XMLHttpRequest`，推荐阅读[现代JavaScript教程](https://zh.javascript.info/xmlhttprequest)中的文章
+
+代码中有用到`platform.isStandardBrowserEnv`，跳转源码可会发现`platform`只导出了`node`目录，又是怎么调用`browser`目录下api的呢。这里需要了解`packages.json`中的`browser`字段
+
+前文介绍了`main`字段定义了整个包的入口文件，除此之外还有两个跟入口有关的字段：
+
+- `module`字段定义包ESM规范入口文件，browser环境与node环境均可使用
+
+- `browser`字段定义browser环境下的import路径对应的实际文件
+
+因为axios在浏览器与服务端均可使用，所以`platform`默认导出node文件，再通过browser属性在浏览器环境下将导入修改为browser文件
 
 ```js
 // 判断xhr是否可用
 const isXHRAdapterSupported = typeof XMLHttpRequest !== 'undefined';
-// 使用&&短路运算，当xhr不可用时xhrAdapter=false，adapters的匹配循环中会匹配失败，进而匹配下一项
+// 使用&&短路运算，当xhr不可用时前文的xhrAdapter=false，adapters的匹配循环中会匹配失败，进而匹配下一项
 export default isXHRAdapterSupported && function (config) {
   return new Promise(function dispatchXhrRequest(resolve, reject) {
     let requestData = config.data;
@@ -482,27 +524,29 @@ export default isXHRAdapterSupported && function (config) {
         config.signal.removeEventListener('abort', onCanceled);
       }
     }
-
+    // 请求参数是FormData格式且为浏览器环境时，取消ContentType设置（浏览器会自动识别参数添加ContentType为JSON或FormData）
     if (utils.isFormData(requestData) && (platform.isStandardBrowserEnv || platform.isStandardBrowserWebWorkerEnv)) {
-      requestHeaders.setContentType(false); // Let the browser set it
+      requestHeaders.setContentType(false);
     }
 
     let request = new XMLHttpRequest();
 
-    // HTTP basic authentication
+    // 后端鉴权参数，可以测试时使用（需要服务端鉴权规则符合下面代码的标准）
     if (config.auth) {
       const username = config.auth.username || '';
+      // unescape为JS自带解码API，现已废弃，推荐使用decodeURI或decodeURIComponent替代
+      // 将URI中的特殊字符转码\解码
       const password = config.auth.password ? unescape(encodeURIComponent(config.auth.password)) : '';
+      // btoa是浏览器自带转base64 api，atob则能解码base64
       requestHeaders.set('Authorization', 'Basic ' + btoa(username + ':' + password));
     }
-
+    // 构建完整请求地址
     const fullPath = buildFullPath(config.baseURL, config.url);
-
+    // 建立XHR请求，buildURL构建包括查询参数的完整链接
     request.open(config.method.toUpperCase(), buildURL(fullPath, config.params, config.paramsSerializer), true);
-
-    // Set the request timeout in MS
+    // 设置超时时间，axios中默认为0，永不超时
     request.timeout = config.timeout;
-
+    // 无论请求是否成功均会触发XHR loadend事件
     function onloadend() {
       if (!request) {
         return;
@@ -671,3 +715,13 @@ export default isXHRAdapterSupported && function (config) {
 }
 
 ```
+
+## 总结
+
+读完Axios源码，除了能理解这个经典请求库的执行逻辑之外，还能从中学到不少技巧：
+
+- 灵活使用短路运算符、三目运算符等语法
+- 参数需要严格判断类型，处理边界情况，并设置兜底的值，避免意外的错误
+- 变量名需要见名知意，axios中甚至作为参数的函数都使用了具名函数
+- 通过函数式编程复用逻辑、优化代码易读性
+- 官方文档也有可能更新不及时甚至出错，遇到问题可以尝试从源码中找答案

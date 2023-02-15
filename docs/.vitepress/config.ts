@@ -14,7 +14,7 @@ export default defineConfig({
     nav: [
       {
         text: '前端系列',
-        link: '/frontend/uniapp/intro'
+        link: '/frontend/sourceCode/axios',
       },
       {
         text: '工具系列',
@@ -28,16 +28,12 @@ export default defineConfig({
     sidebar: {
       '/frontend/': [
         {
-          text: 'UniApp',
-          items: [
-            {text: 'uniapp对比原生小程序', link: '/frontend/uniapp/intro'}
-          ]
+          text: '源码系列',
+          items: [{ text: 'Axios', link: '/frontend/sourceCode/axios' }],
         },
         {
-          text: '源码系列',
-          items: [
-            {text: 'Axios', link: '/frontend/sourceCode/axios'}
-          ]
+          text: 'UniApp',
+          items: [{ text: 'uniapp对比原生小程序', link: '/frontend/uniapp/intro' }],
         },
       ],
       '/tools/': [

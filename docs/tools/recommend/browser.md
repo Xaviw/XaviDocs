@@ -44,7 +44,10 @@
 - 在线绘图（流程图、逻辑图等）：[figjam.new](figjam.new)
 - 破解版软件：[https://foxirj.com/](https://foxirj.com/)
 - OFFICE下载工具：[https://otp.landian.vip/zh-cn/download.html](https://otp.landian.vip/zh-cn/download.html)（[windows实用工具](/tools/recommend/windows.html#办公软件-onlyoffice)中还介绍了可以平替的ONLYOFFICE）
-- 系统镜像资源：[https://third.win/](https://third.win/)
+- 系统镜像资源：
+  - 第三方优化定制系统[https://windsys.win/works](https://windsys.win/works)
+  - 第三方优化定制系统[https://third.win/](https://third.win/)
+  - 最新原版系统[https://latest10.win/](https://latest10.win/)
 - 临时网盘，无需注册，快速传输文件：[https://www.wenshushu.cn/](https://www.wenshushu.cn/)
 - 在线PS：[https://ps.gaoding.com/#/](https://ps.gaoding.com/#/)
 - 地图可视化工具：[http://datav.aliyun.com/portal/school/atlas/area_selector](http://datav.aliyun.com/portal/school/atlas/area_selector)
