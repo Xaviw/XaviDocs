@@ -116,7 +116,7 @@ request(configOrUrl, config) {
 
 得到实际参数后，解构出了`transitional, paramsSerializer, headers`
 
-`transitional`无法在官方文档提供的参数中找到，但通过搜索能在`README.md 546行`中找到说明，这是一个兼容老版本的过渡选项，之后可能会被移除。其作用是定义JSON解析的规则，包括JSON解析错误是否忽略；是否强制通过JSON转换响应；是否修改请求超时抛出的错误。源码中通过`validator.assertOptions`方法检查了该参数属性是否正确
+`transitional`无法在官方文档提供的参数中找到，但通过搜索能在 `README.md` 546行中找到说明，这是一个兼容老版本的过渡选项，之后可能会被移除。其作用是定义JSON解析的规则，包括JSON解析错误是否忽略；是否强制通过JSON转换响应；是否修改请求超时抛出的错误。源码中通过`validator.assertOptions`方法检查了该参数属性是否正确
 
 <hr />
 
@@ -546,17 +546,101 @@ export default isXHRAdapterSupported && function (config) {
     request.open(config.method.toUpperCase(), buildURL(fullPath, config.params, config.paramsSerializer), true);
     // 设置超时时间，axios中默认为0，永不超时
     request.timeout = config.timeout;
+
+    // 下面的代码调整了书写顺序，方便理解
+
+    // Remove Content-Type if data is undefined
+    requestData === undefined && requestHeaders.setContentType(null);
+
+    // 将config中的请求头添加到xhr对象
+    if ('setRequestHeader' in request) {
+      utils.forEach(requestHeaders.toJSON(), function setRequestHeader(val, key) {
+        request.setRequestHeader(key, val);
+      });
+    }
+
+    // 根据配置添加withCredentials
+    if (!utils.isUndefined(config.withCredentials)) {
+      request.withCredentials = !!config.withCredentials;
+    }
+
+    // 设置responseType
+    if (responseType && responseType !== 'json') {
+      request.responseType = config.responseType;
+    }
+
+    // 处理响应进度
+    if (typeof config.onDownloadProgress === 'function') {
+      request.addEventListener('progress', progressEventReducer(config.onDownloadProgress, true));
+    }
+
+    // 处理上传进度（判断兼容性）
+    if (typeof config.onUploadProgress === 'function' && request.upload) {
+      request.upload.addEventListener('progress', progressEventReducer(config.onUploadProgress));
+    }
+
+    // axios支持cancelToken(基于xhr.abort)，与signal(基于AbortController API)两种取消请求方式
+    // cancelToken现已弃用，不推荐使用，查看文档https://axios-http.com/zh/docs/cancellation
+    if (config.cancelToken || config.signal) {
+      // 两种方式通用的请求处理方法
+      onCanceled = cancel => {
+      // 请求不存在，证明请求已被处理过（处理事件结尾会设置request = null，包括出错、超时、已取消或onloadend已执行）
+        if (!request) { return; }
+        reject(!cancel || cancel.type ? new CanceledError(null, config, request) : cancel);
+        request.abort();
+        request = null;
+      };
+      // cancelToken基于发布订阅模式，后文会简答介绍
+      config.cancelToken && config.cancelToken.subscribe(onCanceled);
+      if (config.signal) {
+        // 判断取消是否已执行，执行取消或开始监听取消
+        config.signal.aborted ? onCanceled() : config.signal.addEventListener('abort', onCanceled);
+      }
+    }
+    // 正则获取请求协议，推荐使用上文介绍的正则分析工具理解内部实现
+    const protocol = parseProtocol(fullPath);
+    // 如果当前环境不支持此协议，返回错误
+    if (protocol && platform.protocols.indexOf(protocol) === -1) {
+      reject(new AxiosError('Unsupported protocol ' + protocol + ':', AxiosError.ERR_BAD_REQUEST, config));
+      return;
+    }
+    // 发送请求
+    request.send(requestData || null);
+
+    if ('onloadend' in request) {
+      // 如果onloadend可用，注册回调
+      request.onloadend = onloadend;
+    } else {
+      // onloadend不可用，监听状态
+      request.onreadystatechange = function handleLoad() {
+        if (!request || request.readyState !== 4) {
+          return;
+        }
+
+        // 此处处理readyState等于4，但status仍是0的情况
+        // 部分浏览器可能会因为使用了file协议而出现这种情况，即使请求是成功的
+        // 下面判断的是非file协议导致这种情况则return，因为file协议导致的情况下请求是成功的，可以继续执行
+        if (request.status === 0 && !(request.responseURL && request.responseURL.indexOf('file:') === 0)) {
+          return;
+        }
+        // readystate处理在onerror与ontimeout之前
+        // 所以推迟一轮事件循环，让onerror、ontimeout能被触发，之后再决定如何处理响应
+        setTimeout(onloadend);
+      };
+    }
     // 无论请求是否成功均会触发XHR loadend事件
     function onloadend() {
-      if (!request) {
-        return;
-      }
-      // Prepare the response
+      // 请求不存在，证明请求已被处理过（处理事件结尾会设置request = null，包括出错、超时、已取消或onloadend已执行）
+      if (!request) { return; }
+      // getAllResponseHeaders是xhr自带api，返回所有响应头
       const responseHeaders = AxiosHeaders.from(
         'getAllResponseHeaders' in request && request.getAllResponseHeaders()
       );
+      // 请求config中未设置responseType或者设置为text、json取responseText
+      // 其他情况取response，根据responseType可能返回ArrayBuffer、Blob、Document、Object或字符串
       const responseData = !responseType || responseType === 'text' || responseType === 'json' ?
         request.responseText : request.response;
+      // 整理需要返回的数据
       const response = {
         data: responseData,
         status: request.status,
@@ -565,7 +649,9 @@ export default isXHRAdapterSupported && function (config) {
         config,
         request
       };
-
+      // settle内部判断了validateStatus参数，来决定请求是resolve还是reject
+      // settle中的!response.status条件，对应上文中的file协议成功但status仍未0的情况（因为其余异常情况均已处理，会终止请求）
+      // 处理完成后执行done，删除“取消”监听
       settle(function _resolve(value) {
         resolve(value);
         done();
@@ -573,148 +659,150 @@ export default isXHRAdapterSupported && function (config) {
         reject(err);
         done();
       }, response);
-
-      // Clean up request
+      // 处理完成后删除request
       request = null;
     }
 
-    if ('onloadend' in request) {
-      // Use onloadend if available
-      request.onloadend = onloadend;
-    } else {
-      // Listen for ready state to emulate onloadend
-      request.onreadystatechange = function handleLoad() {
-        if (!request || request.readyState !== 4) {
-          return;
-        }
+    // 此处省略取消请求处理、网络错误处理、超时处理、xsrf设置...
+  });
+}
+```
 
-        // The request errored out and we didn't get a response, this will be
-        // handled by onerror instead
-        // With one exception: request that using file: protocol, most browsers
-        // will return status as 0 even though it's a successful request
-        if (request.status === 0 && !(request.responseURL && request.responseURL.indexOf('file:') === 0)) {
-          return;
-        }
-        // readystate handler is calling before onerror or ontimeout handlers,
-        // so we should call onloadend on the next 'tick'
-        setTimeout(onloadend);
-      };
+### 六、取消请求
+
+推荐使用的`AbortController`是较新的浏览器原生API，可以在[MDN](https://developer.mozilla.org/zh-CN/docs/Web/API/AbortController)中详细了解，使用方法官网中也给出了详细例子，这里不再讲解
+
+已弃用的`CancelToken`不再推荐使用，但其内部lib/cancel/CancelToken.js的实现方式仍值得学习。该API使用方式为：
+
+```js
+const CancelToken = axios.CancelToken;
+const source = CancelToken.source();
+
+axios.get('xxx', { cancelToken: source.token })
+
+source.cancel('取消原因');
+```
+
+核心逻辑中的调用方式为：
+
+```js
+// 订阅取消监听
+config.cancelToken.subscribe(onCanceled)
+// 退订取消监听
+config.cancelToken.unsubscribe(onCanceled);
+```
+
+从订阅、退订就能看出来这是典型的发布订阅模式，下面来看看源码中是如何实现的：
+
+```js
+class CancelToken {
+  constructor(executor) {
+    if (typeof executor !== 'function') {
+      throw new TypeError('executor must be a function.');
     }
+    // 创建用于取消的执行方法
+    let resolvePromise;
+    this.promise = new Promise(function promiseExecutor(resolve) {
+      resolvePromise = resolve;
+    });
+    // 所以cancelToken.subscribe也就是相当于this.subscribe
+    const token = this;
 
-    // Handle browser request cancellation (as opposed to a manual cancellation)
-    request.onabort = function handleAbort() {
-      if (!request) {
+    this.promise.then(cancel => {
+      // cancel参数也就是取消原因
+      if (!token._listeners) return;
+      let i = token._listeners.length;
+      while (i-- > 0) {
+        // 遍历监听中事件并依次执行取消
+        token._listeners[i](cancel);
+      }
+      // 执行完毕后清空监听
+      token._listeners = null;
+    });
+    // 取消方法执行后再执行
+    this.promise.then = onfulfilled => {
+      let _resolve;
+      const promise = new Promise(resolve => {
+        token.subscribe(resolve);
+        _resolve = resolve;
+      }).then(onfulfilled);
+
+      promise.cancel = function reject() {
+        token.unsubscribe(_resolve);
+      };
+      // 此处的作用是让cancel支持链式调用
+      // 例如：cancel('取消原因').then(xxx)
+      return promise;
+    };
+
+    executor(function cancel(message, config, request) {
+      if (token.reason) {
+        // Cancellation has already been requested
         return;
       }
 
-      reject(new AxiosError('Request aborted', AxiosError.ECONNABORTED, config, request));
+      token.reason = new CanceledError(message, config, request);
+      resolvePromise(token.reason);
+    });
+  }
 
-      // Clean up request
-      request = null;
-    };
-
-    // Handle low level network errors
-    request.onerror = function handleError() {
-      // Real errors are hidden from us by the browser
-      // onerror should only fire if it's a network error
-      reject(new AxiosError('Network Error', AxiosError.ERR_NETWORK, config, request));
-
-      // Clean up request
-      request = null;
-    };
-
-    // Handle timeout
-    request.ontimeout = function handleTimeout() {
-      let timeoutErrorMessage = config.timeout ? 'timeout of ' + config.timeout + 'ms exceeded' : 'timeout exceeded';
-      const transitional = config.transitional || transitionalDefaults;
-      if (config.timeoutErrorMessage) {
-        timeoutErrorMessage = config.timeoutErrorMessage;
-      }
-      reject(new AxiosError(
-        timeoutErrorMessage,
-        transitional.clarifyTimeoutError ? AxiosError.ETIMEDOUT : AxiosError.ECONNABORTED,
-        config,
-        request));
-
-      // Clean up request
-      request = null;
-    };
-
-    // Add xsrf header
-    // This is only done if running in a standard browser environment.
-    // Specifically not if we're in a web worker, or react-native.
-    if (platform.isStandardBrowserEnv) {
-      // Add xsrf header
-      const xsrfValue = (config.withCredentials || isURLSameOrigin(fullPath))
-        && config.xsrfCookieName && cookies.read(config.xsrfCookieName);
-
-      if (xsrfValue) {
-        requestHeaders.set(config.xsrfHeaderName, xsrfValue);
-      }
+  /**
+   * Throws a `CanceledError` if cancellation has been requested.
+   */
+  throwIfRequested() {
+    if (this.reason) {
+      throw this.reason;
     }
+  }
 
-    // Remove Content-Type if data is undefined
-    requestData === undefined && requestHeaders.setContentType(null);
+  /**
+   * Subscribe to the cancel signal
+   */
 
-    // Add headers to the request
-    if ('setRequestHeader' in request) {
-      utils.forEach(requestHeaders.toJSON(), function setRequestHeader(val, key) {
-        request.setRequestHeader(key, val);
-      });
-    }
-
-    // Add withCredentials to request if needed
-    if (!utils.isUndefined(config.withCredentials)) {
-      request.withCredentials = !!config.withCredentials;
-    }
-
-    // Add responseType to request if needed
-    if (responseType && responseType !== 'json') {
-      request.responseType = config.responseType;
-    }
-
-    // Handle progress if needed
-    if (typeof config.onDownloadProgress === 'function') {
-      request.addEventListener('progress', progressEventReducer(config.onDownloadProgress, true));
-    }
-
-    // Not all browsers support upload events
-    if (typeof config.onUploadProgress === 'function' && request.upload) {
-      request.upload.addEventListener('progress', progressEventReducer(config.onUploadProgress));
-    }
-
-    if (config.cancelToken || config.signal) {
-      // Handle cancellation
-      // eslint-disable-next-line func-names
-      onCanceled = cancel => {
-        if (!request) {
-          return;
-        }
-        reject(!cancel || cancel.type ? new CanceledError(null, config, request) : cancel);
-        request.abort();
-        request = null;
-      };
-
-      config.cancelToken && config.cancelToken.subscribe(onCanceled);
-      if (config.signal) {
-        config.signal.aborted ? onCanceled() : config.signal.addEventListener('abort', onCanceled);
-      }
-    }
-
-    const protocol = parseProtocol(fullPath);
-
-    if (protocol && platform.protocols.indexOf(protocol) === -1) {
-      reject(new AxiosError('Unsupported protocol ' + protocol + ':', AxiosError.ERR_BAD_REQUEST, config));
+  subscribe(listener) {
+    if (this.reason) {
+      listener(this.reason);
       return;
     }
 
+    if (this._listeners) {
+      this._listeners.push(listener);
+    } else {
+      this._listeners = [listener];
+    }
+  }
 
-    // Send the request
-    request.send(requestData || null);
-  });
+  /**
+   * Unsubscribe from the cancel signal
+   */
+
+  unsubscribe(listener) {
+    if (!this._listeners) {
+      return;
+    }
+    const index = this._listeners.indexOf(listener);
+    if (index !== -1) {
+      this._listeners.splice(index, 1);
+    }
+  }
+
+  /**
+   * Returns an object that contains a new `CancelToken` and a function that, when called,
+   * cancels the `CancelToken`.
+   */
+  static source() {
+    let cancel;
+    const token = new CancelToken(function executor(c) {
+      cancel = c;
+    });
+    return {
+      token,
+      cancel
+    };
+  }
 }
-
 ```
+
 
 ## 总结
 
