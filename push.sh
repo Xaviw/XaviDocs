@@ -5,5 +5,5 @@ set -e
 
 git init
 git add -A
-git commit -m 'daily storage'
+git commit -m 'script save'
 git push

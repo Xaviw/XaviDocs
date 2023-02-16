@@ -10,21 +10,21 @@ axios库基于核心类`Axios`，在库中默认导出了一个名为`axios`的�
 
 基础API有：
 
-1. instance.defaults
+1. **instance.defaults**
    
    设置实例的基础参数，与初始化实例时的defaultConfig合并，作为该实例的参数
 
-2. instance.interceptors
+2. **instance.interceptors**
    
    配置实例拦截器
 
-3. instance(config)
+3. **instance(config)**
    
    发起请求的核心API，`.request`，`.get`等方法都是基于此核心方法
 
    传入的config会与实例参数再次合并，作为实际请求参数
 
-4. instance.create(config)
+4. **instance.create(config)**
    
    基于当前实例对象创建新的实例对象，config与当前实例参数合并作为新实例的参数
 
@@ -32,9 +32,9 @@ axios库基于核心类`Axios`，在库中默认导出了一个名为`axios`的�
 
 ### 下载
 
-**深入理解建议对照源码以及[官方文档](https://axios-http.com/zh/docs/req_config)阅读**
+**深入理解建议对照源码以及官方文档阅读**
 
-axios源码分支中有`0.x`，`1.x`(默认)，`2.x`，查看发版`tags`可以看到发版记录。此文章中为最新的`v1.3.3`，也就是基于的`1.x`分支中的源码
+axios源码分支中有`0.x`，`1.x`(默认)，`2.x`，查看`tags`可以看到发版记录。此文章中为最新的`v1.3.3`，也就是基于的`1.x`分支中的源码
 
 ```
 git clone --depth 1 https://github.com/axios/axios.git
@@ -44,7 +44,7 @@ git clone --depth 1 https://github.com/axios/axios.git
 
 ### 上手
 
-安装好axios后，使用的第一步是需要导入：
+项目使用中安装好axios后，第一步是需要导入：
 
 ```js
 import axios from 'axios'
@@ -62,13 +62,13 @@ import axios from 'axios'
 
 ![源码入口](/images/frontEnd/sourceCode/axios/1.png)
 
-源码阅读中同理，需要从入口index.js文件看起。可以看到index中导入了axios并解构出API后再次统一导出，我们便可以通过快捷键跳转方法内部（VSCode默认按住alt键后单击）阅读具体的实现。常用快捷键还包括`alt + 左右方向键`切换跳转记录
+源码阅读中同理，需要从入口index.js文件看起。可以看到index中导入了`axios`并解构出API后再次统一导出，我们便可以通过快捷键跳转方法内部（VSCode默认按住alt键后单击）阅读具体的实现。常用快捷键还包括`alt + 左右方向键`切换跳转记录
 
 > 在目录index文件中统一收集方法并导出是一种实用技巧，例如工具目录utils将各类型工具子目录中的方法统一导出后，引入只需要写`import {xxx} from '@/utils'`。可以降低路径记忆负担，增加效率
 
 ## Axios类
 
-axios的一切操作始于原始类Axios(lib/core/Axios.js)，其中的逻辑比较简单：
+axios的一切操作始于原始类`Axios`(lib/core/Axios.js)，其中的逻辑比较简单：
 
 1. 将传入的配置存入实例对象的`defaults`属性中
 2. 在实例对象`interceptors`属性中初始化基础的`request`、`response`拦截器管理对象
@@ -93,7 +93,7 @@ axios({
 axios('/user/12345');
 ```
 
-所以request方法第一步便是检查以及矫正参数：
+所以request方法第一步需要检查参数格式，并合并出后续通用的参数：
 
 ```js
 request(configOrUrl, config) {
@@ -120,7 +120,7 @@ request(configOrUrl, config) {
 
 <hr />
 
-`paramsSerializer`同样检查了内部属性是否正确，其作用是自定义序列化查询参数的方式，主要针对数组查询参数，例如官方文档例子中通过Qs库转换数组作为查询参数:
+`paramsSerializer`同样检查了内部属性是否正确，其作用是自定义序列化查询参数的方式，主要针对数组查询参数，例如官方文档例子中通过`Qs`库转换数组作为查询参数:
 
 ```js
 /**
@@ -161,7 +161,7 @@ request(configOrUrl, config) {
 }
 ```
 
-在`axios 2.x`中此属性已简化为`{indexes: xxx}`，默认`null`对应`arrayFormat`值的`repeat`，`false`对应`brackets`，`true`对应`indices`
+> 在`axios 2.x`中此属性已简化为`{indexes: xxx}`，默认`null`对应`arrayFormat`值的`repeat`，`false`对应`brackets`，`true`对应`indices`
 
 ### 三、计算headers
 
@@ -692,22 +692,36 @@ config.cancelToken.subscribe(onCanceled)
 config.cancelToken.unsubscribe(onCanceled);
 ```
 
-从订阅、退订就能看出来这是典型的发布订阅模式，下面来看看源码中是如何实现的：
+下面来看看源码中是如何实现的：
 
 ```js
 class CancelToken {
+  // cancelToken生成工厂方法
+  // 返回的cancel是取消方法，token则是当前CancelToken实例对象
+  static source() {
+    let cancel;
+    const token = new CancelToken(function executor(c) {
+      cancel = c;
+    });
+    return {
+      token,
+      cancel
+    };
+  }
+
   constructor(executor) {
     if (typeof executor !== 'function') {
       throw new TypeError('executor must be a function.');
     }
-    // 创建用于取消的执行方法
+    // 创建用于触发取消的方法
+    // Promise本身就是一个状态机，用来触发状态改变的事件正合适
     let resolvePromise;
     this.promise = new Promise(function promiseExecutor(resolve) {
       resolvePromise = resolve;
     });
     // 所以cancelToken.subscribe也就是相当于this.subscribe
     const token = this;
-
+    // source.cancel执行后触发
     this.promise.then(cancel => {
       // cancel参数也就是取消原因
       if (!token._listeners) return;
@@ -719,7 +733,9 @@ class CancelToken {
       // 执行完毕后清空监听
       token._listeners = null;
     });
-    // 取消方法执行后再执行
+    // 赋值为同步任务，会早于上面的then执行
+    // 上面的then仍是promise状态改变后执行，不会被该条赋值影响
+    // source.cancel('取消原因').then(这里传入的函数也就是下面的onfulfilled)
     this.promise.then = onfulfilled => {
       let _resolve;
       const promise = new Promise(resolve => {
@@ -731,51 +747,33 @@ class CancelToken {
         token.unsubscribe(_resolve);
       };
       // 此处的作用是让cancel支持链式调用
-      // 例如：cancel('取消原因').then(xxx)
       return promise;
     };
-
+    // 取消请求实际调用的就是cancel函数
     executor(function cancel(message, config, request) {
-      if (token.reason) {
-        // Cancellation has already been requested
-        return;
-      }
-
+      // 取消已被调用过，忽略
+      if (token.reason) { return; }
       token.reason = new CanceledError(message, config, request);
+      // 执行取消
       resolvePromise(token.reason);
     });
   }
-
-  /**
-   * Throws a `CanceledError` if cancellation has been requested.
-   */
-  throwIfRequested() {
-    if (this.reason) {
-      throw this.reason;
-    }
-  }
-
-  /**
-   * Subscribe to the cancel signal
-   */
-
+  // 订阅取消事件
   subscribe(listener) {
+    // this.reason也就是cancel函数中的token.reason
+    // reason存在，代表取消已执行过，立即执行新注册的取消处理器
     if (this.reason) {
       listener(this.reason);
       return;
     }
-
+    // 因为同一个token能用于取消多个请求，所以需要使用数组
     if (this._listeners) {
       this._listeners.push(listener);
     } else {
       this._listeners = [listener];
     }
   }
-
-  /**
-   * Unsubscribe from the cancel signal
-   */
-
+  // 退订取消事件，在数组中找到并删除
   unsubscribe(listener) {
     if (!this._listeners) {
       return;
@@ -784,21 +782,6 @@ class CancelToken {
     if (index !== -1) {
       this._listeners.splice(index, 1);
     }
-  }
-
-  /**
-   * Returns an object that contains a new `CancelToken` and a function that, when called,
-   * cancels the `CancelToken`.
-   */
-  static source() {
-    let cancel;
-    const token = new CancelToken(function executor(c) {
-      cancel = c;
-    });
-    return {
-      token,
-      cancel
-    };
   }
 }
 ```
