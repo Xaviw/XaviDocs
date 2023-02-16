@@ -714,12 +714,12 @@ class CancelToken {
       throw new TypeError('executor must be a function.');
     }
     // 创建用于触发取消的方法
-    // Promise本身就是一个状态机，用来触发状态改变的事件正合适
+    // Promise符合取消请求这种状态仅能改变依次的需求
+    // 同时能看出取消请求是异步执行的
     let resolvePromise;
     this.promise = new Promise(function promiseExecutor(resolve) {
       resolvePromise = resolve;
     });
-    // 所以cancelToken.subscribe也就是相当于this.subscribe
     const token = this;
     // source.cancel执行后触发
     this.promise.then(cancel => {
@@ -727,29 +727,30 @@ class CancelToken {
       if (!token._listeners) return;
       let i = token._listeners.length;
       while (i-- > 0) {
-        // 遍历监听中事件并依次执行取消
+        // 遍历监听中事件并依次执行取消，注意是倒序执行
         token._listeners[i](cancel);
       }
-      // 执行完毕后清空监听
+      // 执行完毕后清空事件
       token._listeners = null;
     });
-    // 赋值为同步任务，会早于上面的then执行
-    // 上面的then仍是promise状态改变后执行，不会被该条赋值影响
-    // source.cancel('取消原因').then(这里传入的函数也就是下面的onfulfilled)
+    // 这段赋值代码不会影响上面已经绑定的then事件
+    // 作用是可以通过source.token.promise.then(xxx)注册事件，可以注册多个,注册的返回值是一个promise，且带有cancel属性用于取消注册
+    // 注册的方法会在source.cancel()调用后执行，且先于请求的catch
+    // 没有想到这个功能有什么作用，因为同样的功能在catch中也能实现，且更为直观。也没有查询到任何相关的说明，因为官方已经不推荐使用CancelToken，故不再纠结这里的用意了
     this.promise.then = onfulfilled => {
       let _resolve;
+      // 仅cancel触发时才会让onfulfilled执行
       const promise = new Promise(resolve => {
         token.subscribe(resolve);
         _resolve = resolve;
       }).then(onfulfilled);
-
+      // 提供了取消绑定事件的方法
       promise.cancel = function reject() {
         token.unsubscribe(_resolve);
       };
-      // 此处的作用是让cancel支持链式调用
       return promise;
     };
-    // 取消请求实际调用的就是cancel函数
+    // source方法中将executor参数赋给了cancel，所以取消请求实际调用的就是这里的cancel函数
     executor(function cancel(message, config, request) {
       // 取消已被调用过，忽略
       if (token.reason) { return; }
@@ -758,7 +759,7 @@ class CancelToken {
       resolvePromise(token.reason);
     });
   }
-  // 订阅取消事件
+  // 订阅取消请求事件
   subscribe(listener) {
     // this.reason也就是cancel函数中的token.reason
     // reason存在，代表取消已执行过，立即执行新注册的取消处理器
@@ -773,7 +774,7 @@ class CancelToken {
       this._listeners = [listener];
     }
   }
-  // 退订取消事件，在数组中找到并删除
+  // 退订取消请求事件，在数组中找到并删除
   unsubscribe(listener) {
     if (!this._listeners) {
       return;
