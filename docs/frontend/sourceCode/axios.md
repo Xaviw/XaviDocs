@@ -6,27 +6,27 @@
 
 axios库基于核心类`Axios`，在库中默认导出了一个名为`axios`的实例对象，并传入了基础配置`defaults`
 
-使用中所有的操作通常基于默认导出的实例对象`axios`实现。当然也可以自己导入Axios类，手动定义全部配置后新建实例使用
+使用中所有的操作通常基于默认导出的实例对象`axios`实现。当然也可以自己导入`Axios`类，手动定义全部配置后新建实例使用
 
 基础API有：
 
 1. **instance.defaults**
    
-   设置实例的基础参数，与初始化实例时的defaultConfig合并，作为该实例的参数
+   设置实例的基础参数，与初始化实例时的`defaultConfig`合并，作为该实例的参数
 
 2. **instance.interceptors**
    
    配置实例拦截器
 
-3. **instance(config)**
+3. **instance.request(config)**
    
-   发起请求的核心API，`.request`，`.get`等方法都是基于此核心方法
+   发起请求的核心API，`instance()`，`instance.post()`，`instance.get()`等方法都是基于此核心方法包装而来
 
    传入的config会与实例参数再次合并，作为实际请求参数
 
 4. **instance.create(config)**
    
-   基于当前实例对象创建新的实例对象，config与当前实例参数合并作为新实例的参数
+   基于当前实例对象创建新的实例对象，`config`与当前实例参数合并作为新实例的参数
 
 ## 认识源码
 
@@ -34,7 +34,7 @@ axios库基于核心类`Axios`，在库中默认导出了一个名为`axios`的�
 
 **深入理解建议对照源码以及官方文档阅读**
 
-axios源码分支中有`0.x`，`1.x`(默认)，`2.x`，查看`tags`可以看到发版记录。此文章中为最新的`v1.3.3`，也就是基于的`1.x`分支中的源码
+axios源码分支中有`0.x`，`1.x`(默认)，`2.x`，查看`tags`可以看到发版记录。截至发文最新版本为`v1.3.3`，也就是基于的`1.x`分支中的源码
 
 ```
 git clone --depth 1 https://github.com/axios/axios.git
@@ -51,20 +51,20 @@ import axios from 'axios'
 ```
 
 此时模块查找顺序为：
-- 当前文件层级下的node_modules
-- 当前文件层级下的同名文件夹，此处即为名为axios的文件夹
-- 找到了node_modules或同名文件夹后查找内部是否有package.json
-- 有package.json且main属性指向的路径存在，则从路径对应的文件中尝试导入
-- 没有package.json或main属性错误，则尝试查找index文件并从中导入
+- 当前文件层级下的`node_modules`
+- 当前文件层级下的同名文件夹，此处即为名为`axios`的文件夹
+- 找到了`node_modules`或同名文件夹后查找内部是否有`packages.json`
+- 有``packages.json``且`main`属性指向的路径存在，则从路径对应的文件中尝试导入
+- 没有`packages.json`或`main`属性错误，则尝试查找`index`文件并从中导入
 - 如果都没找到，则按同样的规则在上层目录中依次查找，直到路径错误
 
-实际项目中通过npm等工具安装，则会在项目根目录node_modules中找到axios目录，并通过packages.json -> main属性找到库入口为index.js文件
+实际项目中通过`npm`等工具安装，则会在项目根目录node_modules中找到axios目录，并通过`packages.json` -> `main`属性找到库入口为`index.js`文件
 
 ![源码入口](/images/frontEnd/sourceCode/axios/1.png)
 
-源码阅读中同理，需要从入口index.js文件看起。可以看到index中导入了`axios`并解构出API后再次统一导出，我们便可以通过快捷键跳转方法内部（VSCode默认按住alt键后单击）阅读具体的实现。常用快捷键还包括`alt + 左右方向键`切换跳转记录
+源码阅读中同理，需要从入口`index.js`文件看起。可以看到`index`中导入了`axios`并解构出API后再次统一导出，我们便可以通过快捷键跳转方法内部（VSCode默认按住alt键后单击）阅读具体的实现。常用快捷键还包括`alt + 左右方向键`切换跳转记录
 
-> 在目录index文件中统一收集方法并导出是一种实用技巧，例如工具目录utils将各类型工具子目录中的方法统一导出后，引入只需要写`import {xxx} from '@/utils'`。可以降低路径记忆负担，增加效率
+> 在目录`index`文件中统一收集方法并导出是一种实用技巧，例如工具目录utils将各类型工具子目录中的方法统一导出后，引入只需要写`import {xxx} from '@/utils'`。可以降低路径记忆负担，增加效率
 
 ## Axios类
 
@@ -93,7 +93,7 @@ axios({
 axios('/user/12345');
 ```
 
-所以request方法第一步需要检查参数格式，并合并出后续通用的参数：
+所以`request`方法第一步需要检查参数格式，并合并出后续通用的参数：
 
 ```js
 request(configOrUrl, config) {
@@ -977,7 +977,5 @@ const isURLSearchParams = kindOfTest('URLSearchParams');
 - 参数需要严格判断类型，处理边界情况，并设置兜底的值，避免意外错误
 - 变量名需要见名知意，axios中甚至作为参数的函数都使用了具名函数
 - 运用函数式编程范式以及设计模式优化代码与逻辑（需要针对系统性学习）
-- 官方文档仍有更新不及时甚至出错的情况，遇到问题可以尝试从源码中找答案
+- 官方文档仍有更新不及时甚至出错的情况（特别是非官方的翻译文档），遇到问题可以尝试从源码中找答案
 - ......
-
-
