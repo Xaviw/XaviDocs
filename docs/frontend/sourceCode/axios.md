@@ -246,6 +246,68 @@ class AxiosHeaders {
   // 通过parseHeaders(lib/helpers/parseHeaders.js)解析字符串，以换行\n分隔数据，每一行以冒号:分隔键值对
   // set-cookie项存为数组，其余项键同名的以逗号拼接值存储
   set(header, valueOrRewrite, rewrite) {...}
+
+  // 根据请求头名获取对应值的方法
+  // 内部处理了header格式的规范化，传入parser处理返回值
+  // parser=true返回对象格式，parser=函数调用函数返回，parse=正则，返回匹配后的值
+  get(header, parser) {...}
+
+  // 返回是否存在header的布尔值，如果有matcher会进行比对
+  // matcher是函数调用函数，matcher是字符串匹配是否是值的一部分，matcher是正则调用是否匹配
+  has(header, matcher) {...}
+
+  // 删除请求头，返回布尔值
+  // matcher对应has，匹配成功的删除
+  // header是数组时，会循环调用匹配删除
+  delete(header, matcher) {...}
+
+  // 根据matcher清空，返回布尔值（有任意删除则为true，完全不匹配为false）
+  clear(matcher) {...}
+
+  // 规范化实例内的headers键值
+  // format为布尔值，表示是否需要格式化header名（连续字符串首字母大写）
+  // 内部的 if(key){...} 作用是处理仅名字格式不同的header，格式化后覆盖旧值，并删除多余属性
+  normalize(format) {...}
+
+  // 合并headers
+  concat(...targets) {...}
+
+  // 输出所有headers到一个对象中
+  // asStrings为布尔值，表示数组是否需要转为字符串
+  toJSON(asStrings) {...}
+
+  // 重写内建iterator方法，遍历实例时会调用新定义的方法
+  [Symbol.iterator]() {
+    // entries转换对象后：[[k1,v1], [k2,v2], ...]作为数据源调用数组内置迭代器
+    // 之后可以通过返回值.next()遍历数组，相关知识参考https://zh.javascript.info/iterable
+    return Object.entries(this.toJSON())[Symbol.iterator]();
+  }
+
+  // 返回\n分隔的字符串
+  toString() {...}
+
+  // 在实例中增加一个标识符属性，在utils.js isPlainObject方法中有用到
+  // 所以作用为将AxiosHeaders的实例不识别为普通对象
+  get [Symbol.toStringTag]() {...}
+
+  // 静态方法，确保将传入的参数转为AxiosHeaders实例
+  static from(thing) {...}
+
+  // 静态方法，合并headers，并转为AxiosHeaders实例
+  static concat(first, ...targets) {...}
+
+  // 使用上面的buildAccessors方法向原型中添加请求头操作方法
+  // 支持单个或数组
+  static accessor(header) {...}
+
+  // 源码中设置了这些请求头的操作方法
+  AxiosHeaders.accessor(['Content-Type', 'Content-Length', 'Accept', 'Accept-Encoding', 'User-Agent', 'Authorization']);
+
+  // 冻结AxiosHeaders中的原型方法与静态方法
+  // 修改函数自身属性的enumerable=false, writable = false, 添加set方法触发时报错
+  // 对象的自身属性可以查看https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Object/defineProperty
+  utils.freezeMethods(AxiosHeaders.prototype);
+  utils.freezeMethods(AxiosHeaders);
 }
 ```
 
@@ -787,13 +849,135 @@ class CancelToken {
 }
 ```
 
+## 扩展请求方法
+
+在`Axios`类`request`方法中已经实现了完整的请求逻辑，扩展其他的请求方法就只需要通过`request`包装一层便能实现：
+
+```js
+// lib/core/Axios.js
+utils.forEach(['delete', 'get', 'head', 'options'], function forEachMethodNoData(method) {
+  Axios.prototype[method] = function(url, config) {
+    return this.request(mergeConfig(config || {}, {
+      method,
+      url,
+      data: (config || {}).data
+    }));
+  };
+});
+// 可能提交表单的请求方式，扩展了`methodForm`的别名方法，会自动修改请求头
+utils.forEach(['post', 'put', 'patch'], function forEachMethodWithData(method) {
+  function generateHTTPMethod(isForm) {
+    return function httpMethod(url, data, config) {
+      return this.request(mergeConfig(config || {}, {
+        method,
+        headers: isForm ? {
+          'Content-Type': 'multipart/form-data'
+        } : {},
+        url,
+        data
+      }));
+    };
+  }
+
+  Axios.prototype[method] = generateHTTPMethod();
+
+  Axios.prototype[method + 'Form'] = generateHTTPMethod(true);
+});
+```
+
+前面提到了`Axios`实例对象还能当作函数调用，相关代码定义在 lib/axios.js 中
+
+```js
+function createInstance(defaultConfig) {
+  // 新建实例
+  const context = new Axios(defaultConfig);
+  // 创建instance等于一个绑定this为当前实例的request函数，所以实例能直接当函数调用
+  const instance = bind(Axios.prototype.request, context);
+  // 拷贝原型属性到instance，包括request和各种扩展请求方法以及getUri方法
+  utils.extend(instance, Axios.prototype, context, {allOwnKeys: true});
+  // 拷贝实例属性到instance，也就是defaults和interceptors
+  utils.extend(instance, context, null, {allOwnKeys: true});
+  // 在instance上创建create方法
+  instance.create = function create(instanceConfig) {
+    // create创建的新实例会继承原实例的配置
+    return createInstance(mergeConfig(defaultConfig, instanceConfig));
+  };
+  return instance;
+}
+
+/* ---------- bind内部实现 ------------ */
+export default function bind(fn, thisArg) {
+  return function wrap() {
+    return fn.apply(thisArg, arguments);
+  };
+}
+/* ---------- extend内部实现 ------------ */
+// a是目标对象
+// b是源对象
+// c是提供给对象函数绑定的this参数
+// allOwnKeys表示是否遍历原型链中的属性
+const extend = (a, b, thisArg, {allOwnKeys}= {}) => {
+  // forEach是自定义的遍历方法，支持数组或对象
+  forEach(b, (val, key) => {
+    if (thisArg && isFunction(val)) {
+      a[key] = bind(val, thisArg);
+    } else {
+      a[key] = val;
+    }
+  }, {allOwnKeys});
+  return a;
+}
+```
+
+## 工具函数
+
+axios源码中以函数式编程为主，创建了大量的工具函数。函数式编程有逻辑清晰、利于复用、利于Tree Shaking优化等优点。阅读、掌握这些工具函数能扩宽我们的编程思路，提高编程效率
+
+工具函数主要创建在 lib/utils.js 中，这里仅讲解一个较为实用的例子：
+
+```js
+const {toString} = Object.prototype;
+const kindOf = (cache => thing => {
+    const str = toString.call(thing);
+    return cache[str] || (cache[str] = str.slice(8, -1).toLowerCase());
+})(Object.create(null));
+
+/*-------------kindOf是一个立即执行函数，上面的代码等同于于：------------------*/
+// 创建没有原型的空对象用以缓存
+const cache = Object.create(null)
+const kindOf = thing => {
+  // 更准确的获取类型方法，返回 [object TypeName]
+  const str = Object.prototype.toString.call(thing)
+  // 有缓存直接返回
+  if(cache[str]) {
+    return cache[str]
+  } else {
+    // 缓存TypeName部分的小写字符串，并返回
+    // cache的意义就是省略了重复的slice().toLowerCase()操作
+    cache[str] = str.slice(8, -1).toLowerCase()
+    return cache[str]
+  }
+}
+/*--------------------------------------------------------------------------*/
+// 接收任意type字符串后，返回一个校验的函数
+const kindOfTest = (type) => {
+  type = type.toLowerCase();
+  return (thing) => kindOf(thing) === type
+}
+// 在paramsSerializer逻辑中用到了这个方法，作用是判断传入的参数是不是原生URLSearchParams对象
+const isURLSearchParams = kindOfTest('URLSearchParams');
+```
+
 
 ## 总结
 
-读完Axios源码，除了能理解这个经典请求库的执行逻辑之外，还能从中学到不少技巧：
+阅读Axios源码，除了能理解这个经典请求库的执行逻辑之外，相信还可以增加对编程的一些思考：
 
-- 灵活使用短路运算符、三目运算符等语法
-- 参数需要严格判断类型，处理边界情况，并设置兜底的值，避免意外的错误
+- 灵活使用短路运算符、三目运算符、立即执行函数等语法适当简化代码
+- 参数需要严格判断类型，处理边界情况，并设置兜底的值，避免意外错误
 - 变量名需要见名知意，axios中甚至作为参数的函数都使用了具名函数
-- 通过函数式编程复用逻辑、优化代码易读性
-- 官方文档也有可能更新不及时甚至出错，遇到问题可以尝试从源码中找答案
+- 运用函数式编程范式以及设计模式优化代码与逻辑（需要针对系统性学习）
+- 官方文档仍有更新不及时甚至出错的情况，遇到问题可以尝试从源码中找答案
+- ......
+
+
