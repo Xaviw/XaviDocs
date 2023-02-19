@@ -14,16 +14,19 @@ export default defineConfig({
     nav: [
       {
         text: '前端系列',
+        activeMatch: '/frontend/',
         link: '/frontend/sourceCode/axios',
       },
       {
         text: '工具系列',
+        activeMatch: '/tools/',
         link: '/tools/recommend/windows',
       },
-      {
-        text: '文档搭建',
-        link: '/vitepress/start',
-      },
+      // {
+      //   text: '文档搭建',
+      //   activeMatch: '/vitepress/',
+      //   link: '/vitepress/start',
+      // },
     ],
     sidebar: {
       '/frontend/': [
@@ -86,9 +89,9 @@ export default defineConfig({
       next: '下一篇',
     },
     // algolia: {
-    //   appId: 'RLQAJPQZRF',
-    //   apiKey: '057d79f4e978afb00f30aa041ac38324',
-    //   indexName: 'xaviDocs',
+    //   appId: 'S3XDRVMGC4',
+    //   apiKey: '7c58a765cccb1868ed4cdbce97b9ad6f',
+    //   indexName: 'XaviDocs',
     //   placeholder: '请输入关键词',
     //   buttonText: '搜索',
     // },
