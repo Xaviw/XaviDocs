@@ -1,0 +1,17 @@
+- BandZip
+- HoneyView
+- VLC
+- QQ
+- WeChat
+- ToDesk
+- Chrome
+- Twinkle Tray
+- microsoft todo
+- utools
+- wolai
+- VSCode
+- Git
+- Volta
+- Node
+- everything
+- onlyoffice
