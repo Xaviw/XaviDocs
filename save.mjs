@@ -8,5 +8,4 @@ async function save() {
 
 await save()
 
-// 结束脚本
 await $`exit 0`
