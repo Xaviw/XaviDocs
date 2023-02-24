@@ -9,13 +9,14 @@
   "scripts": {
     "build": "vitepress build docs",
     "dev": "vitepress dev docs",
-    "deploy": "bash deploy.sh",
-    "push": "bash push.sh"
+    "deploy": "zx deploy.mjs",
+    "push": "zx save.mjs"
   },
   "devDependencies": {
     "add": "^2.0.6",
     "vitepress": "1.0.0-alpha.36",
-    "vue": "^3.2.45"
+    "vue": "^3.2.45",
+    "zx": "^7.1.1"
   },
   "volta": {
     "node": "18.14.2"
