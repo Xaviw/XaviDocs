@@ -10,7 +10,7 @@
     "build": "vitepress build docs",
     "dev": "vitepress dev docs",
     "deploy": "zx deploy.mjs",
-    "push": "zx save.mjs"
+    "save": "zx save.mjs"
   },
   "devDependencies": {
     "add": "^2.0.6",
