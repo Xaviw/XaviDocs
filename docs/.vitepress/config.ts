@@ -22,11 +22,11 @@ export default defineConfig({
         activeMatch: '/tools/',
         link: '/tools/recommend/windows',
       },
-      // {
-      //   text: '文档搭建',
-      //   activeMatch: '/vitepress/',
-      //   link: '/vitepress/start',
-      // },
+      {
+        text: '文档搭建',
+        activeMatch: '/vitepress/',
+        link: '/vitepress/start',
+      },
     ],
     sidebar: {
       '/frontend/': [
