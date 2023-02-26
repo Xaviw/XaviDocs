@@ -1,12 +1,12 @@
 #!/usr/bin/env zx
 
-import { cd } from 'zx/core'
+import { $, cd } from 'zx/core'
 import save from './save.mjs'
 
 save()
 
 // 打包
-await $`npm run docs:build`
+await $`npm run build`
 // 跳转
 cd(`docs/.vitepress/dist`)
 // dist文件夹内初始化git并提交

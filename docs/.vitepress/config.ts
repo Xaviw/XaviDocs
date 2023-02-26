@@ -4,10 +4,16 @@ import juejin from '../public/svg/juejin'
 export default defineConfig({
   lang: 'zh-cmn-Hans',
   title: 'Xavi的技术文档',
+  titleTemplate: false,
   description: '个人前端技术文档',
   base: '/XaviDocs/',
   lastUpdated: true,
   // outDir: '/dist',
+  locales: { a: { lang: 'zh' }, b: { lang: 'en' } },
+  head: [
+    ['test', { a: 'a' }],
+    ['test2', { a: 'a' }, 'b'],
+  ],
   themeConfig: {
     // logo: '/xavi-logo.svg',
     // siteTitle:'',
@@ -20,12 +26,7 @@ export default defineConfig({
       {
         text: '工具系列',
         activeMatch: '/tools/',
-        link: '/tools/recommend/windows',
-      },
-      {
-        text: '文档搭建',
-        activeMatch: '/vitepress/',
-        link: '/vitepress/start',
+        link: '/tools/vitepress/start',
       },
     ],
     sidebar: {
@@ -41,10 +42,12 @@ export default defineConfig({
       ],
       '/tools/': [
         {
-          text: '实用工具',
+          text: 'Vitepress搭建',
+          collapsible: true,
           items: [
-            { text: 'Windows工具', link: '/tools/recommend/windows' },
-            { text: '浏览器工具', link: '/tools/recommend/browser' },
+            { text: '基础搭建', link: '/tools/vitepress/start' },
+            { text: '进阶语法', link: '/tools/vitepress/syntax' },
+            { text: '配置解析', link: '/tools/vitepress/config' },
           ],
         },
         {
@@ -56,15 +59,12 @@ export default defineConfig({
             { text: '实用语法-JSDoc、Emmet', link: '/tools/editor/jsdoc-emmet' },
           ],
         },
-      ],
-      '/vitepress/': [
         {
-          text: 'Vitepress搭建',
+          text: '实用工具',
           collapsible: true,
           items: [
-            { text: '基础搭建', link: '/vitepress/start' },
-            { text: '进阶语法', link: '/vitepress/syntax' },
-            { text: '常用配置', link: '/vitepress/config' },
+            { text: 'Windows工具', link: '/tools/recommend/windows' },
+            { text: '浏览器工具', link: '/tools/recommend/browser' },
           ],
         },
       ],
@@ -98,5 +98,11 @@ export default defineConfig({
   },
   markdown: {
     lineNumbers: true,
+    attrs: {
+      leftDelimiter: '<',
+      rightDelimiter: '>',
+      allowedAttributes: [],
+      disable: false
+    }
   },
 })
