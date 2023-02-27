@@ -7,7 +7,9 @@ try {
   await $`git add .`
   await $`git commit -m 'script save'`
   await $`git push`
-} catch (error) {}
+} catch (error) { }
+
+await $`npm cache clean`
 
 // 打包
 await $`npm run build`
