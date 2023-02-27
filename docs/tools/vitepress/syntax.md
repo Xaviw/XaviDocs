@@ -20,6 +20,15 @@ title: VitePress进阶语法
 用相对路径或从根目录开始的绝对路径引用的文件，会在打包时被`Vite`处理，小尺寸的图片转为`Base64`内嵌在页面中，大尺寸的文件则会被打包进`assets`文件夹下
 :::
 
+## 徽标 <Badge type="info" text="info" /> <Badge type="tip" text="tip" /> <Badge type="warning" text="warning" /> <Badge type="danger" text="danger" />
+
+`type`支持`info`、`tip`、`warning`、`danger`
+
+```md
+## Title <Badge type="" text="" />
+## Title <Badge type="info">custom element</Badge>
+```
+
 ## 插入目录
 
 `[[toc]]` 代表插入目录
@@ -43,6 +52,7 @@ title: VitePress扩展md语法
 ```
 
 :::
+
 用于覆盖全局的样式配置，以及定义页面部分参数（`title`、`description`定义的是页面`head`标签中的`title`与`meta`）
 
 除项目配置项外，还包括配置页面`HTML`代码中的`head`标签
@@ -246,9 +256,11 @@ export default defineConfig({
 
 `VitePress`的`md`文件通过`markdown-it`解析后，被渲染为`Vue`页面，所以可以直接在`md`文件中使用`Vue`语法（`SSR`渲染，需遵守相关规则），包括`script setup`、`css`预处理器（需安装）等
 
-比较实用的有通过`<hr />`绘制分割横线等，下面是直接在`md`中写的一个按钮：
+比较实用的比如使用`<hr />`绘制分割横线等，下面是直接在`md`中写的一个按钮：
 
-<button style="padding:10px 40px;background:skyBlue;color:white;border-radius: 24px;font-size:1.2rem">按钮</button>
+<div>
+  <button style="padding:10px 40px;background:skyBlue;color:white;border-radius: 24px;font-size:1.2rem">按钮</button>
+</div>
 
 <hr />
 

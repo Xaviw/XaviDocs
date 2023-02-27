@@ -13,7 +13,7 @@
     "save": "zx save.mjs"
   },
   "devDependencies": {
-    "vitepress": "1.0.0-alpha.36",
+    "vitepress": "1.0.0-alpha.48",
     "vue": "^3.2.45",
     "zx": "^7.1.1"
   },

@@ -2,7 +2,7 @@
 
 import { $ } from 'zx/core'
 
-async function save() {
+export default async function save() {
   await $`git add .`
   await $`git commit -m 'script save'`
   await $`git push`
