@@ -14,6 +14,8 @@
 
 将首页`index.md`中的`layout`设置为`home`后，便可以添加下面的`hero`、`features`属性，定义首页内容
 
+设置为`home`后可以继续使用`Vue`代码添加自定义内容，设置通过设置为`page`完全自定义首页
+
 ## 介绍-hero
 
 ```md
@@ -22,25 +24,42 @@ layout: home
 
 hero:
   # 标题上面的文字
-  name: VitePress
+  name: XaviDocs
   # 标题
-  text: Vite & Vue Powered Static Site Generator
+  text: 个人前端技术文档
   # 标题下面的文字
-  tagline: Simple, powerful, and performant. Meet the modern SSG framework you've always wanted.
+  tagline: 文档持续搭建中，随便逛逛吧...
   # 标题右侧的图片
-  image?:| string
-         | { src: string; alt?: string }
-         | { light: string; dark: string; alt?: string }
+  image:
+    light: svg/pic1.svg
+    dark: svg/pic2.svg
+  # 标题下方按钮
   actions:
-      # 按钮样式，brand或alt
-    - theme: brand
-      text: Get Started
-      link: /guide/what-is-vitepress
-    - theme: alt
-      text: View on GitHub
-      link: https://github.com/vuejs/vitepress
+    - text: 开始阅读
+      link: /frontend/sourceCode/axios
+      # 按钮样式，brand或alt，默认brand
+      theme: brand
 ---
 ```
+image还支持以下格式：
+
+```md
+image: xxx
+
+image: 
+  src: xxx
+  # img标签alt属性，可选
+  alt: xxx
+
+image:
+  light: xxx
+  dark: xxx
+  alt: xxx
+```
+
+免费图片素材资源在[工具系列-浏览器工具](/tools/recommend/browser#常用网页工具)中有推荐，本站所用的素材是在[iconFont-插画](https://www.iconfont.cn/illustrations/index)中复制的`svg`代码
+
+> `svg`插图可能带有背景色，如果想改为透明，可以查看`svg`代码，找到对应的标签修改或添加`class`并设置`fill:rgba(0,0,0,0);`样式
 
 ## 特征-Features
 
@@ -49,27 +68,26 @@ hero:
 layout: home
 
 features:
-    # icon可选，
+    # icon可不传
+  - icon: 📖
+    title: 前端系列
+    details: 手把手入门源码阅读、UniApp实用经验...
+    # link可不传，传入后hover时会有链接效果
+    link: /tools/vitepress/start
+    # linkText可不传，为提示跳转的文字
+    linkText: 前往查看
   - icon: 🛠️
-    title: 标题
-    details: 描述
-    # 跳转链接
-    link?: string
-    #
-    linkText?: string
-  - icon:
-      src: /cool-feature-icon.svg
-    title: Another cool feature
-    details: Lorem ipsum...
-  - icon:
-      dark: /dark-feature-icon.svg
-      light: /light-feature-icon.svg
-    title: Another cool feature
-    details: Lorem ipsum...
+    title: 工具系列
+    details: VitePress文档站点搭建教程、VSCode使用技巧、Windows体验优化...
+    link: /tools/vitepress/start
+    linkText: 前往查看
 ---
-
 ```
 
-得到的效果就是[VitePress官网首页](https://vitepress.vuejs.org/)的效果：
+> `Windows`通过快捷键`徽标键 + .`即可打开表情符号选择，也可以在浏览器中搜索后复制使用
 
-![VitePress官网首页的效果](/images/tools/vitepress-home-1.png)
+## 效果
+
+上面的代码得到的效果就是本站首页的效果：
+
+![首页](/images/tools/vitepress-home-1.png)
