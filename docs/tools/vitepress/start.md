@@ -19,8 +19,19 @@ npm init -y
 
 npm i -D vitepress vue
 ```
+::: tip 提示
+也可以使用`pnpm`或`yarn`，如果使用`pnpm`需要在`package.json`中添加如下代码：
 
-> 也可以使用`pnpm`或`yarn`
+```json
+"pnpm": {
+  "peerDependencyRules": {
+    "ignoreMissing": [
+      "@algolia/client-search"
+    ]
+  }
+}
+```
+:::
 
 ## 二、添加启动命令
 

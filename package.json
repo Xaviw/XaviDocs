@@ -7,10 +7,10 @@
   "author": "Xavi",
   "main": "index.js",
   "scripts": {
-    "build": "vitepress build docs",
     "dev": "vitepress dev docs",
-    "deploy": "zx deploy.mjs",
-    "save": "zx save.mjs"
+    "build": "vitepress build docs",
+    "save": "zx save.mjs",
+    "deploy": "zx deploy.mjs"
   },
   "devDependencies": {
     "vitepress": "1.0.0-alpha.48",

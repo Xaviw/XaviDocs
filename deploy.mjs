@@ -2,7 +2,7 @@
 
 import { $, cd } from 'zx/core'
 
-// 自动提交，例如没有变更等错误
+// 自动提交，忽略例如没有变更等错误
 try {
   await $`git add .`
   await $`git commit -m 'script save'`
