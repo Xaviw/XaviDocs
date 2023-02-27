@@ -9,8 +9,6 @@ try {
   await $`git push`
 } catch (error) { }
 
-await $`npm cache clean`
-
 // 打包
 await $`npm run build`
 
