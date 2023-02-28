@@ -1,7 +1,7 @@
 import { defineConfig } from 'vitepress'
 import sidebar from './sidebar'
 import juejin from '../public/svg/juejin'
-import AutoSidebar from './gen'
+import AutoSidebar from './generateSidebar'
 
 export default defineConfig({
   // 打包后的基础路径，若部署到GitHub Pages配置为仓库名即可
@@ -241,7 +241,7 @@ export default defineConfig({
 
   // vite配置
   vite: {
-    plugins: [AutoSidebar({ignoreList: ['函数式编程', 'WEB安全']})],
+    plugins: [AutoSidebar()],
   },
 
   // 当主体有粘性布局的header时，设置滚动偏移量

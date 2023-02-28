@@ -55,6 +55,7 @@ function genSideBarItems(targetPath: string, ...rest: string[]): DefaultTheme.Si
   let dirs = readdirSync(join(targetPath, ...rest))
   const result: DefaultTheme.SidebarItem[] = []
   for (const dir of dirs) {
+    if (dir.startsWith('_')) continue
     if (statSync(join(targetPath, ...rest, dir)).isDirectory()) {
       // 是目录且有页面
       const items = genSideBarItems(join(targetPath), ...rest, dir)
