@@ -65,7 +65,7 @@ npm i -D vitepress vue
 
 `VitePress`使用文件路径作为路由地址，如果路径是`/docs/son/son.md`，访问路径就变成`http://localhost:5173/son/son.html`。如果文件名是`index.md`，则可以省略最后的`/index.html`
 
-`VitePress`使用`markdown-it`作为`md`语法解析器，具体语法可以参考[基本撰写和格式语法](https://docs.github.com/zh/get-started/writing-on-github/getting-started-with-writing-and-formatting-on-github/basic-writing-and-formatting-syntax)，后续的[进阶语法](/tools/vitepress/syntax)与[常用配置](/tools/vitepress/config)中会介绍怎么完善文档内容
+`VitePress`使用`markdown-it`作为`md`语法解析器，具体语法可以参考[基本撰写和格式语法](https://docs.github.com/zh/get-started/writing-on-github/getting-started-with-writing-and-formatting-on-github/basic-writing-and-formatting-syntax)，后续的[进阶语法](/工具系列/VitePress搭建/VitePress进阶语法)与[常用配置](/工具系列/VitePress搭建/VitePress配置解析)中会介绍怎么完善文档内容
 
 ## 四、部署GitHub Pages
 
@@ -141,7 +141,7 @@ npm i -D vitepress vue
 
   可以看出来部署实际上是将打包后的文件提交到`gh-pages`分支中，这是`GitHub Pages`指定的分支名，检测到该分支中的文件更新后则会自动触发部署，等待几分钟即可在仓库中看到已部署的站点链接：
 
-  ![GitHub Pages 链接](/images/tools/vitepress-start-1.png)
+  ![GitHub Pages 链接](/images/工具系列/使用VitePress搭建文档站点-1.png)
 
 ## 五、使用脚本简化部署流程
 

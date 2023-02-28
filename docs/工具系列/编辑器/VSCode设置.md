@@ -1,4 +1,4 @@
-# VSCode设置相关
+# VSCode设置
 
 VSCode是目前前端最常用的编辑器，优点无需多说。这里记录下我使用过程中让VSCode变得更好用的一些理解
 
@@ -145,7 +145,7 @@ vetur等插件提供代码片段也是通过这种方式，我们可以根据自
 
 body中每一条字符串为一行，支持使用`\n\t`等转义字符，也可以通过[在线工具](https://snippet-generator.app/)快速生成snippets
 
-还有更多的操作，例如使用变量，插入后转换等。不常使用，感兴趣可以参考[官方文档](https://code.visualstudio.com/docs/editor/userdefinedsnippets)
+还有更多的操作，例如使用变量，插入后转换等。不常使用，感兴趣可以参考[官方文档](https://code.visualstudio.com/docs/编辑器/userdefinedsnippets)
 
 ## 实用功能
 
@@ -153,7 +153,7 @@ body中每一条字符串为一行，支持使用`\n\t`等转义字符，也可�
 
 资源管理器栏中的NPM脚本栏，会自动读取项目package.json中配置的命令，可以在这里快速查看命令并执行
 
-![npm脚本栏](/images/tools/vscode-setting-1.png)
+![npm脚本栏](/images/工具系列/VSCode设置-1.png)
 
 ### 源代码管理
 

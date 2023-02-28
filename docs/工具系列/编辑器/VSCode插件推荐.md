@@ -1,3 +1,5 @@
+# VSCode插件推荐
+
 ## 简体中文
 
 MS-CEINTL.vscode-language-pack-zh-hans
@@ -20,7 +22,7 @@ editorconfig插件，安装后会识别项目中的`.editorconfig`配置，用�
 
 usernamehw.errorlens
 
-![errorlens效果](/images/tools/vscode-extension-1.png)
+![errorlens效果](/images/工具系列/VSCode插件推荐-1.png)
 
 可以设置显示级别，和排除部分类型异常
 
@@ -35,7 +37,7 @@ Gruntfuggly.todo-tree
 
 注释中写对应标签时会突出显示，并在左侧todoTree插件栏中添加索引。可以自行设置标签关键字以及颜色
 
-![todo-tree效果](/images/tools/vscode-extension-2.png)
+![todo-tree效果](/images/工具系列/VSCode插件推荐-2.png)
 
 
 

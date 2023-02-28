@@ -1,6 +1,7 @@
 import { defineConfig } from 'vitepress'
 import sidebar from './sidebar'
 import juejin from '../public/svg/juejin'
+// import AutoSidebar from './gen'
 
 export default defineConfig({
   // 打包后的基础路径，若部署到GitHub Pages配置为仓库名即可
@@ -74,13 +75,13 @@ export default defineConfig({
     nav: [
       {
         text: '前端系列',
-        activeMatch: '/frontend/',
-        link: '/frontend/sourceCode/axios',
+        activeMatch: '/前端系列/',
+        link: '/前端系列/源码阅读/axios',
       },
       {
         text: '工具系列',
-        activeMatch: '/tools/',
-        link: '/tools/vitepress/start',
+        activeMatch: '/工具系列/',
+        link: '/工具系列/VitePress搭建/使用VitePress搭建文档站点',
       },
     ],
 
@@ -239,7 +240,9 @@ export default defineConfig({
   // vue?: Options,
 
   // vite配置
-  // vite?: UserConfig$1,
+  // vite: {
+  //   plugins: [AutoSidebar()],
+  // },
 
   // 当主体有粘性布局的header时，设置滚动偏移量
   // 可以设置一个数字或元素选择器

@@ -2,7 +2,12 @@
   "name": "xavi-blog",
   "version": "1.0.0",
   "description": "个人技术文档",
-  "keywords": ["前端", "技术文档", "vitepress", "博客"],
+  "keywords": [
+    "前端",
+    "技术文档",
+    "vitepress",
+    "博客"
+  ],
   "license": "ISC",
   "author": "Xavi",
   "main": "index.js",
@@ -13,6 +18,7 @@
     "deploy": "zx deploy.mjs"
   },
   "devDependencies": {
+    "vite": "^4.1.4",
     "vitepress": "1.0.0-alpha.48",
     "vue": "^3.2.45",
     "zx": "^7.1.1"

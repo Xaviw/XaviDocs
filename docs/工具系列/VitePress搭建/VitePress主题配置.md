@@ -1,4 +1,4 @@
-# 主题配置
+# VitePress主题配置
 
 ## 自定义主题
 
@@ -88,10 +88,10 @@ export default DefaultTheme
 
 1. [vitepress-blog-zaun](https://github.com/clark-cui/vitepress-blog-zaun)
 
-![vitepress-theme-sakura](/images/tools/vitepress-theme-1.png)
+![vitepress-theme-sakura](/images/工具系列/VitePress主题配置-1.png)
 
 <hr />
 
 2. [vitepress-theme-sakura](https://github.com/flaribbit/vitepress-theme-sakura)
 
-![vitepress-theme-sakura](/images/tools/vitepress-theme-2.webp)
+![vitepress-theme-sakura](/images/工具系列/VitePress主题配置-2.webp)
