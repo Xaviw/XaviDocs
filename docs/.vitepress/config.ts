@@ -1,7 +1,7 @@
 import { defineConfig } from 'vitepress'
 import sidebar from './sidebar'
 import juejin from '../public/svg/juejin'
-// import AutoSidebar from './gen'
+import AutoSidebar from './gen'
 
 export default defineConfig({
   // 打包后的基础路径，若部署到GitHub Pages配置为仓库名即可
@@ -76,7 +76,7 @@ export default defineConfig({
       {
         text: '前端系列',
         activeMatch: '/前端系列/',
-        link: '/前端系列/源码阅读/axios',
+        link: '/前端系列/源码阅读/Axios源码解析',
       },
       {
         text: '工具系列',
@@ -87,7 +87,7 @@ export default defineConfig({
 
     // 左侧文档目录
     // 支持直接传递一个数组或一个对象，对象中一个路径对应一个数组
-    sidebar: sidebar,
+    // sidebar: Sidebar,
 
     // 是否在页面底部显示编辑链接
     editLink: {
@@ -240,9 +240,9 @@ export default defineConfig({
   // vue?: Options,
 
   // vite配置
-  // vite: {
-  //   plugins: [AutoSidebar()],
-  // },
+  vite: {
+    plugins: [AutoSidebar({ignoreList: ['函数式编程', 'WEB安全']})],
+  },
 
   // 当主体有粘性布局的header时，设置滚动偏移量
   // 可以设置一个数字或元素选择器

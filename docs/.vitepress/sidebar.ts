@@ -4,7 +4,7 @@ const sidebar: DefaultTheme.Sidebar = {
   '/前端系列/': [
     {
       text: '源码系列',
-      items: [{ text: 'Axios', link: '/前端系列/源码阅读/axios' }],
+      items: [{ text: 'Axios', link: '/前端系列/源码阅读/Axios源码解析' }],
     },
     {
       text: 'UniApp',
