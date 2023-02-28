@@ -268,7 +268,7 @@ export default defineConfig({
 
 <hr />
 
-多处使用的组件可以在`.VitePress/theme/index.js`中使用`enhanceApp`配置，该函数参数为 app 实例
+多处使用的组件可以在`.VitePress/theme/index.js`中使用`enhanceApp`配置公共组件，更详细的介绍查看[主题配置](/tools/vitepress/theme)
 
 ```js
 import DefaultTheme from 'VitePress/theme';

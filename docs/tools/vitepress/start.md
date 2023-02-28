@@ -4,6 +4,14 @@
 
 除了支持标准和扩展的`md`语法外，`VitePress`还支持在`md`文档内书写`Vue`语法，非常适合前端组件库文档或普通技术文档的搭建
 
+::: info
+如果不想了解完整的使用方式，也可以直接克隆本站仓库后修改使用
+
+```shell 
+git clone --depth 1 https://github.com/Xaviw/XaviDocs.git
+```
+:::
+
 ## 一、创建项目
 
 ::: tip 环境要求
@@ -73,6 +81,7 @@ npm i -D vitepress vue
   node_modules/
   /docs/.vitepress/dist/
   /docs/.vitepress/cache/
+  /docs/.vitepress/.temp/
 
   .env.local
   .env.*.local

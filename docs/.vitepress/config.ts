@@ -47,7 +47,7 @@ export default defineConfig({
     // aside: false,
 
     // logo地址，可以设置亮色与暗色模式使用不同的logo
-    // logo: '',
+    logo: 'images/xavi-logo.png',
 
     // 自定义左侧文档目录顶部的标题，默认使用config.title的值，设置false则为不显示
     // siteTitle?: string | false,

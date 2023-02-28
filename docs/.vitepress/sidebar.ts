@@ -20,6 +20,7 @@ const sidebar: DefaultTheme.Sidebar = {
         { text: '进阶语法', link: '/tools/vitepress/syntax' },
         { text: '配置解析', link: '/tools/vitepress/config' },
         { text: '首页配置', link: '/tools/vitepress/home' },
+        { text: '主题配置', link: '/tools/vitepress/theme' },
       ],
     },
     {

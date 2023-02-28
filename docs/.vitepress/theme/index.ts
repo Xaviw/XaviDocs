@@ -1,22 +1,27 @@
 import DefaultTheme from 'vitepress/theme';
+import './customize.css'
+
+export default DefaultTheme
 
 // export default {
-//   ...DefaultTheme,
-//   // 配置包裹页面
-//   // Layout,
+  // 自定义包裹每一个页面的容器组件
+  // Layout: Component,
 
-//   // 404页面
-//   // NotFound: () => 'custom 404',
+  // 自定义404页面
+  // NotFound: Component,
 
-//   enhanceApp({ app, router, siteData }) {
-//     // app is the Vue 3 app instance from `createApp()`.
-//     // router is VitePress' custom router. `siteData` is
-//     // a `ref` of current site-level metadata.
-//   },
+  // 自定义增强功能
+  // 参数中的app是项目Vue3 App实例
+  // router是路由实例
+  // siteData是当前站点的元数据
+  // enhanceApp({ app, router, siteData }) {
+    // 可以在这里注册全局组件
+    // app.component('Comp', Comp)
 
-//   setup() {
-//     // this function will be executed inside VitePressApp's
-//     // setup hook. all composition APIs are available here.
-//   },
-// };
-export default DefaultTheme
+    // 如果不是完全自定义主题,需要执行主题的默认行为
+    // DefaultTheme.enhanceApp({ app, router, siteData })
+  // },
+
+  // 会在VitePress的setup钩子中执行,所有组合式api均可使用
+  // setup() {},
+// }
