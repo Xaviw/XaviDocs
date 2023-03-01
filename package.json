@@ -2,6 +2,10 @@
   "name": "xavi-blog",
   "version": "1.0.0",
   "description": "个人技术文档",
+  "engines": {
+    "node": "^14.18.0 || >=16.0.0"
+  },
+  "homepage": "https://xaviw.github.io/XaviDocs/",
   "keywords": [
     "前端",
     "技术文档",

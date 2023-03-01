@@ -16,11 +16,11 @@ const sidebar: DefaultTheme.Sidebar = {
       text: 'Vitepress搭建',
       collapsed: false,
       items: [
-        { text: '基础搭建', link: '/工具系列/VitePress搭建/使用VitePress搭建文档站点' },
-        { text: '进阶语法', link: '/工具系列/VitePress搭建/VitePress进阶语法' },
-        { text: '配置解析', link: '/工具系列/VitePress搭建/VitePress配置解析' },
-        { text: '首页配置', link: '/工具系列/VitePress搭建/VitePress首页配置' },
-        { text: '主题配置', link: '/工具系列/VitePress搭建/VitePress主题配置' },
+        { text: '基础搭建', link: '/工具系列/VitePress搭建/基础搭建' },
+        { text: '进阶语法', link: '/工具系列/VitePress搭建/进阶语法' },
+        { text: '配置解析', link: '/工具系列/VitePress搭建/配置解析' },
+        { text: '首页配置', link: '/工具系列/VitePress搭建/首页配置' },
+        { text: '主题配置', link: '/工具系列/VitePress搭建/主题配置' },
       ],
     },
     {

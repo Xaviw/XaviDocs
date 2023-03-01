@@ -81,13 +81,13 @@ export default defineConfig({
       {
         text: '工具系列',
         activeMatch: '/工具系列/',
-        link: '/工具系列/VitePress搭建/使用VitePress搭建文档站点',
+        link: '/工具系列/VitePress搭建/基础搭建',
       },
     ],
 
     // 左侧文档目录
     // 支持直接传递一个数组或一个对象，对象中一个路径对应一个数组
-    // sidebar: Sidebar,
+    sidebar: sidebar,
 
     // 是否在页面底部显示编辑链接
     editLink: {
@@ -239,10 +239,14 @@ export default defineConfig({
   // 传递给`@vitejs/plugin-vue`的参数
   // vue?: Options,
 
-  // vite配置
-  vite: {
-    plugins: [AutoSidebar()],
+  rewrites: {
+    '/test/uniapp/UniApp对比原生小程序': '/1.前端系列/uniapp/UniApp对比原生小程序',
   },
+
+  // vite配置
+  // vite: {
+  //   plugins: [AutoSidebar()],
+  // },
 
   // 当主体有粘性布局的header时，设置滚动偏移量
   // 可以设置一个数字或元素选择器

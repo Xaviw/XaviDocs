@@ -1,16 +1,27 @@
 import { join } from 'path'
 import { readdirSync, statSync, closeSync, openSync, utimesSync } from 'fs'
-import { type DefaultTheme } from 'vitepress'
 import { type ViteDevServer } from 'vite'
 
-export interface SidebarPluginOptionType {
+export interface PluginOption {
   ignoreList?: string[]
-  path?: string
+  ignoreFlag?: string
 }
 
-export default function generateSidebar(option: SidebarPluginOptionType = {}) {
+interface SidebarMulti {
+  [path: string]: SidebarItem[]
+}
+
+interface SidebarItem {
+  text?: string
+  link?: string
+  items?: SidebarItem[]
+  collapsed?: boolean
+  _priority?: number
+}
+
+export default function generateSidebar(option: PluginOption = {}) {
   return {
-    name: 'generateSidebar',
+    name: 'vite-plugin-vitepress-auto-nav',
     configureServer({ watcher }: ViteDevServer) {
       const fsWatcher = watcher.add('*.md')
       fsWatcher.on('all', (event, path) => {
@@ -21,16 +32,13 @@ export default function generateSidebar(option: SidebarPluginOptionType = {}) {
       })
     },
     transform(source: string, id: string) {
-      // @siteData也就是项目配置文件
       if (/\/@siteData/.test(id)) {
-        const { ignoreList = [], path = '/docs' } = option
-        // 忽略扫描的文件夹
-        const ignoreFolder = ['public', '.vitepress', ...ignoreList]
-        const docsPath = join(process.cwd(), path)
+        const docsPath = join(process.cwd(), '/docs')
         // 创建侧边栏对象
-        const data = genSidebarMulti(docsPath, ignoreFolder)
+        const { sidebar, rewrites } = genSidebarMulti(docsPath, option)
+        console.log(rewrites)
         // 插入数据
-        const code = injectSidebar(source, data)
+        const code = injectSidebar(source, sidebar)
         // 返回插入sidebar后的配置文件作为实际代码
         return { code }
       }
@@ -38,6 +46,7 @@ export default function generateSidebar(option: SidebarPluginOptionType = {}) {
   }
 }
 
+const reg = /^(\d+)?\.?(\S+?)(\.md)?$/
 const configFile = join(process.cwd(), 'docs/.vitepress/config.ts')
 
 function hotUpdate() {
@@ -51,48 +60,86 @@ function hotUpdate() {
   }
 }
 
-function genSideBarItems(targetPath: string, ...rest: string[]): DefaultTheme.SidebarItem[] {
-  let dirs = readdirSync(join(targetPath, ...rest))
-  const result: DefaultTheme.SidebarItem[] = []
+function genSideBarItems(ignoreFlag: string, targetPath: string, ...rest: string[]): { items: SidebarItem[]; rewrites: Record<string, string> } {
+  const items: SidebarItem[] = []
+  let rewrites: Record<string, string> = {}
+
+  let dirs = readdirSync(join(targetPath, ...rest)).sort(localeSort)
+
   for (const dir of dirs) {
-    if (dir.startsWith('_')) continue
-    if (statSync(join(targetPath, ...rest, dir)).isDirectory()) {
-      // 是目录且有页面
-      const items = genSideBarItems(join(targetPath), ...rest, dir)
-      items.length &&
-        result.push({
-          text: dir,
+    // 忽略固定前缀目录或文件
+    if (dir.startsWith(ignoreFlag)) continue
+
+    const isDir = statSync(join(targetPath, ...rest, dir)).isDirectory()
+
+    const { rewrites: r1, text } = parseText(dir);
+
+    if (isDir) {
+      // 是非空目录
+      const { items: i, rewrites: r2 } = genSideBarItems(ignoreFlag, targetPath, ...rest, dir)
+      if (i.length) {
+        items.push({
+          text,
           collapsed: false,
-          items,
+          items: i,
         })
+        rewrites = { ...rewrites, ...r1, ...r2 }
+      }
     } else {
       // 是页面
-      const text = dir.replace(/\.md$/, '')
-      const item: DefaultTheme.SidebarItem = {
+      const item: SidebarItem = {
         text,
-        link: [...rest, text].join('/'),
+        link: [...rest.map(item => parseText(item).text), text].join('/'),
       }
-      result.push(item)
+      items.push(item)
     }
   }
-  return result
+
+  return { items, rewrites }
 }
 
-function genSidebarMulti(path: string, ignoreList: string[] = []): DefaultTheme.SidebarMulti {
-  const data: DefaultTheme.SidebarMulti = {}
-  let dirs = readdirSync(path).filter((n) => statSync(join(path, n)).isDirectory() && !ignoreList.includes(n))
+function genSidebarMulti(path: string, options: PluginOption): { sidebar: SidebarMulti; rewrites: Record<string, string> } {
+  let { ignoreFlag = '_', ignoreList = [] } = options
+  ignoreList = ['.vitepress', 'public', ...ignoreList]
+  const data: SidebarMulti = {}
+  let rewrites: Record<string, string> = {}
+  let dirs = readdirSync(path)
+    .filter((n) => statSync(join(path, n)).isDirectory() && !ignoreList.includes(n))
+    .sort(localeSort)
   for (const dir of dirs) {
-    data[`/${dir}/`] = genSideBarItems(path, dir)
+    const { text, rewrites: r1 } = parseText(dir);
+    const { items, rewrites: r2 } = genSideBarItems(ignoreFlag, path, dir)
+    data[`/${text}/`] = items
+    rewrites = { ...rewrites, ...r1, ...r2 }
   }
 
-  return data
+  return { sidebar: data, rewrites }
 }
 
 function insertStr(source: string, start: number, newStr: string) {
   return source.slice(0, start) + newStr + source.slice(start)
 }
 
-function injectSidebar(source: string, data: DefaultTheme.SidebarMulti | DefaultTheme.Sidebar) {
+function injectSidebar(source: string, data: SidebarMulti) {
   const themeConfigPosition = source.indexOf('{', source.indexOf('themeConfig'))
   return insertStr(source, themeConfigPosition + 1, `"sidebar": ${JSON.stringify(data)},`.replace(/"/g, '\\"'))
+}
+
+function isNullOrUndef(value: any): boolean {
+  return value === null || value === undefined
+}
+
+function localeSort(a: string, b: string) {
+  return a.localeCompare(b)
+}
+
+function parseText(dir: string): { rewrites: Record<string, string>; text: string } {
+  let [_, _priority, text]: any[] = reg.exec(dir) || []
+  const hasPriority = !isNullOrUndef(_priority)
+  const originText = (hasPriority ? _priority + '.' : '') + text
+  let rewrites = hasPriority ? { [`/${text}/*`]: `/${originText}/*` } : {}
+  return {
+    rewrites,
+    text,
+  }
 }
