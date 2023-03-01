@@ -24,7 +24,7 @@ export default function generateSidebar(option: PluginOption = {}) {
     name: 'vite-plugin-vitepress-auto-nav',
     configureServer({ watcher }: ViteDevServer) {
       const fsWatcher = watcher.add('*.md')
-      fsWatcher.on('all', (event, path) => {
+      fsWatcher.on('all', (event: string) => {
         // 监听md文件变更，有增删文件时触发刷新
         if (event !== 'change') {
           hotUpdate()
@@ -72,7 +72,7 @@ function genSideBarItems(ignoreFlag: string, targetPath: string, ...rest: string
 
     const isDir = statSync(join(targetPath, ...rest, dir)).isDirectory()
 
-    const { rewrites: r1, text } = parseText(dir);
+    const { rewrites: r1, text } = parseText(dir)
 
     if (isDir) {
       // 是非空目录
@@ -89,7 +89,7 @@ function genSideBarItems(ignoreFlag: string, targetPath: string, ...rest: string
       // 是页面
       const item: SidebarItem = {
         text,
-        link: [...rest.map(item => parseText(item).text), text].join('/'),
+        link: [...rest.map((item) => parseText(item).text), text].join('/'),
       }
       items.push(item)
     }
@@ -107,7 +107,7 @@ function genSidebarMulti(path: string, options: PluginOption): { sidebar: Sideba
     .filter((n) => statSync(join(path, n)).isDirectory() && !ignoreList.includes(n))
     .sort(localeSort)
   for (const dir of dirs) {
-    const { text, rewrites: r1 } = parseText(dir);
+    const { text, rewrites: r1 } = parseText(dir)
     const { items, rewrites: r2 } = genSideBarItems(ignoreFlag, path, dir)
     data[`/${text}/`] = items
     rewrites = { ...rewrites, ...r1, ...r2 }
