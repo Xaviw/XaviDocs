@@ -48,7 +48,7 @@ export default defineConfig({
     // aside: false,
 
     // logo地址，可以设置亮色与暗色模式使用不同的logo
-    logo: 'images/xavi-logo.png',
+    // logo?: string,
 
     // 自定义左侧文档目录顶部的标题，默认使用config.title的值，设置false则为不显示
     // siteTitle?: string | false,
@@ -240,7 +240,7 @@ export default defineConfig({
   // vue?: Options,
 
   rewrites: {
-    '/test/uniapp/UniApp对比原生小程序': '/1.前端系列/uniapp/UniApp对比原生小程序',
+    '1.前端系列/uniapp/UniApp对比原生小程序.md': '1.前端系列/UniApp对比原生小程序.md',
   },
 
   // vite配置
