@@ -8,27 +8,22 @@ hero:
   image:
     light: svg/pic1.svg
     dark: svg/pic2.svg
-  actions: 
-    - text: 开始阅读
-      link: /前端系列/源码阅读/Axios源码解析
 
-features:
-  - icon: 📖
-    title: 前端系列
-    details: 手把手入门源码阅读、UniApp实用经验...
-    link: /工具系列/VitePress搭建/基础搭建
-    linkText: 前往查看
-  - icon: 🛠️
-    title: 工具系列
-    details: VitePress文档站点搭建教程、VSCode使用技巧、Windows体验优化...
-    link: /工具系列/VitePress搭建/基础搭建
-    linkText: 前往查看
+# features:
+#   - icon: 📖
+#     title: 前端系列
+#     details: 手把手入门源码阅读、UniApp实用经验...
+#     link: /工具系列/VitePress搭建/基础搭建
+#     linkText: 前往查看
+#   - icon: 🛠️
+#     title: 工具系列
+#     details: VitePress文档站点搭建教程、VSCode使用技巧、Windows体验优化...
+#     link: /工具系列/VitePress搭建/基础搭建
+#     linkText: 前往查看
 ---
 
 <script setup>
-import { useData } from 'vitepress'
-
-const data = useData();
-
-console.log(data)
+  import MDList from './components/MDList.vue'
 </script>
+
+<MDList />

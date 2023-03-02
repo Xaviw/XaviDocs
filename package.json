@@ -12,6 +12,7 @@
   "homepage": "https://xaviw.github.io/XaviDocs/",
   "license": "ISC",
   "author": "Xavi",
+  "type": "module",
   "main": "index.js",
   "scripts": {
     "build": "vitepress build",
@@ -20,6 +21,8 @@
     "save": "zx save.mjs"
   },
   "devDependencies": {
+    "globby": "^13.1.3",
+    "gray-matter": "^4.0.3",
     "vitepress": "1.0.0-alpha.48",
     "vue": "^3.2.45",
     "zx": "^7.1.1"
