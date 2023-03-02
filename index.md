@@ -24,3 +24,11 @@ features:
     link: /工具系列/VitePress搭建/基础搭建
     linkText: 前往查看
 ---
+
+<script setup>
+import { useData } from 'vitepress'
+
+const data = useData();
+
+console.log(data)
+</script>

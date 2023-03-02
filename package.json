@@ -14,9 +14,9 @@
   "author": "Xavi",
   "main": "index.js",
   "scripts": {
-    "build": "vitepress build docs",
+    "build": "vitepress build",
     "deploy": "zx deploy.mjs",
-    "dev": "vitepress dev docs",
+    "dev": "vitepress dev",
     "save": "zx save.mjs"
   },
   "devDependencies": {

@@ -20,7 +20,7 @@ uniapp本身不限制底层API调用，兼容小程序JS SDK与小程序自定�
 
 uniapp因为需要跨端，内部会做层层封装、转换，看似是增加了运行负担，但其实常规场景下uniapp的性能体验更好
 
-微信小程序文档-[合理实用setData](https://developers.weixin.qq.com/miniprogram/dev/framework/performance/tips/runtime_setData.html)一文中明确说明：数据量大小、setData频率均会影响运行性能
+微信小程序文档-[合理使用setData](https://developers.weixin.qq.com/miniprogram/dev/framework/performance/tips/runtime_setData.html)一文中明确说明：数据量大小、setData频率均会影响运行性能
 
 因为setData需要将数据序列化后全量从逻辑层传到数据层，异步的触发视图层更新，且每一次调用setData均会触发虚拟DOM树的遍历、更新，甚至页面重新渲染
 
