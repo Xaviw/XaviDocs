@@ -2,30 +2,30 @@
   "name": "xavi-blog",
   "version": "1.0.0",
   "description": "个人技术文档",
-  "engines": {
-    "node": "^14.18.0 || >=16.0.0"
-  },
-  "homepage": "https://xaviw.github.io/XaviDocs/",
   "keywords": [
     "前端",
     "技术文档",
+    "博客",
     "vitepress",
-    "博客"
+    "frontend"
   ],
+  "homepage": "https://xaviw.github.io/XaviDocs/",
   "license": "ISC",
   "author": "Xavi",
   "main": "index.js",
   "scripts": {
-    "dev": "vitepress dev docs",
     "build": "vitepress build docs",
-    "save": "zx save.mjs",
-    "deploy": "zx deploy.mjs"
+    "deploy": "zx deploy.mjs",
+    "dev": "vitepress dev docs",
+    "save": "zx save.mjs"
   },
   "devDependencies": {
-    "vite": "^4.1.4",
     "vitepress": "1.0.0-alpha.48",
     "vue": "^3.2.45",
     "zx": "^7.1.1"
+  },
+  "engines": {
+    "node": "^14.18.0 || >=16.0.0"
   },
   "pnpm": {
     "peerDependencyRules": {

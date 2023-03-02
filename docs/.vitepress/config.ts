@@ -1,7 +1,7 @@
 import { defineConfig } from 'vitepress'
 import sidebar from './sidebar'
 import juejin from '../public/svg/juejin'
-import AutoSidebar from './generateSidebar'
+import AutoSidebar from './autoSidebarPlugin'
 
 export default defineConfig({
   // 打包后的基础路径，若部署到GitHub Pages配置为仓库名即可
@@ -87,7 +87,7 @@ export default defineConfig({
 
     // 左侧文档目录
     // 支持直接传递一个数组或一个对象，对象中一个路径对应一个数组
-    // sidebar: sidebar,
+    sidebar: sidebar,
 
     // 是否在页面底部显示编辑链接
     editLink: {
@@ -221,6 +221,7 @@ export default defineConfig({
     // config?: (md: MarkdownIt) => void,
   },
   // 存储md文档的目录，相对于根目录，默认.
+  // 官网使用的启动命令vite dev docs,等同于设置srcDir为docs
   // srcDir?: string,
 
   // srcExclude?: string[],
@@ -244,9 +245,9 @@ export default defineConfig({
   // },
 
   // vite配置
-  vite: {
-    plugins: [AutoSidebar()],
-  },
+  // vite: {
+  //   plugins: [AutoSidebar()],
+  // },
 
   // 当主体有粘性布局的header时，设置滚动偏移量
   // 可以设置一个数字或元素选择器
