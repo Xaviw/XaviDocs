@@ -60,7 +60,7 @@ import axios from 'axios'
 
 实际项目中通过`npm`等工具安装，则会在项目根目录node_modules中找到axios目录，并通过`packages.json` -> `main`属性找到库入口为`index.js`文件
 
-![源码入口](/images/前端系列/axios-1.png)
+![源码入口](/images/前端系列/源码阅读-Axios源码解析-1.png)
 
 源码阅读中同理，需要从入口`index.js`文件看起。可以看到`index`中导入了`axios`并解构出API后再次统一导出，我们便可以通过快捷键跳转方法内部（VSCode默认按住alt键后单击）阅读具体的实现。常用快捷键还包括`alt + 左右方向键`切换跳转记录
 
