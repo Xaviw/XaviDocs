@@ -2,11 +2,15 @@
 
 ## 简体中文
 
-MS-CEINTL.vscode-language-pack-zh-hans
+名称: Chinese (Simplified) (简体中文) Language Pack for Visual Studio Code
+
+ID: MS-CEINTL.vscode-language-pack-zh-hans
 
 ## 拼写检查
 
-streetsidesoftware.code-spell-checker
+名称: Code Spell Checker
+
+ID: streetsidesoftware.code-spell-checker
 
 检查单词拼写，错误的拼写会有下划线提示
 
@@ -14,13 +18,17 @@ streetsidesoftware.code-spell-checker
 
 ## 编辑器配置Editorconfig
 
-EditorConfig.EditorConfig
+名称: EditorConfig for VS Code
+
+ID: EditorConfig.EditorConfig
 
 editorconfig插件，安装后会识别项目中的`.editorconfig`配置，用于覆盖编辑器配置，详见[官方文档](https://editorconfig.org/)
 
 ## 增强异常信息显示
 
-usernamehw.errorlens
+名称: Error Lens
+
+ID: usernamehw.errorlens
 
 ![errorlens效果](/images/工具系列/VSCode插件推荐-1.png)
 
@@ -33,7 +41,9 @@ usernamehw.errorlens
 
 ## 增强注释显示以及索引
 
-Gruntfuggly.todo-tree
+名称: Todo Tree
+
+ID: Gruntfuggly.todo-tree
 
 注释中写对应标签时会突出显示，并在左侧todoTree插件栏中添加索引。可以自行设置标签关键字以及颜色
 
@@ -43,45 +53,71 @@ Gruntfuggly.todo-tree
 
 ## 编码时长统计
 
-WakaTime.vscode-wakatime
+名称: WakaTime
+
+ID: WakaTime.vscode-wakatime
 
 记录编辑器使用时间等信息，可以生成开发统计数据。需要注册账号
 
 ## 修改界面图标
 
-antfu.icons-carbon
+名称: Carbon Product Icons
+
+ID: antfu.icons-carbon
 
 ## 修改文件图标
 
-file-icons.file-icons
+名称: file-icons
+
+ID: file-icons.file-icons
 
 ## 增强git能力
 
-donjayamanne.githistory
+名称: Git History
 
-eamodio.gitlens
+ID: donjayamanne.githistory
 
-eamodio.gitlens
+<hr />
+
+名称: GitLens — Git supercharged
+
+ID: eamodio.gitlens
 
 ## 语法检查+格式化
 
-dbaeumer.vscode-eslint
+名称: ESLint
 
-esbenp.prettier-vscode
+ID: dbaeumer.vscode-eslint
 
-## 国际化插件
+<hr />
 
-lokalise.i18n-ally
+名称: Prettier - Code formatter
+
+ID: esbenp.prettier-vscode
+
+## 国际化辅助插件
+
+名称: i18n Ally
+
+ID: lokalise.i18n-ally
 
 ## iconify标签直接显示为对应图标
 
-antfu.iconify
+名称: Iconify IntelliSense
+
+ID: antfu.iconify
 
 ## JSON排序
 
-richie5um2.vscode-sort-json
+名称: Sort JSON objects
 
-unional.vscode-sort-package-json
+ID: richie5um2.vscode-sort-json
+
+<hr />
+
+名称: Sort package.json
+
+ID: unional.vscode-sort-package-json
 
 排序json与排序package.json，package.json有自己推荐的顺序
 
