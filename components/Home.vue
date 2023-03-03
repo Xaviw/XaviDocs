@@ -7,7 +7,7 @@
 import dayjs from 'dayjs'
 import relativeTime from 'dayjs/plugin/relativeTime'
 import duration from 'dayjs/plugin/duration'
-import { onUnmounted, ref } from 'vue'
+import { onUnmounted, ref, onMounted } from 'vue'
 import { useData } from 'vitepress'
 import VPHero from 'vitepress/dist/client/theme-default/components/VPHero.vue'
 import VPFeatures, { type Feature } from 'vitepress/dist/client/theme-default/components/VPFeatures.vue'
@@ -23,20 +23,6 @@ const pages: Pages[] = data.theme.value.pages
 const firstCommit: number = data.theme.value.firstCommit
 
 const tagline = ref()
-const update = () => {
-  const diff = dayjs().diff(dayjs(firstCommit))
-  const diffDays = dayjs.duration(diff).days()
-  const diffHours = dayjs.duration(diff).hours()
-  const diffMinutes = dayjs.duration(diff).minutes()
-  const diffSeconds = dayjs.duration(diff).seconds()
-  tagline.value = `过去的${diffDays || ''}天${diffHours || ''}时${diffMinutes < 10 ? `0${diffMinutes}` : diffMinutes}分${diffSeconds < 10 ? `0${diffSeconds}` : diffSeconds}秒中，本站累计更新${
-    pages.length
-  }篇文章`
-  return update
-}
-const timer = setInterval(update(), 1000)
-onUnmounted(clearInterval.bind(null, timer))
-
 const image = { light: 'svg/pic1.svg', dark: 'svg/pic2.svg' }
 const actions = ref([
   {
@@ -44,6 +30,22 @@ const actions = ref([
     link: randomPage(),
   },
 ])
+
+onMounted(() => {
+  const update = () => {
+    const diff = dayjs().diff(dayjs(firstCommit))
+    const diffDays = dayjs.duration(diff).days()
+    const diffHours = dayjs.duration(diff).hours()
+    const diffMinutes = dayjs.duration(diff).minutes()
+    const diffSeconds = dayjs.duration(diff).seconds()
+    tagline.value = `过去的${diffDays || ''}天${diffHours || ''}时${diffMinutes < 10 ? `0${diffMinutes}` : diffMinutes}分${diffSeconds < 10 ? `0${diffSeconds}` : diffSeconds}秒中，本站累计更新${
+      pages.length
+    }篇文章`
+    return update
+  }
+  const timer = setInterval(update(), 1000)
+  onUnmounted(clearInterval.bind(null, timer))
+})
 
 const features = ref<Feature[]>(
   pages.map((item) => {
