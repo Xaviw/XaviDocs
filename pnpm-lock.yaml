@@ -1,16 +1,20 @@
 lockfileVersion: 5.4
 
 specifiers:
+  dayjs: ^1.11.7
   globby: ^13.1.3
   gray-matter: ^4.0.3
-  vitepress: 1.0.0-alpha.48
+  vitepress: 1.0.0-alpha.49
   vue: ^3.2.45
   zx: ^7.1.1
+
+dependencies:
+  dayjs: 1.11.7
 
 devDependencies:
   globby: 13.1.3
   gray-matter: 4.0.3
-  vitepress: 1.0.0-alpha.48
+  vitepress: 1.0.0-alpha.49
   vue: 3.2.47
   zx: 7.1.1
 
@@ -616,6 +620,10 @@ packages:
     engines: {node: '>= 12'}
     dev: true
 
+  /dayjs/1.11.7:
+    resolution: {integrity: sha512-+Yw9U6YO5TQohxLcIkrXBeY73WP3ejHWVvx8XCk3gxvQDCTEmS48ZrSZCKciI7Bhl/uCMyxYtE9UqRILmFphkQ==}
+    dev: false
+
   /dir-glob/3.0.1:
     resolution: {integrity: sha512-WkrWp9GR4KXfKGYzOLmTuGVi1UWFfws377n9cc55/tb6DuqyF6pcQ5AbiHEshaDpY9v6oaSr2XCDidGmMwdzIA==}
     engines: {node: '>=8'}
@@ -1092,8 +1100,8 @@ packages:
       fsevents: 2.3.2
     dev: true
 
-  /vitepress/1.0.0-alpha.48:
-    resolution: {integrity: sha512-vu9J6Eg1l+o33lfDAMD9+cxomMNQGNQEW/GPu32tkffagMBxoBqhzxfqjaOqtTQ2VdS+dauOdROtrWQrElyivw==}
+  /vitepress/1.0.0-alpha.49:
+    resolution: {integrity: sha512-3nUZJow4qL8NHRWYatqqVj45AJDxWst/TuOj+IbQRhxesEswa+Fpwayj9/FxzRzBl665fuiG5y+QeVhOeUm0OA==}
     hasBin: true
     dependencies:
       '@docsearch/css': 3.3.3

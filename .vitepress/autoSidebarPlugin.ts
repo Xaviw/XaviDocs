@@ -50,7 +50,7 @@ function hotUpdate() {
 
 function genSidebarMulti(path: string, options: PluginOption): DefaultTheme.SidebarMulti {
   let { ignoreFlag = '_', ignoreList = [] } = options
-  ignoreList = ['.vitepress', 'public', 'components', 'scripts', 'README.md', ...ignoreList]
+  ignoreList = ['.vitepress', 'public', 'components', 'scripts', ...ignoreList]
   const data: DefaultTheme.SidebarMulti = {}
   let dirs = readdirSync(path)
     .filter((n) => statSync(join(path, n)).isDirectory() && !ignoreList.includes(n))
