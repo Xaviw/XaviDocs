@@ -31,18 +31,9 @@ const actions = ref([
   },
 ])
 
+update()
+
 onMounted(() => {
-  const update = () => {
-    const diff = dayjs().diff(dayjs(firstCommit))
-    const diffDays = dayjs.duration(diff).days()
-    const diffHours = dayjs.duration(diff).hours()
-    const diffMinutes = dayjs.duration(diff).minutes()
-    const diffSeconds = dayjs.duration(diff).seconds()
-    tagline.value = `过去的${diffDays || ''}天${diffHours || ''}时${diffMinutes < 10 ? `0${diffMinutes}` : diffMinutes}分${diffSeconds < 10 ? `0${diffSeconds}` : diffSeconds}秒中，本站累计更新${
-      pages.length
-    }篇文章`
-    return update
-  }
   const timer = setInterval(update(), 1000)
   onUnmounted(clearInterval.bind(null, timer))
 })
@@ -56,7 +47,10 @@ const features = ref<Feature[]>(
     }
     return {
       title: regTitle || item.title,
-      details: item.content.replace(/#* [\S]+?\s/g, ''),
+      details: item.content
+        .slice(0, 200)
+        .replace(/#* [\S]+?\s/g, '')
+        .replace(/<[^>]+>/g, ''),
       link: item.path,
       linkText: dayjs(item.frontMatter.date[0]).format('YYYY-MM-DD'),
     }
@@ -67,4 +61,27 @@ function randomPage(): string {
   const length = pages.length - 1
   return pages[Math.floor(Math.random() * length)].path
 }
+
+function update() {
+  const diff = dayjs().diff(dayjs(firstCommit))
+  const diffDays = dayjs.duration(diff).days()
+  const diffHours = dayjs.duration(diff).hours()
+  const diffMinutes = dayjs.duration(diff).minutes()
+  const diffSeconds = dayjs.duration(diff).seconds()
+  tagline.value = `过去的${diffDays || ''}天${diffHours || ''}时${diffMinutes < 10 ? `0${diffMinutes}` : diffMinutes}分${diffSeconds < 10 ? `0${diffSeconds}` : diffSeconds}秒中，本站累计更新${
+    pages.length
+  }篇文章`
+  console.log(tagline)
+  return update
+}
 </script>
+
+<style scoped>
+:deep(.details) {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+</style>

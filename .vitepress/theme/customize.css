@@ -5,11 +5,3 @@
   --vp-home-hero-image-background-image: linear-gradient( 135deg, #EE9AE5 10%, #5961F9 100%);
   --vp-home-hero-image-filter: blur(100px);
 }
-
-.details {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-}
