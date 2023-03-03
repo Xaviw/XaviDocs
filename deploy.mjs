@@ -13,7 +13,7 @@ try {
 await $`npm run build`
 
 // 跳转
-cd(`docs/.vitepress/dist`)
+cd(`.vitepress/dist`)
 
 // dist文件夹内初始化git并提交
 await $`git init`
