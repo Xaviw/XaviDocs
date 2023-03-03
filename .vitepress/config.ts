@@ -1,4 +1,4 @@
-import { DefaultTheme, defineConfig, UserConfig } from 'vitepress'
+import { DefaultTheme, UserConfig } from 'vitepress'
 import sidebar from './sidebar'
 import juejin from '../public/svg/juejin'
 import readPages, { getGitTimestamp } from './readPages'
@@ -116,7 +116,7 @@ async function config() {
 
       // 配置顶部右侧的社交链接
       socialLinks: [
-        { icon: 'github', link: 'https://github.com/Xaviw' },
+        { icon: 'github', link: 'https://github.com/Xaviw/XaviDocs' },
         {
           icon: { svg: juejin },
           link: 'https://juejin.cn/user/3192637500426840',
@@ -289,7 +289,7 @@ async function config() {
     // transformPageData?: (pageData: PageData) => Awaitable<Partial<PageData> | {
     //   [key: string]: any;
     // } | void>,
-  } as UserConfig<DefaultTheme.Config & { pages: any }>
+  } as UserConfig<DefaultTheme.Config>
 }
 
 export default config()
