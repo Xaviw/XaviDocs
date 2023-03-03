@@ -1,15 +1,15 @@
 import DefaultTheme from 'vitepress/theme'
 import './customize.css'
-// import NotFound from '../../components/NotFound.vue'
-import Layout from '../../components/Layout.vue'
+import NotFound from '../../components/NotFound.vue'
+// import Layout from '../../components/Layout.vue'
 
 export default {
   ...DefaultTheme,
   // // 自定义包裹每一个页面的容器组件
-  Layout,
+  // Layout,
 
   // 自定义404页面
-  // NotFound,
+  NotFound,
 
   // // 自定义增强功能
   // // 参数中的app是项目Vue3 App实例
