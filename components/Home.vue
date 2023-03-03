@@ -54,7 +54,7 @@ const features = ref<Feature[]>(
     }
     return {
       title: regTitle || item.title,
-      details: item.content.replace(/#* [\S]+?\n/g, ''),
+      details: item.content.replace(/#* [\S]+?\s/g, ''),
       link: item.path,
       linkText: dayjs(item.frontMatter.date[0]).format('YYYY-MM-DD'),
     }

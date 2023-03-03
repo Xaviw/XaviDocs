@@ -26,6 +26,7 @@ const sidebar: DefaultTheme.Sidebar = {
         { text: '首页配置', link: '/工具系列/VitePress搭建/首页配置' },
         { text: '主题配置', link: '/工具系列/VitePress搭建/主题配置' },
         { text: '自动生成目录', link: '/工具系列/VitePress搭建/自动生成目录' },
+        { text: '扩展首页内容', link: '/工具系列/VitePress搭建/扩展首页内容' },
       ],
     },
     {
