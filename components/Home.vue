@@ -31,8 +31,6 @@ const actions = ref([
   },
 ])
 
-update()
-
 onMounted(() => {
   const timer = setInterval(update(), 1000)
   onUnmounted(clearInterval.bind(null, timer))
@@ -71,7 +69,6 @@ function update() {
   tagline.value = `过去的${diffDays || ''}天${diffHours || ''}时${diffMinutes < 10 ? `0${diffMinutes}` : diffMinutes}分${diffSeconds < 10 ? `0${diffSeconds}` : diffSeconds}秒中，本站累计更新${
     pages.length
   }篇文章`
-  console.log(tagline)
   return update
 }
 </script>
