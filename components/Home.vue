@@ -69,8 +69,8 @@ function randomPage(): string {
 }
 </script>
 
-<style scoped>
-:deep(.details) {
+<style>
+.details {
   overflow: hidden;
   text-overflow: ellipsis;
   display: -webkit-box;
