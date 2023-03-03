@@ -47,8 +47,9 @@ const features = ref<Feature[]>(
       title: regTitle || item.title,
       details: item.content
         .slice(0, 200)
-        .replace(/#* [\S]+?\s/g, '')
-        .replace(/<[^>]+>/g, ''),
+        .replace(/\s+|^# [\S]+?\s/g, '')
+        .replace(/<[^>]+>/g, '')
+        .replace(/\s/g, ' '),
       link: item.path,
       linkText: dayjs(item.frontMatter.date[0]).format('YYYY-MM-DD'),
     }
@@ -80,5 +81,6 @@ function update() {
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
+  word-break: break-all;
 }
 </style>
