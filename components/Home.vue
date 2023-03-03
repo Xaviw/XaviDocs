@@ -68,13 +68,3 @@ function randomPage(): string {
   return pages[Math.floor(Math.random() * length)].path
 }
 </script>
-
-<style>
-.details {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-}
-</style>
