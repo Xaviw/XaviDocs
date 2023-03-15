@@ -18,7 +18,10 @@
     "build": "vitepress build",
     "deploy": "zx deploy.mjs",
     "dev": "vitepress dev",
-    "save": "zx save.mjs"
+    "save": "zx save.mjs",
+    "preecho": "echo pre",
+    "echo": "echo echo",
+    "postecho": "echo post"
   },
   "dependencies": {
     "dayjs": "^1.11.7"

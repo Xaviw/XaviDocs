@@ -4,7 +4,17 @@ const sidebar: DefaultTheme.Sidebar = {
   '/前端系列/': [
     {
       text: '源码系列',
-      items: [{ text: 'Axios', link: '/前端系列/源码阅读/Axios源码解析' }],
+      items: [
+        { text: 'Axios', link: '/前端系列/源码阅读/Axios源码解析' },
+        // { text: 'Vuex', link: '/前端系列/源码阅读/Vuex源码解析' },
+      ],
+    },
+    {
+      text: '工程化',
+      items: [
+        { text: 'JS模块化原理', link: '/前端系列/工程化/JS模块化原理' },
+        { text: '掌握package.json', link: '/前端系列/工程化/掌握package' },
+      ],
     },
     {
       text: 'UniApp',

@@ -1,0 +1,289 @@
+# 认识package.json
+
+`package.json`存在于每个基于`node`的前端工程化项目中，所以正确的认识该文件中的字段，对提升工程化能力格外重要
+
+## 介绍
+
+[中文文档](https://nodejs.cn/api/packages.html#introduction)中机械的翻译，理解起来还是有难度。简单来说`package.json`就是一个包（`package`）描述文件，在`node`对包内文件进行处理（比如模块类型识别等）时，会按照最近的平级或上级`package.json`中描述的规则处理，另外`package.json`默认不对`node_modules`目录生效
+
+## Node使用的字段
+
+### type
+
+指定包模块类型，默认值为`commonjs`也就是采用`CommonJS`模块规则，指定为`module`时采用`ESModule`模块规则
+
+扩展了`.mjs`和`.cjs`扩展名，分别对应`ESModule`模块和`CommonJS`模块。设置这两种扩展名的文件将始终按对应模块解析器解析模块，不受`type`字段限制
+
+也就是说如果没指定`type`或指定为`commonjs`时，项目内要使用`ESModule`语法，则需要将对应的文件改为`.mjs`扩展名。反之`type`指定为`module`时，应该将`CommonJS`模块改为`.cjs`扩展名
+
+> `ESModule`内部也其实支持混用`CommonJS`语法，`webpack`等打包器中更是二者都可以混用，详情查看[JS模块化原理]('前端系列/工程化/JS模块化原理')）
+
+
+`node`命令执行文件时也可以指定模块类型
+
+```shell
+node --input-type=module './index.js'
+```
+
+### main
+
+定义包的入口文件
+
+比如在项目中下载了包`A`，通过`import A from 'A'`方式引入时，实际查找的就是`node_modules/A/入口文件路径`：
+
+### module
+
+`main`与`module`同时存在时，`main`字段作为`CommonJS`的入口点，而`module`字段作为`ES Module`的入口
+
+### exports
+
+`main`、`module`的替代方案，同时存在时，优先使用`exports`
+
+允许定义多个入口点，对于暴露入口较少的情况，官方建议明确指定每个入口点；暴露入口过多时，可以直接导出整个文件夹
+
+```json
+{
+  "exports": {
+    // 明确指定每个入口点
+    ".": "./lib/index.js",
+    "./lib": "./lib/index.js",
+    // 官方建议同时提供有扩展名和无扩展名的子路径
+    "./lib/index": "./lib/index.js",
+    "./lib/index.js": "./lib/index.js",
+    // 导出整个文件夹
+    "./feature/*": "./lib/feature/*.js",
+    // 导出文件夹中有不想暴露的入口点时，可以明确指定不暴露
+    "./feature/internal/*": null
+  }
+}
+```
+
+**每个路径都应该相当于包根目录**。仅有根目录暴露时，可以简写为：`"exports": "./index.js"`
+
+<hr />
+
+支持条件导出，常用条件包括`import`、`require`、`default`
+
+```json
+{
+  "exports": {
+    // 使用import导入时，加载mjs文件
+    "import": "./index.mjs",
+    // 使用require导入时 ，加载cjs文件
+    "require": "./index.cjs",
+    // default作为通用后备选项，应该始终放在最后
+    "default": "./index.js"
+  },
+  // 也可以用在导出子路径
+  "exports": {
+    ".": "./index.js",
+    "./feature": {
+      "import": "./feature/index.mjs",
+      "require": "./feature/index.cjs"
+    }
+  }
+}
+```
+
+**定义`exports`后，导入非入口点的路径时会抛出`ERR_PACKAGE_PATH_NOT_EXPORTED`错误**
+
+### browser
+
+`browser`是属于`npm`中定义的字段，但同`main`、`module`也是定义入口文件，所以放在一起说
+
+`browser`用于提示用户，该包依赖于浏览器，可能使用了只有浏览器环境才有的`window`等属性
+
+当使用了例如`webpack`时，如果打包`target`指定为`web`，则`webpack`会优先识别该字段，并使用该字段提供的入口文件
+
+### name
+
+定义包名，也就是发布到`npm`仓库的名字，需要符合[命名规则](https://nodejs.cn/npm/cli/v8/configuring-npm/package-json/#name)
+
+::: tip
+`@a/b`格式的包名含义是`a`范围中名字为`b`的包，里面的`@`和`/`属于命名规范。范围的作用是将一系列相关的包组织在一起，更重要的是不用担心包名重复的问题。如何发布范围，参考[官方文档](https://nodejs.cn/npm/cli/v8/using-npm/scope/#)
+:::
+
+
+### packageManager
+
+截至发文仍处于实验性阶段，需要`NodeJS`版本大于等于`16.9.0`。基于新版`node`中附带的`corepack`包，用于统一项目包管理器，具体可以参考[这篇文章](https://www.jianshu.com/p/c239ed5dedd6)
+
+> 如果使用NVM、Volta等工具管理Node版本时，corepack命令可能不可用，可以在官方issue中找到解决办法
+
+## 包管理器常用字段
+
+### scripts
+
+包自身的运行脚本，例如本文档的启动方式：
+
+```json
+{
+  "scripts": {
+    "dev": "vitepress dev"
+  }
+}
+```
+
+可以通过`npm run dev`的方式调用对应的`vitepress dev`命令
+
+<hr />
+
+`npm`还提供了前后脚本关键字`pre`、`post`，例如
+
+```json
+{
+  "scripts": {
+    "preecho": "",
+    "echo": "",
+    "postecho": ""
+  }
+}
+```
+
+执行`npm run echo`后会分别调用`preecho`、`echo`、`postecho`
+
+除此之外还提供了一些特定的脚本，可以自行查看[官方文档](https://nodejs.cn/npm/cli/v8/using-npm/scripts/#life-cycle-scripts)
+
+### dependencies
+
+运行时依赖（运行相关的核心文件），包含包名以及版本的映射，通过`npm install xxx`（现在`--save`可以省略）时会自动将`xxx`添加到`dependencies`中
+
+标准的项目版本规则通常为：`主版本号.副版本号.修订版本号-预发布标签.预发布版本号`，例如`vitepress`当前版本`1.0.0-alpha.49`。详情可以查看[semver](https://github.com/npm/node-semver#versions)
+
+版本号前可以指定范围符，包括：
+
+- `<`：小于指定版本号
+- `<=`：小于对于指定版本号
+- `>`、`>=`同理
+- `=`：与指定版本号系统，等号可以省略
+- 范围标识符可以混用，例如`>=1.2.0<2.0.0`，也可以使用`1.2.0-2.0.0`表示
+- `||`：指定多个版本范围
+- `x`：可以作为通配符，例如`1.x`表示主版本为1，副版本，修订版本任意
+- `~`：指定版本到副版本+1的范围
+- `^`：指定版本到首位非0版本号+1的范围
+- `*`：匹配任何范围
+- ``tag``标记：匹配发布为`tag`的特定版本，例如`latest`标记
+
+存在预发布标签时，即使使用范围符，也需要满足主版本号、副版本号、修订版本号相同
+
+### devDependencies
+
+开发时依赖（例如代码格式化、测试等，与主题功能无关），内容同`dependencies`。通过`npm install xxx -D`（或者`--save-dev`）时会自动将`xxx`添加到`devDependencies`中
+
+在普通项目开发时，`dependencies`和`devDependencies`没有区别，因为打包器是按照导入读取的文件，与依赖项无关。所以普通项目中唯一的作用是可以通过`npm install`一键安装依赖
+
+但如果项目要作为包发布，用户引入你的包时，则只会下载`dependencies`中的依赖
+
+### peerDependencies
+
+用于指定当前包需要的宿主环境，内容同`dependencies`，通常在插件中使用
+
+例如开发`vue`的插件，如果将`vue`放在`dependencies`中，则用户在本身已安装`vue`的项目中引用你的插件时，还会再安装一次`vue`，造成浪费。如果定义在`peerDependencies`中，`npm install`默认不会重复安装`vue`，只要定义的版本号与用户已安装版本号匹配，就能直接使用。而如果用户还没有安装对应版本的`vue`，则会提示用户有`peerDependencies`未安装
+
+### files
+
+定义包作为依赖被安装时，只包含哪些文件，默认`["*"]`也就是全部文件
+
+无论如何设置，`package.json`、`README`、`LICENSE/LICENCE`、`main`字段文件始终会包含
+
+相反，`.git`等文件会被忽略
+
+### bin
+
+定义可执行命令添加到系统环境变量中，例如本文档使用到的`zx`：
+
+```json
+{
+  "bin": {
+    "zx": "./build/cli.js"
+  },
+  // 也可以简写，此时命令名称为包名
+  "bin": "./build/cli.js"
+}
+```
+
+### engines
+
+指定适用的`node`版本，版本规则同依赖项
+
+```json
+{
+  "engines": {
+    "node": ">=14.0.0"
+  }
+}
+```
+
+### version
+
+发布到`npm`的版本号
+
+### description
+
+包介绍
+
+### keywords
+
+包关键字，用于在`npm`中发现你的包
+
+### homepage
+
+项目主页地址
+
+### bugs
+
+项目问题追踪地址或邮件地址
+
+```json
+{
+  "url": "例如github issue页地址",
+  "email": "email@xxx.com"
+}
+```
+
+### license
+
+项目使用的许可证，表示别人能如何利用你的开源项目
+
+### author、contributors
+
+项目开发人员
+
+```json
+{
+  "author": {
+    "name": "",
+    "email": "",
+    "url": ""
+  },
+  // 或者精简为一行
+  "author": "name <email> (url)"
+  // contributors格式同author
+  "contributors": [
+    {...},
+    {...}
+  ]
+}
+```
+
+### repository
+
+包代码所在位置，如`github`仓库
+
+```json
+{
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Xaviw/XaviDocs.git",
+    // 如果包是monorepo（多个包在一个项目下）的一部分，可以指定该包所在的目录
+    "directory": "packages/react-dom"
+  }
+}
+```
+
+
+### private
+
+如果设置为`true`，则`npm`会拒绝发布该包
+
+

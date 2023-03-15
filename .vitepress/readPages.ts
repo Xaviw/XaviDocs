@@ -29,7 +29,7 @@ export default async function readPages(option: ReadOption = {}): Promise<Pages[
       const file = await readFile(item, { encoding: 'utf-8' })
       const { data, content } = matter(file)
       data.date = date
-      const path = item.replace('.md', '');
+      const path = item.replace('.md', '')
       return {
         frontMatter: data,
         path,
@@ -72,10 +72,15 @@ export function getGitTimestamp(file: string) {
     const child = spawn('git', ['--no-pager', 'log', '--pretty="%ci"', file])
     let output: string[] = []
     child.stdout.on('data', (d) => {
-      output.push(...String(d).trim().split('\n'))
+      const data = String(d).trim()
+      data && output.push(...data.split('\n'))
     })
     child.on('close', () => {
-      resolve([+new Date(output[0]), +new Date(output[output.length - 1])])
+      if (output.length) {
+        resolve([+new Date(output[0]), +new Date(output[output.length - 1])])
+      } else {
+        resolve([+new Date(), +new Date()])
+      }
     })
     child.on('error', reject)
   })
