@@ -146,12 +146,15 @@ module.exports = { "a": "a" }
 未找到与传入路径完全匹配的模块时，会依次尝试添加`.js`、`.json`、`.node`扩展名进行匹配
 
 ::: tip CommonJS详细的加载顺序为：
-
+使用相对或绝对路径导入时
 1. 判断是否有完全匹配路径的文件
 2. 依次尝试`.js`，`.json`，`.node`扩展名进行匹配（路径无扩展名则添加扩展名，路径本身有扩展名则修改扩展名）
 3. 尝试寻找同名文件夹（去掉扩展名）
-4. 如果有同名文件夹，且内部有`package.json`文件和正确的`main`字段指向，尝试加载`main`字段对应的文件（没有与`main`完全匹配的文件时，前面的规则仍适用）
-5. 如果有同名文件夹，但没有`package.json`或`main`字段不正确，在文件夹中按第二条规则尝试查找`index`文件
+4. 如果有同名文件夹，且内部有`package.json`文件和正确的`exports`字段，尝试解析其指定规则的文件（没有与规则路径完全匹配的文件时，前面的规则仍适用）
+5. 如果没有正确的`exports`字段，但有正确的`main`字段，尝试加载`main`字段对应的文件（没有与规则路径完全匹配的文件时，前面的规则仍适用）
+6. 如果有同名文件夹，但没有`package.json`或`exports`、`main`字段均不正确，在文件夹中按第二条规则尝试查找`index`文件
+
+直接通过包名导入时（`require('package')`），会查找当前目录或最近上级目录中的`node_modules`文件夹，然后再根据上诉规则在`node_modules`文件夹中查找
 
 如果均匹配失败，报错`Cannot find module`
 :::
@@ -338,11 +341,19 @@ import { `${varName}Module.js` } from 'module'
 `ES`模块中还有一些特性：
 
 1. `ES`模块文件中会自动采用严格模式，严格模式相关规则查看[MDN-严格模式](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Strict_mode)
-2. 导入路径必须完全匹配，包括扩展名（`webpack`等打包器中能够扩展配置类似`CommonJS`的解析规则）
-3. `ES`模块支持顶层`await`（也就是代码最外层，非函数内部也可以使用，会断住模块主流程）
-4. 模块中顶层`this`为`undefined`，而不是`window`，可以用这个特性区分模块类型
-5. 只支持导入`.js`、`.mjs`、`.cjs`、`.json`格式的文件
-6. 导入`json`文件需要做断言`import name from './xxx.json' assert { type: 'json' }`，只能使用默认导入的方式，导入数据为`json`解析后的对象
+2. `ES`模块支持顶层`await`（也就是代码最外层，非函数内部也可以使用，会断住模块主流程）
+3. 模块中顶层`this`为`undefined`，而不是`window`，可以用这个特性区分模块类型
+4. 导入`json`文件需要做断言`import name from './xxx.json' assert { type: 'json' }`，只能使用默认导入的方式，导入数据为`json`解析后的对象
+
+### 模块匹配规则
+
+`ES`模块相比于`CommonJS`，只支持导入`.js`、`.mjs`、`.cjs`、`.json`格式的文件，且模块路径必须完全匹配，包括扩展名。所以`ES`模块匹配规则直接在`CommonJS`上进行精简即可：
+
+使用相对或绝对路径导入时，直接尝试查找完全匹配路径的文件
+
+通过包名导入时（`import 'package'`），会查找当前目录或最近上级目录中的`node_modules`文件夹。如果`node_modules`中有同名文件夹，且内部有`package.json`文件和正确的`exports`字段，尝试解析其指定规则的文件
+
+否则匹配失败，报错`Cannot find package`（在`webpack`等打包器中，会扩展`ESModule`支持`CommonJS`的解析规则，要注意并不是`ES`模块的原生解析规则）
 
 ### 循环加载规则
 
@@ -472,4 +483,4 @@ export default 'ccccccc'
 1. `import.meta.url`：返回当前模块的`url`路径，如`https://foo.com/main.js`
 2. `import.meta.scriptElement`：是浏览器特有的原属性会返回加载模块的`script`标签元素
 
-`import.meta`带有一个`null`原型对象，这个对象是可扩展的。例如`vite`扩展了`import.meta.env`等属性
+`import.meta`是可扩展的，通过`import.meta.key = value`的形式扩展属性，整个项目其他`ES`模块中也能访问。例如`vite`扩展了`import.meta.env`等属性

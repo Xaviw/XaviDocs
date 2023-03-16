@@ -47,8 +47,12 @@ const features = ref<Feature[]>(
       title: regTitle || item.title,
       details: item.content
         .slice(0, 200)
-        .replace(/\s+|^# [\S]+?\s/g, '')
+        .replace(/^#+ [\S]+?\s/gm, '')
+        .replace(/^\> /gm, '')
+        .replace(/`(\S+?)`/g, '$1')
+        .replace(/\[(\S+?)\]\(\S+?\)/g, '$1')
         .replace(/<[^>]+>/g, '')
+        .replace(/^:::[\s\S]+?$/gm, '')
         .replace(/\s/g, ' '),
       link: item.path,
       linkText: dayjs(item.frontMatter.date[0]).format('YYYY-MM-DD'),
@@ -67,7 +71,7 @@ function update() {
   const diffHours = dayjs.duration(diff).hours()
   const diffMinutes = dayjs.duration(diff).minutes()
   const diffSeconds = dayjs.duration(diff).seconds()
-  tagline.value = `过去的${diffDays || ''}天${diffHours || ''}时${diffMinutes < 10 ? `0${diffMinutes}` : diffMinutes}分${diffSeconds < 10 ? `0${diffSeconds}` : diffSeconds}秒中，本站累计更新${
+  tagline.value = `过去的${diffDays || ''}天${diffHours || ''}时${diffMinutes < 10 ? `0${diffMinutes}` : diffMinutes}分${diffSeconds < 10 ? `0${diffSeconds}` : diffSeconds}秒中，累计更新${
     pages.length
   }篇文章`
   return update

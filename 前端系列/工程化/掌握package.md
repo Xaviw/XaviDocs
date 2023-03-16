@@ -1,43 +1,58 @@
 # 认识package.json
 
-`package.json`存在于每个基于`node`的前端工程化项目中，所以正确的认识该文件中的字段，对提升工程化能力格外重要
+`package.json`存在于每个基于`node`的前端工程化项目中，所以正确的认识该文件中的字段，对理清项目流程、提升工程化能力格外重要
 
 ## 介绍
 
-[中文文档](https://nodejs.cn/api/packages.html#introduction)中机械的翻译，理解起来还是有难度。简单来说`package.json`就是一个包（`package`）描述文件，在`node`对包内文件进行处理（比如模块类型识别等）时，会按照最近的平级或上级`package.json`中描述的规则处理，另外`package.json`默认不对`node_modules`目录生效
+[中文文档](https://nodejs.cn/api/packages.html#introduction)中翻译的介绍，理解起来仍有难度。简单来说`package.json`就是一个包（`package`）描述文件，在`node`对包内文件进行处理（比如模块类型识别等）时，会按照最近的平级或上级`package.json`中描述的规则处理，另外`package.json`默认不对`node_modules`目录生效
 
 ## Node使用的字段
 
 ### type
 
-指定包模块类型，默认值为`commonjs`也就是采用`CommonJS`模块规则，指定为`module`时采用`ESModule`模块规则
+目前`JS`有两种主流模块化方案，分别是`Node`采用的`CommonJS`，和最新的`ESModule`，推荐先阅读[JS模块化原理](/前端系列/工程化/JS模块化原理)熟悉这两种模块化规则。对于不同的模块类型，引擎会采用不同的模块解析器进行处理，所以需要正确的识别模块类型
 
-扩展了`.mjs`和`.cjs`扩展名，分别对应`ESModule`模块和`CommonJS`模块。设置这两种扩展名的文件将始终按对应模块解析器解析模块，不受`type`字段限制
+`type`默认值为`commonjs`，所以项目中的文件默认会采用`CommonJS`模块规则解析。如果指定为`module`则会采用`ESModule`模块规则解析
+
+官方还扩展了`.mjs`和`.cjs`扩展名，分别对应`ESModule`和`CommonJS`。设置这两种扩展名的文件将始终按对应模块解析器解析，不受`type`字段限制
 
 也就是说如果没指定`type`或指定为`commonjs`时，项目内要使用`ESModule`语法，则需要将对应的文件改为`.mjs`扩展名。反之`type`指定为`module`时，应该将`CommonJS`模块改为`.cjs`扩展名
-
-> `ESModule`内部也其实支持混用`CommonJS`语法，`webpack`等打包器中更是二者都可以混用，详情查看[JS模块化原理]('前端系列/工程化/JS模块化原理')）
-
-
-`node`命令执行文件时也可以指定模块类型
-
-```shell
-node --input-type=module './index.js'
-```
 
 ### main
 
 定义包的入口文件
 
-比如在项目中下载了包`A`，通过`import A from 'A'`方式引入时，实际查找的就是`node_modules/A/入口文件路径`：
+比如在项目中下载了包`A`，通过`import A from 'A'`方式引入时，实际查找的就是`node_modules/A/main定义的路径`：
 
 ### module
 
-`main`与`module`同时存在时，`main`字段作为`CommonJS`的入口点，而`module`字段作为`ES Module`的入口
+`module`字段最早由`rollup`提出，目前在中文官网中还没有提到。目的是提供`ESModule`入口，这样打包器能够利用`ESModule`的静态分析能力实现`TreeShaking`功能
+
+如果打包器支持`module`字段，则在查找包时，首先会尝试以`ESModule`规则读取`module`对应文件
+
+### browser
+
+在例如`Axios`这种同时支持`node`端和浏览器端的包中，对于不同环境可能依赖于不同的模块（`Axios`中`node`环境使用`http`请求，浏览器环境使用`xhr`请求），`browser`字段就是为了更好的实现这一功能
+
+当使用了例如`webpack`等打包器时，如果指定环境`target`为`web`，则会使用该字段指定的文件规则
+
+支持单个属性，代表入口文件。也支持定义多个键值对，代表替换对于路径
+
+```json
+// 单个字段，代表作为浏览器环境的入口文件
+"browser": "./lib/browser/main.js"
+// 指定键值对时，解析对应的键时，会替换到对应值的路径
+"browser": {
+  "module-a": "./browser/module-a.js",
+  "./server/module-b.js": "./browser/module-b.js",
+  // 还支持配置false，防止模块被加载
+  "module-c": false
+}
+```
 
 ### exports
 
-`main`、`module`的替代方案，同时存在时，优先使用`exports`
+作为`main`、`module`的替代方案，多个字段同时存在时，会优先使用`exports`
 
 允许定义多个入口点，对于暴露入口较少的情况，官方建议明确指定每个入口点；暴露入口过多时，可以直接导出整个文件夹
 
@@ -86,14 +101,6 @@ node --input-type=module './index.js'
 ```
 
 **定义`exports`后，导入非入口点的路径时会抛出`ERR_PACKAGE_PATH_NOT_EXPORTED`错误**
-
-### browser
-
-`browser`是属于`npm`中定义的字段，但同`main`、`module`也是定义入口文件，所以放在一起说
-
-`browser`用于提示用户，该包依赖于浏览器，可能使用了只有浏览器环境才有的`window`等属性
-
-当使用了例如`webpack`时，如果打包`target`指定为`web`，则`webpack`会优先识别该字段，并使用该字段提供的入口文件
 
 ### name
 
