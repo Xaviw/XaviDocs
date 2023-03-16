@@ -483,4 +483,4 @@ export default 'ccccccc'
 1. `import.meta.url`：返回当前模块的`url`路径，如`https://foo.com/main.js`
 2. `import.meta.scriptElement`：是浏览器特有的原属性会返回加载模块的`script`标签元素
 
-`import.meta`是可扩展的，通过`import.meta.key = value`的形式扩展属性，整个项目其他`ES`模块中也能访问。例如`vite`扩展了`import.meta.env`等属性
+`import.meta`是可扩展的，通过`import.meta.key = value`的形式扩展属性，整个项目其他`ES`模块中也能访问
