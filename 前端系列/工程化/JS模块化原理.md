@@ -256,11 +256,11 @@ export { default as newName } from 'module'
 浏览器中也已支持`ESModule`模块，采用异步加载的方式，等同于`script`添加了`defer`关键字，多个`ESModule script`标签同样会按照书写顺序加载和执行。也可以添加`async`关键字，这时候模块会在加载完成时立即执行
 
 ```html
-<script type="module" src=""></script>
-<!-- 等同于 -->
-<script type="module" src="" defer></script>
-<!-- 添加async时，脚本加载完成时便会立即执行 -->
-<script type="module" src="" async></script>
+  <script type="module" src=""></script>
+  <!-- 等同于 -->
+  <script type="module" src="" defer></script>
+  <!-- 添加async时，脚本加载完成时便会立即执行 -->
+  <script type="module" src="" async></script>
 ```
 
 ::: tip `defer`与`async`的区别是：
