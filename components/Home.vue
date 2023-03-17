@@ -38,7 +38,7 @@ onMounted(() => {
 
 const features = ref<Feature[]>(
   pages.map((item) => {
-    let regTitle = item.content.match(/[\s\S]*?# (\S+?)\s+[\s\S]*/)?.[1]
+    let regTitle = item.content.match(/^# (\S+?)\s*$/m)?.[1]
     const matterTitle = regTitle?.match(/\{\{\$frontmatter\.(\S+)\}\}/)?.[1]
     if (matterTitle) {
       regTitle = item.frontMatter[matterTitle]
@@ -55,7 +55,7 @@ const features = ref<Feature[]>(
         .replace(/^:::[\s\S]+?$/gm, '')
         .replace(/\s/g, ' '),
       link: item.path,
-      linkText: dayjs(item.frontMatter.date[0]).format('YYYY-MM-DD'),
+      linkText: dayjs(item.frontMatter.date[item.frontMatter.date.length - 1]).format('YYYY-MM-DD'),
     }
   })
 )

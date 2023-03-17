@@ -40,7 +40,9 @@ export default async function readPages(option: ReadOption = {}): Promise<Pages[
   )
   // 按日期降序排列
   pages.sort((a, b) => {
-    return b.frontMatter.date[1] - a.frontMatter.date[1]
+    let d1 = a.frontMatter.date[a.frontMatter.date.length - 1]
+    let d2 = b.frontMatter.date[b.frontMatter.date.length - 1]
+    return d2 - d1
   })
   return pages
 }
