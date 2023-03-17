@@ -255,13 +255,15 @@ export { default as newName } from 'module'
 
 浏览器中也已支持`ESModule`模块，采用异步加载的方式，等同于`script`添加了`defer`关键字，多个`ESModule script`标签同样会按照书写顺序加载和执行。也可以添加`async`关键字，这时候模块会在加载完成时立即执行
 
+::: v-pre
 ```html
-  <script type="module" src=""></script>
-  <!-- 等同于 -->
-  <script type="module" src="" defer></script>
-  <!-- 添加async时，脚本加载完成时便会立即执行 -->
-  <script type="module" src="" async></script>
+<script type="module" src=""></script>
+<!-- 等同于 -->
+<script type="module" src="" defer></script>
+<!-- 添加async时，脚本加载完成时便会立即执行 -->
+<script type="module" src="" async></script>
 ```
+:::
 
 ::: tip `defer`与`async`的区别是：
 `defer`要等到整个页面在内存中正常渲染结束（`DOM` 结构完全生成，以及其他脚本执行完成），才会执行；`async`一旦下载完，渲染引擎就会中断渲染，执行这个脚本以后，再继续渲染。一句话，`defer`是“渲染完再执行”，`async`是“下载完就执行”。另外，如果有多个`defer`脚本，会按照它们在页面出现的顺序加载，而多个`async`脚本是不能保证加载顺序的。
