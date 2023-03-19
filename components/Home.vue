@@ -20,8 +20,10 @@ dayjs.extend(relativeTime)
 
 const data = useData()
 const pages: Pages[] = data.theme.value.pages
-const firstCommit: number = data.theme.value.firstCommit
+// 第一篇文章的发布时间作为建站时间
+const firstCommit: number = pages[pages.length - 1].frontMatter.date[0]
 
+// 传入Hero组件的tagline值
 const tagline = ref()
 const image = { light: 'svg/pic1.svg', dark: 'svg/pic2.svg' }
 const actions = ref([
@@ -38,7 +40,9 @@ onMounted(() => {
 
 const features = ref<Feature[]>(
   pages.map((item) => {
+    // 用页面的一级标题作为文章标题（因为sidebar中可能是精简的标题）
     let regTitle = item.content.match(/^# (\S+?)\s*$/m)?.[1]
+    // 标题可能用到了变量，需要替换
     const matterTitle = regTitle?.match(/\{\{\$frontmatter\.(\S+)\}\}/)?.[1]
     if (matterTitle) {
       regTitle = item.frontMatter[matterTitle]
@@ -46,16 +50,25 @@ const features = ref<Feature[]>(
     return {
       title: regTitle || item.title,
       details: item.content
+        // 只保留最大可能显示范围
         .slice(0, 200)
+        // 去除html标签，因为Feature组件内部用的v-html显示
+        .replace(/<[^>]+?>/g, '')
+        // 去除标题
         .replace(/^#+ [\S]+?\s/gm, '')
+        // 去除引用
         .replace(/^\> /gm, '')
+        // 只保留反引号内部内容
         .replace(/`(\S+?)`/g, '$1')
+        // 只保留跳转内容
         .replace(/\[(\S+?)\]\(\S+?\)/g, '$1')
-        .replace(/<[^>]+>/g, '')
+        // 去除提示块
         .replace(/^:::[\s\S]+?$/gm, '')
+        // 去除空白字符
         .replace(/\s/g, ' '),
       link: item.path,
-      linkText: dayjs(item.frontMatter.date[item.frontMatter.date.length - 1]).format('YYYY-MM-DD'),
+      // 显示发布时间
+      linkText: dayjs(item.frontMatter.date[0]).format('YYYY-MM-DD'),
     }
   })
 )

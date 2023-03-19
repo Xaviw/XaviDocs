@@ -6,6 +6,21 @@
 
 [中文文档](https://nodejs.cn/api/packages.html#introduction)中翻译的介绍，理解起来仍有难度。简单来说`package.json`就是一个包（`package`）描述文件，在`node`对包内文件进行处理（比如模块类型识别等）时，会按照最近的平级或上级`package.json`中描述的规则处理，另外`package.json`默认不对`node_modules`目录生效
 
+## 生成
+
+`package.json`可以手动生成也可以通过命令生成:
+
+```shell
+# 根据提示输入字段内容
+npm init
+# 全部使用默认值生成
+npm init -y
+# yarn或pnpm也有同样的命令，区别是yarn和pnpm都是默认生成，不需要加-y
+# pnpm生成内容与npm默认内容一致，yarn生成只有name和packageManager字段
+yarn init
+pnpm init
+```
+
 ## Node使用的字段
 
 ### type
@@ -151,9 +166,34 @@
 
 除此之外还提供了一些特定的脚本，可以自行查看[官方文档](https://nodejs.cn/npm/cli/v8/using-npm/scripts/#life-cycle-scripts)
 
+### config
+
+`config`字段用于添加命令行环境变量，添加后`scripts`字段中指定运行的脚本中便可以使用添加的环境变量
+
+```json
+{
+  "config": { "port": "8888" },
+  "scripts": { "start": "node server.js" }
+}
+```
+
+```js
+// server.js
+console.log(process.env.npm_package_config_port) // 8888
+```
+
 ### dependencies
 
-运行时依赖（运行相关的核心文件），包含包名以及版本的映射，通过`npm install xxx`（现在`--save`可以省略）时会自动将`xxx`添加到`dependencies`中
+```shell
+# i是全称install的缩写命令
+# 常见的--save或-S可以不用添加
+# @version可以省略，默认最新稳定版本
+npm i lib-name@version
+pnpm i lib-name@version
+yarn add lib-name@version
+```
+
+运行时依赖（运行相关的核心文件），包含包名以及版本的映射，通过包管理器安装时会自动将包名以及版本添加到`dependencies`中
 
 标准的项目版本规则通常为：`主版本号.副版本号.修订版本号-预发布标签.预发布版本号`，例如`vitepress`当前版本`1.0.0-alpha.49`。详情可以查看[semver](https://github.com/npm/node-semver#versions)
 
@@ -175,13 +215,26 @@
 
 ### devDependencies
 
-开发时依赖（例如代码格式化、测试等，与主题功能无关），内容同`dependencies`。通过`npm install xxx -D`（或者`--save-dev`）时会自动将`xxx`添加到`devDependencies`中
+```shell
+# -D也可以写作--save-dev
+npm i lib-name@version -D
+pnpm i lib-name@version -D
+yarn add lib-name@version -D
+```
 
-在普通项目开发时，`dependencies`和`devDependencies`没有区别，因为打包器是按照导入读取的文件，与依赖项无关。所以普通项目中唯一的作用是可以通过`npm install`一键安装依赖
+开发时依赖（例如代码格式化、测试等，与主题功能无关），内容同`dependencies`。通过包管理器安装时会自动将`xxx`添加到`devDependencies`中
+
+在不作为包发布的项目中，`dependencies`和`devDependencies`没有区别，因为打包器是按照导入读取的文件，与依赖项无关
 
 但如果项目要作为包发布，用户引入你的包时，则只会下载`dependencies`中的依赖
 
 ### peerDependencies
+
+```shell
+npm i lib-name@version --save-peer
+pnpm i lib-name@version --save-peer
+yarn add lib-name@version --save-peer
+```
 
 用于指定当前包需要的宿主环境，内容同`dependencies`，通常在插件中使用
 
@@ -293,4 +346,6 @@
 
 如果设置为`true`，则`npm`会拒绝发布该包
 
+### preferGlobal
 
+设置为`true`时，如果用户安装该包未使用`--global`参数，则会显示警告

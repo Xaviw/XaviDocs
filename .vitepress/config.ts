@@ -1,7 +1,7 @@
 import { DefaultTheme, UserConfig } from 'vitepress'
 import sidebar from './sidebar'
 import juejin from '../public/svg/juejin'
-import readPages, { getGitTimestamp } from './readPages'
+import readPages from './readPages'
 import AutoSidebar from './autoSidebarPlugin'
 
 async function config() {
@@ -47,7 +47,6 @@ async function config() {
 
     themeConfig: {
       pages: await readPages({ sidebar, path: '.' }),
-      firstCommit: (await getGitTimestamp('package.json'))[1],
       // 是否显示右边目录
       // aside: false,
 

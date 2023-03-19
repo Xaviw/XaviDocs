@@ -38,12 +38,8 @@ export default async function readPages(option: ReadOption = {}): Promise<Pages[
       }
     })
   )
-  // 按日期降序排列
-  pages.sort((a, b) => {
-    let d1 = a.frontMatter.date[a.frontMatter.date.length - 1]
-    let d2 = b.frontMatter.date[b.frontMatter.date.length - 1]
-    return d2 - d1
-  })
+  // 按发布日期降序排列
+  pages.sort((a, b) => b.frontMatter.date[0] - a.frontMatter.date[0])
   return pages
 }
 
@@ -51,6 +47,7 @@ async function getPagePaths(option: ReadOption) {
   // 如果传入了sidebar，则获取sidebar中所有页面路径传入globby
   // 否则遍历所有md文件
   const patterns: string[] = option.sidebar ? getLink(option.sidebar, option.path) : ['**.md']
+  // 忽略无需识别的文件
   return await globby(patterns, {
     ignore: ['node_modules', 'README.md', 'public', '.vitepress', 'components', 'scripts', ...(option.ignorePath || [])],
   })
@@ -68,19 +65,21 @@ function getLink(sidebar: DefaultTheme.Sidebar, path: string = '/docs'): string[
 }
 
 // 获取文件提交时间
-export function getGitTimestamp(file: string) {
+function getGitTimestamp(file: string) {
   return new Promise<[number, number]>((resolve, reject) => {
     // 开启子进程执行git log命令
     const child = spawn('git', ['--no-pager', 'log', '--pretty="%ci"', file])
     let output: string[] = []
     child.stdout.on('data', (d) => {
       const data = String(d).trim()
-      data && output.push(...data.split('\n'))
+      data && (output = data.split('\n'))
     })
     child.on('close', () => {
       if (output.length) {
-        resolve([+new Date(output[0]), +new Date(output[output.length - 1])])
+        // 返回[发布时间，最近更新时间]
+        resolve([+new Date(output[output.length - 1]), +new Date(output[0])])
       } else {
+        // 没有提交记录的文件，返回当前时间
         resolve([+new Date(), +new Date()])
       }
     })
