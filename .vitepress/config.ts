@@ -243,9 +243,7 @@ async function config() {
     // 传递给`@vitejs/plugin-vue`的参数
     // vue?: Options,
 
-    // rewrites: {
-    //   '1.前端系列/uniapp/UniApp对比原生小程序.md': '1.前端系列/UniApp对比原生小程序.md',
-    // },
+    // rewrites: {},
 
     // vite配置
     // vite: {

@@ -1,4 +1,4 @@
-# UniApp对比原生小程序
+# uniapp对比原生小程序
 
 uniapp和原生小程序都有不少的槽点，但相对来说更推荐uniapp
 

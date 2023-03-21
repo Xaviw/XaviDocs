@@ -14,40 +14,130 @@
 /** 简单描述 */
 
 /**
+ * @file 用于描述文件，放在文件头部
  * 文件作者
  * @author name <email>
- */
- 
-/**
- * 弃用
- * @deprecated description
- */
- 
-/**
- * 函数示例，可以有多个
- * @example description
- * // return x
- * methodName(args)
- */
- 
-/**
- * 描述函数
- * @callback 使用后下面参数描述回调函数参数
- * @param {type} name=default - description
- * @param {(type1|type2|*)} [name.param] - description
- * @param {...type} [name[].param] - description
- * @returns {type} description
+ * @version 1.0.0
  */
  
 /**
  * 普通类型描述
- * @type {type}
+ * '*'表示任意类型
+ * '?'表示可能为null
+ * '!'表示不能为null
+ * @type {*}
+ * @type {?string}
+ * @type {!number}
+ */
+
+/**
+ * 某部分的详细描述
+ * @desc description
+ * 某部分的简要描述
+ * @summary description
+ */
+
+/**
+ * 标记变量
+ * type类型同@type规则
+ * '[]'表示非必填
+ * @var [type] [name]
+ * 标记常量
+ * @constant [type] [name]
+ */
+
+/**
+ * 标记只读
+ * @readonly
+ * 标记默认值
+ * @default [value]
+ */
+
+/**
+ * 标记一个枚举类型（对象所有值都是同一个类型）
+ * 仅某个属性类型不同时可以用@type单独标记
+ * @enum {type}
  */
  
 /**
  * 描述对象属性
  * @property {type} defaults - description
  * @property {type} defaults.param - description
+ */
+
+/**
+ * 标记函数
+ * @func [name]
+ */
+ 
+/**
+ * 函数示例，可以有多个
+ * @example description
+ * add(1,2) // return 3
+ */
+function add(a, b) { return a + b }
+ 
+/**
+ * 第一行可以描述函数
+ * 标记默认值
+ * @param {type} name=default - description
+ * 标记多个属性类型，'[name]'表示参数非必填
+ * @param {(type1|type2|*)} [name.param] - description
+ * 表示类型为对象组成的数组，'name[].param'描述对象中属性
+ * @param {object[]} [name[].param] - description
+ * @returns {type} description
+ */
+
+/**
+ * 创建自定义类型，用于传递给作为回调函数的参数
+ * callback后续描述为自定义类型描述
+ * @callback name
+ * @param {number} a
+ * 使用方式：
+ * @param {name} a - 参数a是一个回调函数
+ */
+
+/**
+ * 标记是一个构造函数
+ * @class [type] [name]
+ * 标记是继承得来的类
+ * @extends className
+ * @classdesc 对类的描述
+ * @desc 类使用是是对构造函数的描述
+ */
+
+/**
+ * 标记类属性
+ * @member [type] [name]
+ * 标记类方法
+ * @method [name]
+ * 标记访问范围
+ * @public
+ * @private
+ * @protected
+ * 实例属性或方法
+ * @instance
+ * 静态属性或方法
+ * @static
+ * 标记子类必须实现此方法
+ * @abstract
+ * 标记此方法是重写了父类同名方法
+ * @override
+ */
+
+/**
+ * 标记这部分代码会抛出某个异常
+ * @throws {type} - description
+ */
+
+/**
+ * 标记未完成事项
+ * @todo description
+ */
+ 
+/**
+ * 标记api已弃用
+ * @deprecated description
  */
 
 ```

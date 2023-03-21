@@ -49,23 +49,7 @@ const features = ref<Feature[]>(
     }
     return {
       title: regTitle || item.title,
-      details: item.content
-        // 只保留最大可能显示范围
-        .slice(0, 200)
-        // 去除html标签，因为Feature组件内部用的v-html显示
-        .replace(/<[^>]+?>/g, '')
-        // 去除标题
-        .replace(/^#+ [\S]+?\s/gm, '')
-        // 去除引用
-        .replace(/^\> /gm, '')
-        // 只保留反引号内部内容
-        .replace(/`(\S+?)`/g, '$1')
-        // 只保留跳转内容
-        .replace(/\[(\S+?)\]\(\S+?\)/g, '$1')
-        // 去除提示块
-        .replace(/^:::[\s\S]+?$/gm, '')
-        // 去除空白字符
-        .replace(/\s/g, ' '),
+      details: item.content,
       link: item.path,
       // 显示发布时间
       linkText: dayjs(item.frontMatter.date[0]).format('YYYY-MM-DD'),

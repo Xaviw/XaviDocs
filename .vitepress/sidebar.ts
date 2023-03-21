@@ -17,9 +17,9 @@ const sidebar: DefaultTheme.Sidebar = {
       ],
     },
     {
-      text: 'UniApp',
+      text: 'uniapp',
       items: [
-        { text: 'uniapp对比原生小程序', link: '/前端系列/uniapp/UniApp对比原生小程序' },
+        { text: 'uniapp对比原生小程序', link: '/前端系列/uniapp/uniapp对比原生小程序' },
         { text: '解决首页闪烁问题', link: '/前端系列/uniapp/解决首页闪烁问题' },
         { text: '实现全局自定义浮层', link: '/前端系列/uniapp/实现全局自定义浮层' },
       ],
@@ -45,6 +45,7 @@ const sidebar: DefaultTheme.Sidebar = {
         { text: 'VSCode设置', link: '/工具系列/编辑器/VSCode设置' },
         { text: 'VSCode插件推荐', link: '/工具系列/编辑器/VSCode插件推荐' },
         { text: '实用语法-JSDoc、Emmet', link: '/工具系列/编辑器/实用语法-JSDoc、Emmet' },
+        { text: 'HBuilderX设置', link: '/工具系列/编辑器/HBuilderX设置' },
       ],
     },
     {

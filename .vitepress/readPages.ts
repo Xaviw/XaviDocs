@@ -33,7 +33,27 @@ export default async function readPages(option: ReadOption = {}): Promise<Pages[
       return {
         frontMatter: data,
         path,
-        content,
+        content: content
+          // 只保留最大可能显示范围
+          .slice(0, 200)
+          // 本文档创作过程中发现不能在config配置中含有`import.meta.env`字样
+          // 在向官方提issue后得到回复这并不算一个bug，建议通过\0插入空字符解决
+          .replace(/(import)/gi, 'i\0mport')
+          .replace(/(export)/gi, 'e\0export')
+          // 去除html标签，因为Feature组件内部用的v-html显示
+          .replace(/<[^>]+?>/g, '')
+          // 去除标题
+          .replace(/^#+ [\S]+?\s/gm, '')
+          // 去除引用
+          .replace(/^\> /gm, '')
+          // 只保留反引号内部内容
+          .replace(/`(\S+?)`/g, '$1')
+          // 只保留跳转内容
+          .replace(/\[(\S+?)\]\(\S+?\)/g, '$1')
+          // 去除提示块
+          .replace(/^:::[\s\S]+?$/gm, '')
+          // 去除空白字符
+          .replace(/\s/g, ' '),
         title: path.split('/').pop() || path, // 从路径中获取标题
       }
     })
