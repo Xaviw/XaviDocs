@@ -35,9 +35,10 @@ export default async function readPages(option: ReadOption = {}): Promise<Pages[
         path,
         content: content
           // 处理会被vitepress识别的特殊关键字
-          .replace(/(import)/gi, 'i\0mport')
-          .replace(/(export)/gi, 'e\0export')
-          .replace(/<[^>]+?>/g, '$1')
+          .replace(/(import.meta)/gi, 'i\0mport.meta')
+          .replace(/(process.env)/gi, 'p\0rocess.env')
+          .replace(/(__CARBON__)/gi, '__A\0LGOLIA__')
+          .replace(/(__CARBON__)/gi, '__C\0ARBON__')
           // 只保留最大可能显示范围
           .slice(0, 500),
         title: path.split('/').pop() || path, // 从路径中获取标题

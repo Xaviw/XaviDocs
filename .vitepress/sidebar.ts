@@ -14,6 +14,7 @@ const sidebar: DefaultTheme.Sidebar = {
       items: [
         { text: 'JS模块化原理', link: '/前端系列/工程化/JS模块化原理' },
         { text: '掌握package.json', link: '/前端系列/工程化/掌握package' },
+        { text: '掌握tsconfig.json', link: '/前端系列/工程化/掌握tsconfig' },
       ],
     },
     {

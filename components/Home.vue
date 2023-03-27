@@ -50,6 +50,8 @@ const features = ref<Feature[]>(
     return {
       title: regTitle || item.title,
       details: item.content
+        // 去除html标签
+        .replace(/<[^>]+?>/g, '')
         // 去除标题
         .replace(/^#+ [\S]+?\s/gm, '')
         // 去除引用
