@@ -20,14 +20,14 @@
     "save": "zx save.mjs"
   },
   "dependencies": {
-    "dayjs": "^1.11.7"
+    "dayjs": "^1.11.9"
   },
   "devDependencies": {
-    "globby": "^13.1.3",
+    "globby": "^13.2.2",
     "gray-matter": "^4.0.3",
-    "vitepress": "1.0.0-alpha.61",
-    "vue": "^3.2.45",
-    "zx": "^7.1.1"
+    "vitepress": "1.0.0-rc.4",
+    "vue": "^3.3.4",
+    "zx": "^7.2.3"
   },
   "engines": {
     "node": "^14.18.0 || >=16.0.0"

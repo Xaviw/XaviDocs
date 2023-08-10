@@ -27,6 +27,12 @@ const sidebar: DefaultTheme.Sidebar = {
         { text: '封装APP跳转微信小程序支付方法', link: '/前端系列/uniapp/封装APP跳转微信小程序支付方法' },
       ],
     },
+    {
+      text: '日常记录',
+      items: [
+        // { text: 'Axios', link: '/前端系列/日常记录/Vue静态资源处理' }
+      ],
+    },
   ],
   '/工具系列/': [
     {
