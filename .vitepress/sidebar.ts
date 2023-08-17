@@ -53,7 +53,8 @@ const sidebar: DefaultTheme.Sidebar = {
       items: [
         { text: 'VSCode设置', link: '/工具系列/编辑器/VSCode设置' },
         { text: 'VSCode插件推荐', link: '/工具系列/编辑器/VSCode插件推荐' },
-        { text: '实用语法-JSDoc、Emmet', link: '/工具系列/编辑器/实用语法-JSDoc、Emmet' },
+        { text: 'JSDoc介绍', link: '/工具系列/编辑器/JSDoc介绍' },
+        { text: 'Emmet语法介绍', link: '/工具系列/编辑器/Emmet语法介绍' },
         { text: 'HBuilderX设置', link: '/工具系列/编辑器/HBuilderX设置' },
       ],
     },
