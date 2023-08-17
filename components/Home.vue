@@ -50,12 +50,16 @@ const features = ref<Feature[]>(
     return {
       title: regTitle || item.title,
       details: item.content
+        // 去除html标签
+        .replace(/<[^>]+?>/g, '')
         // 去除标题
         .replace(/^#+ [\S]+?\s/gm, '')
         // 去除引用
         .replace(/^\> /gm, '')
         // 只保留反引号内部内容
         .replace(/`(\S+?)`/g, '$1')
+        // 只保留加粗、倾斜符号中的内容
+        .replace(/\*{1,3}(\S+?)\*{1,3}/g, '$1')
         // 只保留跳转内容
         .replace(/\[(\S+?)\]\(\S+?\)/g, '$1')
         // 去除提示块
@@ -75,11 +79,11 @@ function randomPage(): string {
 }
 
 function update() {
-  const diff = dayjs().diff(dayjs(firstCommit))
-  const diffDays = dayjs.duration(diff).days()
-  const diffHours = dayjs.duration(diff).hours()
-  const diffMinutes = dayjs.duration(diff).minutes()
-  const diffSeconds = dayjs.duration(diff).seconds()
+  const duration = dayjs.duration(dayjs().diff(dayjs(firstCommit)))
+  const diffDays = dayjs().diff(dayjs(firstCommit), 'day')
+  const diffHours = duration.hours()
+  const diffMinutes = duration.minutes()
+  const diffSeconds = duration.seconds()
   tagline.value = `过去的${diffDays || ''}天${diffHours || ''}时${diffMinutes < 10 ? `0${diffMinutes}` : diffMinutes}分${diffSeconds < 10 ? `0${diffSeconds}` : diffSeconds}秒中，累计更新${
     pages.length
   }篇文章`

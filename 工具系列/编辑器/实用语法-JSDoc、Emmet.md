@@ -1,12 +1,12 @@
 # 实用语法-JSDoc、Emmet
 
-> VSCode、HBuilderX等大部分编辑器均已内置支持，无需额外安装插件
+> VSCode、HBuilderX等编辑器均已内置支持，无需额外安装插件
 
 ## JSDoc
 
 对JS、TS代码添加描述注释，编辑器会识别并在引用处提供代码提示（类似TS类型提示）
 
-也可作为TS项目中JS文件的类型补充
+可用于导出API文档，也可作为TS项目中JS文件的类型补充
 
 详细查看[文档](https://www.jsdoc.com.cn/)，常用示例如下：
 
@@ -15,8 +15,7 @@
 
 /**
  * @file 用于描述文件，放在文件头部
- * 文件作者
- * @author name <email>
+ * @author 文件作者 <email>
  * @version 1.0.0
  */
  

@@ -14,14 +14,23 @@ const sidebar: DefaultTheme.Sidebar = {
       items: [
         { text: 'JS模块化原理', link: '/前端系列/工程化/JS模块化原理' },
         { text: '掌握package.json', link: '/前端系列/工程化/掌握package' },
+        // { text: '掌握tsconfig.json', link: '/前端系列/工程化/掌握tsconfig' },
       ],
     },
     {
       text: 'uniapp',
       items: [
         { text: 'uniapp对比原生小程序', link: '/前端系列/uniapp/uniapp对比原生小程序' },
+        { text: '搭建uniapp通用业务框架', link: '/前端系列/uniapp/搭建uniapp通用业务框架' },
         { text: '解决首页闪烁问题', link: '/前端系列/uniapp/解决首页闪烁问题' },
         { text: '实现全局自定义浮层', link: '/前端系列/uniapp/实现全局自定义浮层' },
+        { text: '封装APP跳转微信小程序支付方法', link: '/前端系列/uniapp/封装APP跳转微信小程序支付方法' },
+      ],
+    },
+    {
+      text: '日常记录',
+      items: [
+        // { text: 'Axios', link: '/前端系列/日常记录/Vue静态资源处理' }
       ],
     },
   ],
