@@ -2,6 +2,7 @@
   "name": "xavi-blog",
   "version": "1.0.0",
   "description": "个人技术文档",
+  "packageManager": "pnpm@8.6.5",
   "keywords": [
     "前端",
     "技术文档",
@@ -35,11 +36,9 @@
   "pnpm": {
     "peerDependencyRules": {
       "ignoreMissing": [
-        "@algolia/client-search"
+        "@algolia/client-search",
+        "search-insights"
       ]
     }
-  },
-  "volta": {
-    "node": "18.14.2"
   }
 }
