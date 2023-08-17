@@ -17,8 +17,7 @@
   "scripts": {
     "build": "vitepress build",
     "deploy": "zx deploy.mjs",
-    "dev": "vitepress dev",
-    "save": "zx save.mjs"
+    "dev": "vitepress dev"
   },
   "dependencies": {
     "dayjs": "^1.11.9"
@@ -27,8 +26,7 @@
     "globby": "^13.2.2",
     "gray-matter": "^4.0.3",
     "vitepress": "1.0.0-rc.4",
-    "vue": "^3.3.4",
-    "zx": "^7.2.3"
+    "vue": "^3.3.4"
   },
   "engines": {
     "node": "^14.18.0 || >=16.0.0"

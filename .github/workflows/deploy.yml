@@ -1,5 +1,4 @@
-# github工作流构建部署GitHubPages
-name: 部署XaviDocs到GithubPages
+name: 部署到GithubPages
 
 on:
   # 执行 'push' 到 'master' 时触发
@@ -26,22 +25,24 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
+      - name: 获取代码
         uses: actions/checkout@v3
         with:
-          fetch-depth: 0 # 如果未启用lastUpdated，则不需要
-      - uses: pnpm/action-setup@v2 # Uncomment this if you're using pnpm
-      - name: Setup Node
+          # 获取全部提交记录，如果未启用lastUpdated，则不需要
+          fetch-depth: 0
+      - name: 安装PNPM
+        uses: pnpm/action-setup@v2
+      - name: 安装Node
         uses: actions/setup-node@v3
         with:
           node-version: 18
-          cache: pnpm # 或者 npm / yarn
+          cache: pnpm
       - name: Setup Pages
         uses: actions/configure-pages@v3
-      - name: Install dependencies
-        run: pnpm install # 或者 npm ci / yarn install
-      - name: Build with VitePress
-        run: pnpm build # 或者 npm run build / yarn build
+      - name: 安装依赖
+        run: pnpm install
+      - name: 打包
+        run: pnpm build
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v2
         with:
@@ -54,8 +55,8 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
     needs: build
     runs-on: ubuntu-latest
-    name: Deploy
+    name: 部署
     steps:
-      - name: Deploy to GitHub Pages
+      - name: 部署到 GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v2
