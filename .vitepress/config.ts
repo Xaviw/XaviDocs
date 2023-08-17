@@ -1,6 +1,5 @@
 import type { DefaultTheme, UserConfig } from 'vitepress'
 import type { Pages } from './readPages'
-import juejin from '../public/svg/juejin'
 import sidebar from './sidebar'
 import readPages from './readPages'
 import AutoSidebar from './autoSidebarPlugin'
@@ -40,13 +39,7 @@ const config: Config = {
     sidebar: sidebar,
     outline: 'deep',
     outlineTitle: '目录',
-    socialLinks: [
-      { icon: 'github', link: 'https://github.com/Xaviw/XaviDocs' },
-      {
-        icon: { svg: juejin },
-        link: 'https://juejin.cn/user/3192637500426840',
-      },
-    ],
+    socialLinks: [{ icon: 'github', link: 'https://github.com/Xaviw/XaviDocs' }],
     editLink: {
       pattern: 'https://github.com/Xaviw/XaviDocs/edit/master/docs/:path',
       text: '修改本文',

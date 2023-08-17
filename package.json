@@ -2,13 +2,11 @@
   "name": "xavi-blog",
   "version": "1.0.0",
   "description": "个人技术文档",
-  "packageManager": "pnpm@8.6.5",
   "keywords": [
-    "前端",
+    "vitepress",
     "技术文档",
     "博客",
-    "vitepress",
-    "frontend"
+    "blog"
   ],
   "homepage": "https://xaviw.github.io/XaviDocs/",
   "license": "ISC",
@@ -28,6 +26,7 @@
     "vitepress": "1.0.0-rc.4",
     "vue": "^3.3.4"
   },
+  "packageManager": "pnpm@8.6.5",
   "engines": {
     "node": "^14.18.0 || >=16.0.0"
   },
