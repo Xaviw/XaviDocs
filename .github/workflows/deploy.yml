@@ -1,0 +1,61 @@
+# github工作流构建部署GitHubPages
+name: 部署XaviDocs到GithubPages
+
+on:
+  # 执行 'push' 到 'master' 时触发
+  push:
+    branches: [master]
+
+  # 允许从“操作”选项卡手动运行此工作流
+  workflow_dispatch:
+
+# 设置GITHUB_TOKEN的权限以允许部署到GITHUB页面
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# 只允许一次并发部署，跳过在进行中的运行和最近排队的运行之间排队的运行。
+# 但是，不要取消正在进行的运行，因为我们希望完成这些生产部署。
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  # 打包流程
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0 # 如果未启用lastUpdated，则不需要
+      - uses: pnpm/action-setup@v2 # Uncomment this if you're using pnpm
+      - name: Setup Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+          cache: pnpm # 或者 npm / yarn
+      - name: Setup Pages
+        uses: actions/configure-pages@v3
+      - name: Install dependencies
+        run: pnpm install # 或者 npm ci / yarn install
+      - name: Build with VitePress
+        run: pnpm build # 或者 npm run build / yarn build
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v2
+        with:
+          path: docs/.vitepress/dist
+
+  # 部署流程
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    needs: build
+    runs-on: ubuntu-latest
+    name: Deploy
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v2
