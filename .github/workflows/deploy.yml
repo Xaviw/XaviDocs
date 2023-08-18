@@ -1,31 +1,32 @@
+# name名称可以任意取
 name: 部署到GithubPages
 
 on:
-  # 执行 'push' 到 'master' 时触发
+  # 执行 'push' 到 'master' 时触发，根据自己仓库的分支名修改
   push:
     branches: [master]
 
   # 允许从“操作”选项卡手动运行此工作流
   workflow_dispatch:
 
-# 设置GITHUB_TOKEN的权限以允许部署到GITHUB页面
+# 设置GITHUB_TOKEN的权限
 permissions:
   contents: read
   pages: write
   id-token: write
 
-# 只允许一次并发部署，跳过在进行中的运行和最近排队的运行之间排队的运行。
-# 但是，不要取消正在进行的运行，因为我们希望完成这些生产部署。
+# 设置属于'pages'组下的工作流并发，设置后只运行首个和最新的工作流，中间等待状态的工作流将被取消
 concurrency:
   group: pages
-  cancel-in-progress: false
+  # 取消首个工作流的运行，这样在并发时就只会运行最新的
+  cancel-in-progress: true
 
 jobs:
   # 打包流程
   build:
     runs-on: ubuntu-latest
     steps:
-      - name: 获取代码
+      - name: 检出代码到打包环境中
         uses: actions/checkout@v3
         with:
           # 获取全部提交记录，如果未启用lastUpdated，则不需要
@@ -37,13 +38,13 @@ jobs:
         with:
           node-version: 18
           cache: pnpm
-      - name: Setup Pages
+      - name: 启用Github Pages并读取文档元数据
         uses: actions/configure-pages@v3
       - name: 安装依赖
         run: pnpm install
       - name: 打包
         run: pnpm build
-      - name: Upload artifact
+      - name: 上传项目
         uses: actions/upload-pages-artifact@v2
         with:
           path: .vitepress/dist
@@ -55,7 +56,6 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
     needs: build
     runs-on: ubuntu-latest
-    name: 部署
     steps:
       - name: 部署到 GitHub Pages
         id: deployment

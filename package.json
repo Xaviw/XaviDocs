@@ -17,10 +17,8 @@
     "deploy": "zx deploy.mjs",
     "dev": "vitepress dev"
   },
-  "dependencies": {
-    "dayjs": "^1.11.9"
-  },
   "devDependencies": {
+    "@types/node": "^20.5.0",
     "globby": "^13.2.2",
     "gray-matter": "^4.0.3",
     "vitepress": "1.0.0-rc.4",

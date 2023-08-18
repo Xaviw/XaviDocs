@@ -1,19 +1,14 @@
-import type { DefaultTheme, UserConfig } from 'vitepress'
-import type { Pages } from './readPages'
+import { defineConfig } from 'vitepress'
 import sidebar from './sidebar'
-import readPages from './readPages'
 import AutoSidebar from './autoSidebarPlugin'
 
-type Config = UserConfig<DefaultTheme.Config & { pages: Pages[] }>
-
-const config: Config = {
-  locales: { zh: { label: '简体中文' } },
+export default defineConfig({
   title: 'Xavi的技术文档',
   description: '个人前端技术文档',
   lang: 'zh-cmn-Hans',
   base: '/XaviDocs/',
   // 忽略根目录的README和TODO
-  srcExclude: ['/README.md', '/TODO.md'],
+  srcExclude: ['**/README.md', '**/TODO.md'],
   lastUpdated: true,
   markdown: {
     lineNumbers: true,
@@ -41,7 +36,7 @@ const config: Config = {
     outlineTitle: '目录',
     socialLinks: [{ icon: 'github', link: 'https://github.com/Xaviw/XaviDocs' }],
     editLink: {
-      pattern: 'https://github.com/Xaviw/XaviDocs/edit/master/docs/:path',
+      pattern: 'https://github.com/Xaviw/XaviDocs/edit/master/:path',
       text: '修改本文',
     },
     docFooter: {
@@ -74,8 +69,5 @@ const config: Config = {
         },
       },
     },
-    pages: await readPages({ sidebar, path: '.' }),
   },
-}
-
-export default config
+})
