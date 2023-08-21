@@ -2,6 +2,15 @@ import { join } from 'path'
 import { readdirSync, statSync, closeSync, openSync, utimesSync } from 'fs'
 import { DefaultTheme } from 'vitepress'
 
+/**
+ * @file 自动生成nav和sidebar的vite插件
+ * 1.读取文档目录，按一级目录生成nav
+ * 2.读取次级目录，依次生成sidebar
+ * 3.跳过空目录，以及需要忽略的目录
+ * 4.文档可以在frontmatter中定义是否展示（默认展示）、展示名（默认文件名）、排序值（默认创建时间排序）
+ * 5.配置中可以传入nav排序
+ */
+
 export interface PluginOption {
   ignoreList?: string[]
   ignoreFlag?: string
@@ -11,7 +20,7 @@ export interface PluginOption {
 
 let configPath: string
 
-export default function autoSidebarPlugin(option: PluginOption = {}) {
+export default function autoNavPlugin(option: PluginOption = {}) {
   const docsPath = join(process.cwd(), option.path || '/docs')
   configPath = join(docsPath, `/.vitepress/config.${option.configExtname || 'ts'}`)
   return {
