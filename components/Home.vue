@@ -9,7 +9,7 @@ import VPFeatures from 'vitepress/dist/client/theme-default/components/VPFeature
 import { data as pages } from '../.vitepress/create.data'
 
 const tagline = `累计更新${pages.length}篇文章`
-const image = { light: 'svg/pic1.svg', dark: 'svg/pic2.svg' }
+const image = { light: '/pic1.svg', dark: '/pic2.svg' }
 const actions = [
   {
     text: '随便逛逛',

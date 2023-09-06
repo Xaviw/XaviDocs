@@ -11,15 +11,18 @@
 </template>
 
 <script lang="ts" setup>
+import { useData } from 'vitepress';
 import DefaultTheme from 'vitepress/theme'
-import { onMounted } from 'vue'
+import { nextTick, onMounted, watch, watchEffect } from 'vue'
 import NotFound from './NotFound.vue';
 
 const { Layout } = DefaultTheme
 
+const { page } = useData()
+
 onMounted(() => {
   const script = document.createElement('script')
-  const beaudar = document.getElementById('beaudar')
+  script.async = true
   script.src = 'https://beaudar.lipk.org/client.js'
   script.setAttribute('repo', 'Xaviw/XaviDocs')
   script.setAttribute('issue-term', 'pathname')
@@ -32,9 +35,15 @@ onMounted(() => {
     script.setAttribute('theme', 'github-light')
     window.localStorage.setItem('beaudar-theme', 'github-light')
   }
-  script.async = true
-  beaudar?.appendChild(script)
-  console.log(script);
-  
+
+
+  watchEffect(() => {
+    if (page.value?.relativePath !== 'index.md') {
+      nextTick(() => {
+        const beaudar = document.getElementById('beaudar')
+        beaudar?.appendChild(script)
+      })
+    }
+  })
 })
 </script>

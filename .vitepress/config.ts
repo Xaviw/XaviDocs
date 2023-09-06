@@ -18,7 +18,7 @@ export default defineConfig({
   //   plugins: [AutoSidebar({path: '/'})],
   // },
   themeConfig: {
-    logo: '/svg/logo.svg',
+    logo: '/logo.svg',
     nav: [
       {
         text: '前端系列',

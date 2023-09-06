@@ -131,7 +131,7 @@ Module.prototype.require('./index.js')
 
 关于浅拷贝，可以根据这张图理解:
 
-![CommonJS模块化原理](/images/前端系列/工程化-JS模块化原理-1.png)
+![CommonJS模块化原理](../../images/前端系列/工程化-JS模块化原理-1.png)
 
 ### 模块匹配规则
 
