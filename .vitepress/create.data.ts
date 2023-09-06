@@ -34,7 +34,6 @@ export default createContentLoader(sidebarPattern || defaultPattern, {
         .normalize(item.url)
         .split(path.sep)
         .filter((item) => item)
-        .slice(1)
         .join(path.sep)
 
       // 获取发布时间

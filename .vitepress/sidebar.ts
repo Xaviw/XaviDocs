@@ -30,7 +30,8 @@ const sidebar: DefaultTheme.Sidebar = {
     {
       text: '日常记录',
       items: [
-        // { text: 'Axios', link: '/前端系列/日常记录/Vue静态资源处理' }
+        { text: 'Provide、Inject使用指南', link: '/前端系列/日常记录/Provide、Inject使用指南' },
+        // { text: 'Vue静态资源处理', link: '/前端系列/日常记录/Vue静态资源处理' }
       ],
     },
   ],
@@ -42,10 +43,8 @@ const sidebar: DefaultTheme.Sidebar = {
         { text: '基础搭建', link: '/工具系列/VitePress搭建/基础搭建' },
         { text: '进阶语法', link: '/工具系列/VitePress搭建/进阶语法' },
         { text: '配置解析', link: '/工具系列/VitePress搭建/配置解析' },
-        { text: '首页配置', link: '/工具系列/VitePress搭建/首页配置' },
-        { text: '主题配置', link: '/工具系列/VitePress搭建/主题配置' },
-        { text: '自动生成目录', link: '/工具系列/VitePress搭建/自动生成目录' },
         { text: '扩展首页内容', link: '/工具系列/VitePress搭建/扩展首页内容' },
+        { text: '自动生成目录', link: '/工具系列/VitePress搭建/自动生成目录' },
       ],
     },
     {
