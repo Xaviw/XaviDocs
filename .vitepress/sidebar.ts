@@ -44,6 +44,7 @@ const sidebar: DefaultTheme.Sidebar = {
         { text: '进阶语法', link: '/工具系列/VitePress搭建/进阶语法' },
         { text: '配置解析', link: '/工具系列/VitePress搭建/配置解析' },
         { text: '扩展首页内容', link: '/工具系列/VitePress搭建/扩展首页内容' },
+        { text: '添加评论功能', link: '/工具系列/VitePress搭建/添加评论功能' },
         { text: '自动生成目录', link: '/工具系列/VitePress搭建/自动生成目录' },
       ],
     },

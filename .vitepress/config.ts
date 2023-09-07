@@ -8,7 +8,7 @@ export default defineConfig({
   lang: 'zh-cmn-Hans',
   base: '/XaviDocs/',
   // 忽略解析部分md文件（默认忽略node_modules），仅打包后生效，被忽略的文件不影响被其他文件导入
-  srcExclude: ['**/(README|TODO).md', '(.vitepress|public|.guthub|components|snippets)/**/*.md'],
+  srcExclude: ['**/(README|TODO).md', '(.vitepress|public|images|.guthub|components|snippets)/**/*.md'],
   lastUpdated: true,
   markdown: {
     lineNumbers: true,
