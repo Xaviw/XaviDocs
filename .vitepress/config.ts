@@ -15,7 +15,7 @@ export default defineConfig({
     defaultHighlightLang: 'js',
   },
   // vite: {
-  //   plugins: [AutoSidebar({path: '/'})],
+  //   plugins: [AutoSidebar()],
   // },
   themeConfig: {
     logo: '/logo.svg',

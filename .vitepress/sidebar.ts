@@ -4,6 +4,7 @@ const sidebar: DefaultTheme.Sidebar = {
   '/前端系列/': [
     {
       text: '源码系列',
+      collapsed: false,
       items: [
         { text: 'Axios', link: '/前端系列/源码阅读/Axios源码解析' },
         // { text: 'Vuex', link: '/前端系列/源码阅读/Vuex源码解析' },
@@ -11,6 +12,7 @@ const sidebar: DefaultTheme.Sidebar = {
     },
     {
       text: '工程化',
+      collapsed: false,
       items: [
         { text: 'JS模块化原理', link: '/前端系列/工程化/JS模块化原理' },
         { text: '掌握package.json', link: '/前端系列/工程化/掌握package' },
@@ -19,6 +21,7 @@ const sidebar: DefaultTheme.Sidebar = {
     },
     {
       text: 'uniapp',
+      collapsed: false,
       items: [
         { text: 'uniapp对比原生小程序', link: '/前端系列/uniapp/uniapp对比原生小程序' },
         { text: '搭建uniapp通用业务框架', link: '/前端系列/uniapp/搭建uniapp通用业务框架' },
@@ -29,6 +32,7 @@ const sidebar: DefaultTheme.Sidebar = {
     },
     {
       text: '日常记录',
+      collapsed: false,
       items: [
         { text: 'Provide、Inject使用指南', link: '/前端系列/日常记录/Provide、Inject使用指南' },
         // { text: 'Vue静态资源处理', link: '/前端系列/日常记录/Vue静态资源处理' }
@@ -50,6 +54,7 @@ const sidebar: DefaultTheme.Sidebar = {
     },
     {
       text: '编辑器',
+      collapsed: false,
       items: [
         { text: 'VSCode设置', link: '/工具系列/编辑器/VSCode设置' },
         { text: 'VSCode插件推荐', link: '/工具系列/编辑器/VSCode插件推荐' },
