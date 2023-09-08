@@ -42,9 +42,9 @@ function setComments() {
     script.src = 'https://beaudar.lipk.org/client.js';
     script.setAttribute('repo', 'Xaviw/XaviDocs')
     script.setAttribute('issue-term', 'title')
-    script.setAttribute('issue-label', 'pathname');
+    script.setAttribute('comment-order', 'desc')
+    script.setAttribute('input-position', 'top')
     script.setAttribute('crossorigin', 'anonymous')
-    script.setAttribute('label', '💬评论')
     script.async = true;
     comments.value.innerHTML = '';
     comments.value.appendChild(script);
