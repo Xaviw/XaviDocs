@@ -1,5 +1,4 @@
 import { defineConfig } from 'vitepress'
-import sidebar from './sidebar'
 import AutoSidebar from './autoNavPlugin'
 
 export default defineConfig({
@@ -14,24 +13,33 @@ export default defineConfig({
     lineNumbers: true,
     defaultHighlightLang: 'js',
   },
-  // vite: {
-  //   plugins: [AutoSidebar()],
-  // },
+  vite: {
+    plugins: [
+      AutoSidebar({
+        settings: {
+          前端系列: { navSort: 9 },
+          '工具系列/VitePress搭建': { navSort: 9 },
+          '前端系列/源码阅读': { navSort: 9 },
+          '前端系列/日常记录': { navSort: 8 },
+        },
+      }),
+    ],
+  },
   themeConfig: {
     logo: '/logo.svg',
-    nav: [
-      {
-        text: '前端系列',
-        activeMatch: '/前端系列/',
-        link: '/前端系列/源码阅读/Axios源码解析',
-      },
-      {
-        text: '工具系列',
-        activeMatch: '/工具系列/',
-        link: '/工具系列/VitePress搭建/基础搭建',
-      },
-    ],
-    sidebar: sidebar,
+    // nav: [
+    //   {
+    //     text: '前端系列',
+    //     activeMatch: '/前端系列/',
+    //     link: '/前端系列/源码阅读/Axios源码解析',
+    //   },
+    //   {
+    //     text: '工具系列',
+    //     activeMatch: '/工具系列/',
+    //     link: '/工具系列/VitePress搭建/基础搭建',
+    //   },
+    // ],
+    // sidebar: sidebar,
     outline: 'deep',
     outlineTitle: '目录',
     socialLinks: [{ icon: 'github', link: 'https://github.com/Xaviw/XaviDocs' }],

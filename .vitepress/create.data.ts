@@ -2,7 +2,6 @@ import { createContentLoader, DefaultTheme } from 'vitepress'
 import path from 'path'
 import { spawn } from 'child_process'
 import config from './config'
-import sidebar from './sidebar'
 
 // 避免导入时报错
 let data
@@ -10,12 +9,10 @@ export { data }
 
 // 默认匹配所有可用文档
 const defaultPattern = config.srcExclude?.map((item) => `!${item}`) || '*.md'
-// 有sidebar数据则只需要匹配sidebar中存储的文档
-const sidebarPattern = getUrls(sidebar)
 
 // 获取并处理所有文档数据，供首页等使用
 // createContentLoader会默认忽略'**/node_modules/**', '**/dist/**'
-export default createContentLoader(sidebarPattern || defaultPattern, {
+export default createContentLoader(defaultPattern, {
   includeSrc: true,
   async transform(data) {
     const promises: Promise<any>[] = []
