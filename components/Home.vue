@@ -19,7 +19,7 @@ const actions = [
 
 function randomPage(): string {
   const length = pages.length - 1
-  return pages[Math.floor(Math.random() * length)].link
+  return pages[Math.floor(Math.random() * length)]?.link
 }
 </script>
 

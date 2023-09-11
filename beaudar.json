@@ -1,5 +1,6 @@
 {
   "origins": [
-    "https://xaviw.github.io"
+    "https://xaviw.github.io",
+    "http://localhost:5173"
   ]
 }

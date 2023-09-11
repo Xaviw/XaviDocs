@@ -1,5 +1,5 @@
 import { defineConfig } from 'vitepress'
-import AutoSidebar from './autoNavPlugin'
+import AutoNav from 'vite-plugin-vitepress-auto-nav'
 
 export default defineConfig({
   title: 'Xavi的技术文档',
@@ -15,31 +15,23 @@ export default defineConfig({
   },
   vite: {
     plugins: [
-      AutoSidebar({
+      AutoNav({
         settings: {
-          前端系列: { navSort: 9 },
-          '工具系列/VitePress搭建': { navSort: 9 },
-          '前端系列/源码阅读': { navSort: 9 },
-          '前端系列/日常记录': { navSort: 8 },
+          前端系列: { sort: 9 },
+          VitePress搭建: { sort: 9 },
+          源码阅读: { sort: 9 },
+          日常记录: { sort: 8 },
+          Vuex源码解析: { hide: true },
+          Vue静态资源处理: { hide: true },
+          基础搭建: { sort: 9 },
+          进阶语法: { sort: 8 },
+          配置解析: { sort: 7 },
         },
       }),
     ],
   },
   themeConfig: {
     logo: '/logo.svg',
-    // nav: [
-    //   {
-    //     text: '前端系列',
-    //     activeMatch: '/前端系列/',
-    //     link: '/前端系列/源码阅读/Axios源码解析',
-    //   },
-    //   {
-    //     text: '工具系列',
-    //     activeMatch: '/工具系列/',
-    //     link: '/工具系列/VitePress搭建/基础搭建',
-    //   },
-    // ],
-    // sidebar: sidebar,
     outline: 'deep',
     outlineTitle: '目录',
     socialLinks: [{ icon: 'github', link: 'https://github.com/Xaviw/XaviDocs' }],
