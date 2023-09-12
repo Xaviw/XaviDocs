@@ -19,7 +19,7 @@
   },
   "devDependencies": {
     "gray-matter": "^4.0.3",
-    "vite-plugin-vitepress-auto-nav": "^1.0.3",
+    "vite-plugin-vitepress-auto-nav": "^1.0.4",
     "vitepress": "1.0.0-rc.10",
     "vue": "^3.3.4"
   },
@@ -34,5 +34,8 @@
         "search-insights"
       ]
     }
+  },
+  "dependencies": {
+    "@types/node": "^20.6.0"
   }
 }

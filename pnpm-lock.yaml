@@ -4,16 +4,21 @@ settings:
   autoInstallPeers: true
   excludeLinksFromLockfile: false
 
+dependencies:
+  '@types/node':
+    specifier: ^20.6.0
+    version: 20.6.0
+
 devDependencies:
   gray-matter:
     specifier: ^4.0.3
     version: 4.0.3
   vite-plugin-vitepress-auto-nav:
-    specifier: ^1.0.3
-    version: 1.0.3(vite@4.4.9)(vitepress@1.0.0-rc.10)
+    specifier: ^1.0.4
+    version: 1.0.4(vite@4.4.9)(vitepress@1.0.0-rc.10)
   vitepress:
     specifier: 1.0.0-rc.10
-    version: 1.0.0-rc.10
+    version: 1.0.0-rc.10(@types/node@20.6.0)
   vue:
     specifier: ^3.3.4
     version: 3.3.4
@@ -451,6 +456,9 @@ packages:
       '@nodelib/fs.scandir': 2.1.5
       fastq: 1.15.0
     dev: true
+
+  /@types/node@20.6.0:
+    resolution: {integrity: sha512-najjVq5KN2vsH2U/xyh2opaSEz6cZMR2SetLIlxlj08nOcmPOemJmUK2o4kUzfLqfrWE0PIrNeE16XhYDd3nqg==}
 
   /@types/web-bluetooth@0.0.17:
     resolution: {integrity: sha512-4p9vcSmxAayx72yn70joFoL44c9MO/0+iVEBIQXe3v2h2SiAsEIo/G5v6ObFWvNKRFjbrVadNf9LqEEZeQPzdA==}
@@ -951,19 +959,19 @@ packages:
     engines: {node: '>= 10.0.0'}
     dev: true
 
-  /vite-plugin-vitepress-auto-nav@1.0.3(vite@4.4.9)(vitepress@1.0.0-rc.10):
-    resolution: {integrity: sha512-sjJ4D7hfguCxu2VL6UJ9OfaWCF6tPpOkw4GxJLBtIxkDuHtVuohgJPQOb/n2NX0Lg8SXDHDLs6l37Nu8kPdeXQ==}
+  /vite-plugin-vitepress-auto-nav@1.0.4(vite@4.4.9)(vitepress@1.0.0-rc.10):
+    resolution: {integrity: sha512-dGY7MWit4csmRAj2NUruJjdyqhV4mXLUoJPrJ+FP2Cs2KWeV4/UTziAH1FLxDlLSHfI5ah7E4g4i9ZUcG4HClw==}
     peerDependencies:
       vite: ^4.0.0
       vitepress: ^1.0.0
     dependencies:
       fast-glob: 3.3.1
       fs-extra: 11.1.1
-      vite: 4.4.9
-      vitepress: 1.0.0-rc.10
+      vite: 4.4.9(@types/node@20.6.0)
+      vitepress: 1.0.0-rc.10(@types/node@20.6.0)
     dev: true
 
-  /vite@4.4.9:
+  /vite@4.4.9(@types/node@20.6.0):
     resolution: {integrity: sha512-2mbUn2LlUmNASWwSCNSJ/EG2HuSRTnVNaydp6vMCm5VIqJsjMfbIWtbH2kDuwUVW5mMUKKZvGPX/rqeqVvv1XA==}
     engines: {node: ^14.18.0 || >=16.0.0}
     hasBin: true
@@ -991,6 +999,7 @@ packages:
       terser:
         optional: true
     dependencies:
+      '@types/node': 20.6.0
       esbuild: 0.18.20
       postcss: 8.4.28
       rollup: 3.28.0
@@ -998,7 +1007,7 @@ packages:
       fsevents: 2.3.2
     dev: true
 
-  /vitepress@1.0.0-rc.10:
+  /vitepress@1.0.0-rc.10(@types/node@20.6.0):
     resolution: {integrity: sha512-+MsahIWqq5WUEmj6MR4obcKYbT7im07jZPCQPdNJExkeOSbOAJ4xypSLx88x7rvtzWHhHc5aXbOhCRvGEGjFrw==}
     hasBin: true
     dependencies:
@@ -1011,7 +1020,7 @@ packages:
       mark.js: 8.11.1
       minisearch: 6.1.0
       shiki: 0.14.3
-      vite: 4.4.9
+      vite: 4.4.9(@types/node@20.6.0)
       vue: 3.3.4
     transitivePeerDependencies:
       - '@algolia/client-search'

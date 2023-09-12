@@ -50,7 +50,9 @@ export default createContentLoader(['!(.vitepress|public|images|.guthub|componen
           // 去除提示块
           .replace(/^:::[\s\S]+?$/gm, '')
           // 去除空白字符
-          .replace(/\s/g, ' '),
+          .replace(/\s/g, ' ')
+          // 仅保留可能显示的部分，减小数据大小
+          .slice(0, 200),
         link,
         // 显示更新时间
         linkText: new Date(fileTimeInfo[1]).toLocaleDateString(),
