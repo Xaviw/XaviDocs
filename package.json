@@ -19,8 +19,8 @@
   },
   "devDependencies": {
     "gray-matter": "^4.0.3",
-    "vite-plugin-vitepress-auto-nav": "^1.0.4",
-    "vitepress": "1.0.0-rc.10",
+    "vite-plugin-vitepress-auto-nav": "^1.2.2",
+    "vitepress": "1.0.0-rc.20",
     "vue": "^3.3.4"
   },
   "packageManager": "pnpm@8.6.5",

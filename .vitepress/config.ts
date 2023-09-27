@@ -16,7 +16,7 @@ export default defineConfig({
   vite: {
     plugins: [
       AutoNav({
-        settings: {
+        itemsSetting: {
           前端系列: { sort: 9 },
           VitePress搭建: { sort: 9 },
           源码阅读: { sort: 9 },

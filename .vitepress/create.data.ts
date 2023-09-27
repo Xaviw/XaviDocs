@@ -1,6 +1,7 @@
 import { createContentLoader, DefaultTheme } from 'vitepress'
 import path from 'path'
 import { spawn } from 'child_process'
+import fs from 'fs'
 
 // 避免导入时报错
 let data
@@ -15,7 +16,7 @@ export default createContentLoader(['!(.vitepress|public|images|.guthub|componen
 
     data.forEach((item) => {
       // 用页面的一级标题作为文章标题（因为sidebar中可能是精简的标题）
-      let title = item.src?.match(/^#\s+(.*?)\s*$/m)?.[1] || path.basename(item.url).replace(path.extname(item.url), '')
+      let title = item.src?.match(/^#\s+(.*?)\s*/)?.[1] || path.basename(item.url).replace(path.extname(item.url), '')
       // 标题可能用到了变量，需要替换
       const matterTitle = title?.match(/\{\{\$frontmatter\.(\S+)\}\}/)?.[1]
       if (matterTitle) {
@@ -69,38 +70,47 @@ export default createContentLoader(['!(.vitepress|public|images|.guthub|componen
 })
 
 // 获取文件提交时间
-function getGitTimestamp(file: string) {
+function getGitTimestamp(filePath: string) {
   return new Promise<[number, number]>((resolve) => {
-    let output: number[] = []
+    let output: number[] = [];
 
     // 开启子进程执行git log命令
-    const child = spawn('git', ['--no-pager', 'log', '--pretty="%ci"', file])
+    const child = spawn("git", [
+      "--no-pager",
+      "log",
+      '--pretty="%ci"',
+      filePath,
+    ]);
 
     // 监听输出流
-    child.stdout.on('data', (d) => {
+    child.stdout.on("data", (d) => {
       const data = String(d)
-        .split('\n')
+        .split("\n")
         .map((item) => +new Date(item))
-        .filter((item) => item)
-      output.push(...data)
-    })
+        .filter((item) => item);
+      output.push(...data);
+    });
 
     // 输出接受后返回
-    child.on('close', () => {
+    child.on("close", () => {
       if (output.length) {
         // 返回[发布时间，最近更新时间]
-        resolve([+new Date(output[output.length - 1]), +new Date(output[0])])
+        resolve([+new Date(output[output.length - 1]), +new Date(output[0])]);
       } else {
-        // 没有提交记录的文件，返回当前时间
-        resolve([+new Date(), +new Date()])
+        // 没有提交记录时获取文件时间
+        const { birthtimeMs: createTime, ctimeMs: updateTime } =
+          fs.statSync(filePath);
+        resolve([createTime, updateTime]);
       }
-    })
+    });
 
-    child.on('error', () => {
-      // 获取失败时使用当前时间，避免构建错误
-      resolve([+new Date(), +new Date()])
-    })
-  })
+    child.on("error", () => {
+      // 获取失败时使用文件时间
+      const { birthtimeMs: createTime, ctimeMs: updateTime } =
+        fs.statSync(filePath);
+      resolve([createTime, updateTime]);
+    });
+  });
 }
 
 // 使用正则提取sidebar中所有页面链接
