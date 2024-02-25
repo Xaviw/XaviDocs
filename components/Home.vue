@@ -19,17 +19,23 @@ const actions = [
 
 function randomPage(): string {
   const length = pages.length - 1
-  return pages[Math.floor(Math.random() * length)]?.link
+  return pages[Math.floor(Math.random() * length)]!.link!
 }
 </script>
 
-<style scoped>
-:deep(.details) {
+<style>
+.details {
   overflow: hidden;
   text-overflow: ellipsis;
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   word-break: break-all;
+}
+
+.vp-doc h2 {
+  margin: 0;
+  border: none;
+  padding: 0;
 }
 </style>

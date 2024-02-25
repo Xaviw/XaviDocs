@@ -18,14 +18,16 @@
     "preview": "vitePress preview"
   },
   "devDependencies": {
+    "@types/node": "^20.6.0",
     "gray-matter": "^4.0.3",
-    "vite-plugin-vitepress-auto-nav": "^1.2.2",
-    "vitepress": "1.0.0-rc.20",
+    "vite": "^5.1.4",
+    "vite-plugin-vitepress-auto-nav": "^1.3.0",
+    "vitepress": "1.0.0-rc.44",
     "vue": "^3.3.4"
   },
   "packageManager": "pnpm@8.6.5",
   "engines": {
-    "node": "^14.18.0 || >=16.0.0"
+    "node": ">=18.0.0"
   },
   "pnpm": {
     "peerDependencyRules": {
@@ -34,8 +36,5 @@
         "search-insights"
       ]
     }
-  },
-  "dependencies": {
-    "@types/node": "^20.6.0"
   }
 }
