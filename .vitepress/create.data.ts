@@ -64,7 +64,7 @@ export default createContentLoader(
               .slice(0, 200),
             link,
             // 显示更新时间
-            linkText: new Date(fileTimeInfo[1]).toLocaleDateString(),
+            // linkText: new Date(fileTimeInfo[1]).toLocaleDateString(),
             updateTime: fileTimeInfo[1],
           })
         );
