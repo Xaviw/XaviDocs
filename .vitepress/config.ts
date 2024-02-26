@@ -29,6 +29,8 @@ export default defineConfig({
           基础搭建: { sort: 9 },
           进阶语法: { sort: 8 },
           配置解析: { sort: 7 },
+          认识package: { useArticleTitle: true },
+          掌握tsconfig: { useArticleTitle: true, sort: -1 },
         },
       }),
     ],

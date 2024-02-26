@@ -15,8 +15,8 @@ devDependencies:
     specifier: ^5.1.4
     version: 5.1.4(@types/node@20.6.0)
   vite-plugin-vitepress-auto-nav:
-    specifier: ^1.3.0
-    version: 1.3.0(vite@5.1.4)(vitepress@1.0.0-rc.44)
+    specifier: ^2.0.0
+    version: 2.0.0(vite@5.1.4)(vitepress@1.0.0-rc.44)
   vitepress:
     specifier: 1.0.0-rc.44
     version: 1.0.0-rc.44(@types/node@20.6.0)
@@ -1273,14 +1273,15 @@ packages:
       is-number: 7.0.0
     dev: true
 
-  /vite-plugin-vitepress-auto-nav@1.3.0(vite@5.1.4)(vitepress@1.0.0-rc.44):
-    resolution: {integrity: sha512-sZHQqv90GKR2KwpibE87D31gHj0WXk2E1U+SCs8TVbLYbin/5ljzhZUA/SAXk2PJbdlPOCZYsoqa40/+N8HhVw==}
+  /vite-plugin-vitepress-auto-nav@2.0.0(vite@5.1.4)(vitepress@1.0.0-rc.44):
+    resolution: {integrity: sha512-+kbHHYUtKkI1PpXC+cIqDKR7gilj4AZCMNY4pzxBNLRoTNlXpKAnHNrneF+mR7rih2nw0vS4SN3SB5zit5vQMQ==}
     engines: {node: '>=18.0.0'}
     peerDependencies:
       vite: ^5.0.0
-      vitepress: '>=1.0.0-rc.1 <2.0.0'
+      vitepress: ^1.0.0-rc.44
     dependencies:
       fast-glob: 3.3.2
+      gray-matter: 4.0.3
       vite: 5.1.4(@types/node@20.6.0)
       vitepress: 1.0.0-rc.44(@types/node@20.6.0)
     dev: true
