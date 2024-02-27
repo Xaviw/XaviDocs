@@ -20,17 +20,11 @@ export default defineConfig({
     plugins: [
       AutoNav({
         itemsSetting: {
-          前端系列: { sort: 9 },
-          VitePress搭建: { sort: 9 },
-          源码阅读: { sort: 9 },
-          日常记录: { sort: 8 },
-          Vuex源码解析: { hide: true },
-          Vue静态资源处理: { hide: true },
-          基础搭建: { sort: 9 },
-          进阶语法: { sort: 8 },
-          配置解析: { sort: 7 },
-          认识package: { useArticleTitle: true },
-          掌握tsconfig: { useArticleTitle: true, sort: -1 },
+          前端系列: { sort: 0 },
+          源码阅读: { sort: 0 },
+          日常记录: { sort: 1 },
+          typescript: { sort: 2 },
+          VitePress搭建: { sort: 0 },
         },
       }),
     ],

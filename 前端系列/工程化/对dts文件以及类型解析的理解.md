@@ -50,7 +50,7 @@ compilerOptions 中的配置可以按[功能分类](https://www.typescriptlang.o
 
 无论是使用打包器打包 ts 应用(例如 Rollup、Vite)，还是编辑器提供的类型提示(例如 VSCode)，都是读取编译范围中的文件后（`默认包括 .ts、.d.ts、.tsx 文件，设置 allowJs 后还包括 .js、.jsx`），再根据编译选项对文件进行编译后完成的，所以需要正确配置 tsconfig.json
 
-本文不对具体的配置做介绍，推荐在实际使用时参考知名的库或者在 [github.com/tsconfig/bases](github.com/tsconfig/bases) 上寻找一个合适的基本配置，需要理解更具体的含义时再查看[编译器选项](https://www.typescriptlang.org/tsconfig#compiler-options)列表
+本文不对具体的配置做介绍，推荐在实际使用时参考知名的库或者在 [github.com/tsconfig/bases](https://github.com/tsconfig/bases) 上寻找一个合适的基本配置，需要理解更具体的含义时再查看[编译器选项](https://www.typescriptlang.org/tsconfig#compiler-options)列表
 
 ### Vite+Vue 模板的 tsconfig.node.json 文件的作用
 

@@ -1,4 +1,9 @@
-# 掌握tsconfig.json
+---
+useArticleTitle: true
+sort: 9
+---
+
+# 掌握 tsconfig.json
 
 如果你使用`VSCode`，通常每个项目根目录下都会有一个`jsconfig.json`或`tsconfig.json`文件，那这个文件的作用是什么呢？
 
@@ -27,13 +32,13 @@
 
 `tsconfig.json`文件可以是个空文件，只要创建了这个文件，所在目录就会被识别为项目根目录，相关属性会使用默认值
 
-## JS、TS通用属性
+## JS、TS 通用属性
 
 ### include
 
 指定允许被识别的文件或文件夹列表，运行使用通配符：
 
-- `*`匹配0个或多个字符（不包括目录分隔符）
+- `*`匹配 0 个或多个字符（不包括目录分隔符）
 - `?`匹配任意一个字符（不包括目录分隔符）
 - `**/`匹配任意一级或多级目录
 
@@ -63,7 +68,7 @@
 }
 ```
 
-继承另一个配置文件中的配置，路径匹配规则采用`NodeJS`匹配规则（[JS模块化原理](/前端系列/工程化/JS模块化原理#模块匹配规则)中有详细说明）。主配置文件中的配置属性会覆盖`extends`指定文件中的属性，对象中的不同属性会合并后作为完整的配置。多个配置文件不能通过`extends`属性循环引用
+继承另一个配置文件中的配置，路径匹配规则采用`NodeJS`匹配规则（[JS 模块化原理](/前端系列/工程化/JS模块化原理#模块匹配规则)中有详细说明）。主配置文件中的配置属性会覆盖`extends`指定文件中的属性，对象中的不同属性会合并后作为完整的配置。多个配置文件不能通过`extends`属性循环引用
 
 需要注意`files`、`include`、`exclude`字段不会发生合并，优先使用主配置文件中的配置
 
@@ -71,7 +76,7 @@
 
 ### vueCompilerOptions
 
-## TS相关属性
+## TS 相关属性
 
 ### compilerOptions
 
@@ -95,7 +100,7 @@ function fn(n: number) {
 
 #### allowUnusedLabels
 
-定义如何处理未使用的标签，规则同`allowUnreachableCode`。标签语法并不常用，若不了解可以参考[MDN文档](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Statements/label)
+定义如何处理未使用的标签，规则同`allowUnreachableCode`。标签语法并不常用，若不了解可以参考[MDN 文档](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Statements/label)
 
 #### exactOptionalPropertyTypes
 
@@ -129,16 +134,16 @@ interface test {
   [key: string]: string;
 }
 
-let obj: test = { a: 'a' }
+let obj: test = { a: "a" };
 // 开启noPropertyAccessFromIndexSignature后将报错
 // 属性“b”来自索引签名，因此必须使用[“b”]访问它。ts(4111)
-console.log(obj.b)
-
+console.log(obj.b);
 ```
 
 #### noUncheckedIndexedAccess
 
 <!-- TODO -->
+
 开启后
 
 #### noUnusedLocals
@@ -151,7 +156,7 @@ console.log(obj.b)
 
 #### alwaysStrict
 
-是否将每个文件都看作开启严格模式(`use strict`)，在`ESModule`文件中会默认开启，具体规则可以参考[MDN文档](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Strict_mode)
+是否将每个文件都看作开启严格模式(`use strict`)，在`ESModule`文件中会默认开启，具体规则可以参考[MDN 文档](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Strict_mode)
 
 #### strictBindCallApply
 
@@ -165,9 +170,9 @@ console.log(obj.b)
 function fn(x: string) {
   console.log("Hello, " + x.toLowerCase());
 }
- 
+
 type StringOrNumberFunc = (ns: string | number) => void;
- 
+
 // Unsafe assignment is prevented
 let func: StringOrNumberFunc = fn;
 ```
@@ -177,13 +182,13 @@ let func: StringOrNumberFunc = fn;
 开启后`null`和`undefined`将看作具体的类型，而不会默认为其他类型的子类型
 
 ```ts
-let a: string
+let a: string;
 // 默认null和undefined可以赋值给其他类型，开启strictNullChecks后将会报错
-a = undefined
+a = undefined;
 // 未开启strictNullChecks时b的类型别识别为string
 // 开启后会识别为string|undefined
-let a: string[] = []
-let b = a.find((item) => item == 'a')
+let a: string[] = [];
+let b = a.find((item) => item == "a");
 ```
 
 #### strictPropertyInitialization
@@ -200,14 +205,14 @@ let b = a.find((item) => item == 'a')
 
 ```ts
 class Name {
-  firstName: '';
-  lastName: '';
+  firstName: "";
+  lastName: "";
 
-  outputName(){
-    return function(){
+  outputName() {
+    return function () {
       // 这个函数中的this在调用时才能确定，而不是Name类，会报错
-      return this.firstName + this.lastName
-    }
+      return this.firstName + this.lastName;
+    };
   }
 }
 ```
@@ -234,6 +239,7 @@ class Name {
 #### allowUmdGlobalAccess
 
 <!-- TODO -->
+
 开启后允许以全局变量的形式访问`UMD`模块导出
 
 #### baseUrl
@@ -254,7 +260,7 @@ class Name {
 
 `Classic`策略是早期`TS`默认的解析策略：相对导入时会依次查找相对目录下的`.ts`、`.d.ts`文件；非相对导入时会从当前目录依次遍历至根目录（`baseUrl`）查找`.ts`、`.d.ts`文件
 
-`Node`策略是模仿`NodeJS`的模块解析机制，在[JS模块化原理](/前端系列/工程化/JS模块化原理#模块匹配规则)中有详细介绍，不同的是`TS`项目增加了扩展名的支持(`.ts`、`.tsx`、`.d.ts`，如果设置了`allowJs`则还包括`.js`和`.jsx`)
+`Node`策略是模仿`NodeJS`的模块解析机制，在[JS 模块化原理](/前端系列/工程化/JS模块化原理#模块匹配规则)中有详细介绍，不同的是`TS`项目增加了扩展名的支持(`.ts`、`.tsx`、`.d.ts`，如果设置了`allowJs`则还包括`.js`和`.jsx`)
 
 #### moduleSuffixes
 
@@ -270,8 +276,6 @@ import * as foo from "./foo";
 
 #### noResolve
 
-
-
 ### buildOptions
 
 ### compileOnSave
@@ -281,5 +285,3 @@ import * as foo from "./foo";
 ### typeAcquisition
 
 ### ts-node
-
-

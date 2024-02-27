@@ -1,4 +1,8 @@
-# 认识package.json
+---
+useArticleTitle: true
+---
+
+# 认识 package.json
 
 `package.json`存在于每个基于`node`的前端工程化项目中，所以正确的认识该文件中的字段，对理清项目流程、提升工程化能力格外重要
 
@@ -21,11 +25,11 @@ yarn init
 pnpm init
 ```
 
-## Node使用的字段
+## Node 使用的字段
 
 ### type
 
-目前`JS`有两种主流模块化方案，分别是`Node`采用的`CommonJS`，和最新的`ESModule`，推荐先阅读[JS模块化原理](/前端系列/工程化/JS模块化原理)熟悉这两种模块化规则。对于不同的模块类型，引擎会采用不同的模块解析器进行处理，所以需要正确的识别模块类型
+目前`JS`有两种主流模块化方案，分别是`Node`采用的`CommonJS`，和最新的`ESModule`，推荐先阅读[JS 模块化原理](/前端系列/工程化/JS模块化原理)熟悉这两种模块化规则。对于不同的模块类型，引擎会采用不同的模块解析器进行处理，所以需要正确的识别模块类型
 
 `type`默认值为`commonjs`，所以项目中的文件默认会采用`CommonJS`模块规则解析。如果指定为`module`则会采用`ESModule`模块规则解析
 
@@ -125,12 +129,11 @@ pnpm init
 `@a/b`格式的包名含义是`a`范围中名字为`b`的包，里面的`@`和`/`属于命名规范。范围的作用是将一系列相关的包组织在一起，更重要的是不用担心包名重复的问题。如何发布范围，参考[官方文档](https://nodejs.cn/npm/cli/v8/using-npm/scope/#)
 :::
 
-
 ### packageManager
 
 截至发文仍处于实验性阶段，需要`NodeJS`版本大于等于`16.9.0`。基于新版`node`中附带的`corepack`包，用于统一项目包管理器，具体可以参考[这篇文章](https://www.jianshu.com/p/c239ed5dedd6)
 
-> 如果使用NVM、Volta等工具管理Node版本时，corepack命令可能不可用，可以在官方issue中找到解决办法
+> 如果使用 NVM、Volta 等工具管理 Node 版本时，corepack 命令可能不可用，可以在官方 issue 中找到解决办法
 
 ## 包管理器常用字段
 
@@ -179,7 +182,7 @@ pnpm init
 
 ```js
 // server.js
-console.log(process.env.npm_package_config_port) // 8888
+console.log(process.env.npm_package_config_port); // 8888
 ```
 
 ### dependencies
@@ -205,13 +208,13 @@ yarn add lib-name@version
 - `=`：与指定版本号系统，等号可以省略
 - 范围标识符可以混用，例如`>=1.2.0<2.0.0`，也可以使用`1.2.0-2.0.0`表示
 - `||`：指定多个版本范围
-- `x`：可以作为通配符，例如`1.x`表示主版本为1，副版本，修订版本任意
-- `~`：指定版本到副版本+1的范围
-- `^`：指定版本到首位非0版本号+1的范围
+- `x`：可以作为通配符，例如`1.x`表示主版本为 1，副版本，修订版本任意
+- `~`：指定版本到副版本+1 的范围
+- `^`：指定版本到首位非 0 版本号+1 的范围
 - `*`：匹配任何范围
-- ``tag``标记：匹配发布为`tag`的特定版本，例如`latest`标记
+- `tag`标记：匹配发布为`tag`的特定版本，例如`latest`标记
 
-预发布标签通常由alpha与beta。alpha版本表示工作正在开发中，可以看作技术预览版，beta版本表示产品已做好发布的准备，可以看作测试版。存在预发布标签时，即使使用范围符，也需要满足主版本号、副版本号、修订版本号相同
+预发布标签通常由 alpha 与 beta。alpha 版本表示工作正在开发中，可以看作技术预览版，beta 版本表示产品已做好发布的准备，可以看作测试版。存在预发布标签时，即使使用范围符，也需要满足主版本号、副版本号、修订版本号相同
 
 ### devDependencies
 
@@ -340,7 +343,6 @@ yarn add lib-name@version --save-peer
   }
 }
 ```
-
 
 ### private
 
