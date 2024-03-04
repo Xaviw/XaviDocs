@@ -21,9 +21,13 @@ export default defineConfig({
       AutoNav({
         itemsSetting: {
           前端系列: { sort: 0 },
+
           源码阅读: { sort: 0 },
           日常记录: { sort: 1 },
           typescript: { sort: 2 },
+          uniapp: { sort: 3 },
+          工程化: { sort: 4 },
+
           VitePress搭建: { sort: 0 },
         },
       }),
