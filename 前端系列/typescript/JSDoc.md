@@ -1,37 +1,46 @@
 ---
-sort: 14
+sort: 15
 ---
 
 # JSDoc
 
-JSDoc 是 JS 官方的代码注释规范，可以用于生成 API 文档以及对 JS 代码提供 TS 的类型支持，具体可以查看 [JSDoc 中文文档](https://www.jsdoc.com.cn/)。
+JSDoc 是 JS 官方的代码注释规范，还可以用于生成 API 文档，具体可以查看 [JSDoc 中文文档](https://www.jsdoc.com.cn/)。
 
-本文仅介绍 TypeScript 支持的 JSDoc 语法，也是日常使用中较为常用的语法。
+TS 官方以 JSDoc 为基础，扩展了对 JS 代码的类型支持，使用 JSDoc 能够实现大部分 TS 的功能。
+
+本文仅介绍 TypeScript 支持的 JSDoc 标签，和部分 TS 不支持但常用的标签。
 
 ## 检查 JS 文件
 
-当项目中存在 `jsconfig.json` 文件且开启了 `allowJS` 编译选项后，TS 将会检查这个 JS 项目中的代码并提供类型支持。JS 文件的头部添加注释 `@ts-check` 会让 TS 编译器对该文件进行类型检查。
+当项目中存在 `jsconfig.json` 文件，且开启了 `allowJS` 编译选项后，TS 会对这个项目进行识别。
 
-如果有很多 JS 文件需要检查，可以在 `jsconfig.json` 文件中配置，内部配置与 `tsconfig` 基本一致。此时如果要忽略部分文件中的类型检查，可以在文件头部添加注释 `@ts-nocheck`。
+`jsconfig.json` 文件与 `tsconfig.json` 配置基本一致，可以通过将 JS 文件添加到编译范围或在 JS 文件头加入注释 `@ts-check` 的方式对文件进行类型检查。
 
-因为 JS 代码类型不健全，TS 可能会有意料之外的报错，此时可以通过在报错行前添加注释 `@ts-ignore` 来忽略 TS 类型检查。
+如果要忽略部分文件中的类型检查，可以在文件头部添加注释 `@ts-nocheck`。如果有意料之外的类型报错，可以通过在报错行前添加注释 `@ts-ignore` 来忽略 TS 类型检查。
 
 在 JS 文件中，TS 编译器会通过上下文赋值情况来推断变量、参数等的类型，正如 TS 文件中的自动推断一样。如果类型无法自动推断则需要使用 JSDoc 来手动标注类型，否则会被当作 any 类型。
 
 JSDoc 注释通常应该放在记录代码之前。为了被 JSDoc 解析器识别，每个注释必须以 `/**` 序列开头，星号（`*`）数量不匹配的注释将被 JSDoc 忽略。
 
-最简单的示例就是进行描述：
+最简单的示例就是进行描述，JSDoc 描述支持书写 MarkDown 语法：
 
 ```js
-/** hover 下面的函数时会显示这段描述 */
+/** 单行注释 */
+function fun() {}
+
+/**
+ * # 多行注释
+ * - 支持 markdown 语法
+ * - hover 函数名时会显示 JSDoc
+ */
 function foo() {}
 ```
 
 ::: tip
-在 [TypeScript PlayGround](https://www.typescriptlang.org/zh/play) 中，可以切换配置中的 `Lang` 为 JavaScript 来测试 JSDoc 的使用。
+在 [TypeScript PlayGround](https://www.typescriptlang.org/zh/play) 中，可以切换配置中的 `Lang` 为 `JavaScript` 来测试 JSDoc 的使用。
 :::
 
-## 类型注释
+## 类型标签
 
 ### `@type`
 
@@ -291,7 +300,7 @@ const a = { url: "www.xxx.com" };
 a.url.toUpperCase();
 ```
 
-## 类注释
+## 类标签
 
 JSDoc 提供了 `@private`、`@protected`、`@public`、`@readonly` 修饰符，它们的功能与 TS 中的 `private`、`protected`、`publick`、`readonly` 关键字一样。
 
@@ -374,7 +383,7 @@ function callbackForLater(e) {
 }
 ```
 
-## 文档注释
+## 文档标签
 
 ### `@deprecated`
 
@@ -426,7 +435,7 @@ function box(u) {
 
 如果上面的 `@link` 改为 `@see` 则 hover 时不会显示类型定义
 
-## 其他注释
+## 其他标签
 
 ### `@enum`
 
@@ -455,3 +464,110 @@ MathFuncs.add1;
 ```
 
 > 注意将邮箱用尖括号括起来，否则@后会被识别为新标签
+
+## TS 不支持的常用标签
+
+### `@default`
+
+配合 `@constant` 标签使用，可以标识一个值为常量类型：
+
+```js
+/**
+ * 此时 RED 的类型为 0xff0000
+ * @constant
+ * @default
+ */
+const RED = 0xff0000;
+```
+
+也可以标记一个变量的默认值（非规范用法，仅 hover 时会显示写的注释）：
+
+```js
+/** @default 1 */
+let x;
+```
+
+### `@example`
+
+提供使用示例，一条注释中可以有多个 `@example` 标签，标签后还可以添加 `<caption>xxx</caption>` 标签作为示例标题。`@example` 后连续的多行文本会在 hover 时一行显示，直到遇见空行或其他标签：
+
+```js
+/**
+ * @example <caption>示例1</caption>
+ * // returns 2
+ * globalNS.method1(5, 10);
+ *
+ * @example
+ * // returns 3
+ * globalNS.method(5, 15);
+ *
+ * @returns {Number}
+ */
+globalNS.method1 = function (a, b) {
+  return b / a;
+};
+```
+
+### `@version`
+
+标识某段代码的版本：
+
+```js
+/**
+ * 描述
+ * @version 1.2.3
+ */
+function solver(a, b) {
+  return b / a;
+}
+```
+
+### `@todo`
+
+记录未完成的任务，一个注释块中可以有多个 `@todo` 标签：
+
+```js
+/**
+ * @todo Write the documentation.
+ * @todo Implement this function.
+ */
+function foo() {
+  // write me
+}
+```
+
+### `@tutorial`
+
+插入一个教程链接，一个注释块中可以多次使用：
+
+```js
+/**
+ * Description
+ * @class
+ * @tutorial tutorial-1
+ * @tutorial www.xxx.com
+ */
+function MyClass() {}
+```
+
+### `@copyright`
+
+用来描述一个文件的版权信息，一般和 `@file` 标签结合使用：
+
+```js
+/**
+ * @file 这是一段文件描述
+ * @copyright 版权信息
+ */
+```
+
+### `@license`
+
+标记应用于代码任何部分的软件许可证：
+
+```js
+/**
+ * 描述
+ * @license Apache-2.0
+ */
+```
