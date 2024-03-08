@@ -124,9 +124,9 @@ watch 方法有多个函数重载，包含了多种侦听来源（`WatchSource`�
 watch 第三个参数是一个可选的配置对象，支持以下选项：
 
 - `immediate`：在侦听器创建时立即触发回调。第一次调用时旧值是 undefined。
-- `deep`：如果源是对象，强制深度遍历，以便在深层级变更时触发回调。参考深层侦听器。
-- `flush`：调整回调函数的刷新时机。参考回调的刷新时机及 watchEffect()。
-- `onTrack / onTrigger`：调试侦听器的依赖。参考调试侦听器。
+- `deep`：如果源是对象，强制深度遍历，以便在深层级变更时触发回调。
+- `flush`：调整回调函数的刷新时机。同 `watchEffect`。
+- `onTrack / onTrigger`：调试侦听器的依赖。
 - `once`: 回调函数只会运行一次。侦听器将在回调函数首次运行后自动停止。
 
 ## 实现方式
@@ -142,7 +142,7 @@ watch 第三个参数是一个可选的配置对象，支持以下选项：
 
 1. 创建 `getter`
 2. 创建 `onCleanup`
-3. 创建 `job`、`scheduler`
+3. 创建响应式副作用函数
 4. 执行副作用函数
 5. 返回 `unwatch`
 
@@ -161,13 +161,13 @@ watch 第三个参数是一个可选的配置对象，支持以下选项：
 
 `reactiveGetter` 方法内部调用了 `traverse` 方法。如果开启了 `deep` 配置，会递归的对数据源深层次属性进行访问；如果没开启 `deep` 配置，则只会对数据源第一层属性进行访问。
 
-3. 如果数据源是数组，会遍历数组，将处理后的数组值返回。对于 `Ref` 和 `Reactive` 值与上面的处理一样，对于函数直接获取返回值。
-4. 如果数据源是函数，需要根据是否存在回调函数参数（`cb`）分别处理 watch 和 watchEffect 的情况：
+3. 如果数据源是数组，会遍历数组，将处理后的数组值返回。对于 `Ref` 和 `Reactive` 同上面的处理方式，对于函数直接获取返回值。
+4. 如果数据源是函数，需要根据是否存在回调函数参数（`cb`）分别处理 watch 和 watchEffect：
 
 - 对于 watch，直接执行函数并返回函数返回值。
 - 对于 watchEffect，这里加入了执行的逻辑。先判断是否有 `cleanup` 并执行，再执行 watchEffect 参数中的副作用函数（会将 `onCleanup` 作为参数传入）
 
-源码中还创建了 `forceTrigger`、`isMultiSource` 变量，分别标识是否需要强制触发更新和是否是多数据源，后面会介绍相关作用。
+源码中还创建了 `forceTrigger`、`isMultiSource` 变量。在数据源是数组时 `isMultiSource=true`；数据源或数据源数组中的值是 `shallowRef` 或 `Reactive` 时 `forceTrigger=true`；用途会在后面会介绍。
 
 完整源码还包括参数检查和 Vue2 兼容代码，此处不做介绍。主要源码如下：
 
@@ -244,9 +244,9 @@ if (cb && deep) {
 
 源码中定义了 `cleanup` 变量和 `onCleanup` 函数。
 
-`onCleanup` 接收一个函数参数作为清除过期副作用的方法，内部会将接收到的方法赋值给 `cleanup` 变量和后面创建的响应式对象的 `onStop` 方法。这样在手动调用 `cleanup` 或当前副作用被从数据源的依赖中剔除时（即 `effect.stop` 被触发时）便可以执行过期副作用清除。
+`onCleanup` 接收一个函数参数作为清除过期副作用的方法，内部会将接收到的方法赋值给 `cleanup` 变量和后面创建的 `ReactiveEffect` 实例的 `onStop` 方法。这样在手动调用 `cleanup` 或当前副作用被从数据源的依赖中剔除时（即 `effect.stop` 被触发时）便可以执行过期副作用清除。
 
-正如前面定义 watchEffect 的 `getter` `定义，onCleanup` 会作为参数被传入回调中，所以用户能够正确传入清除方法。
+正如前面 watchEffect 的 `getter` 定义，`onCleanup` 会作为参数被传入回调中，所以用户能够正确使用。
 
 主要源码为：
 
@@ -264,7 +264,7 @@ let onCleanup: OnCleanup = (fn: () => void) => {
 };
 ```
 
-### 创建 `job`、`scheduler`
+### 创建响应式副作用函数
 
 在此之前，源码还进行了初始化值的操作，代码很简单：
 
@@ -274,7 +274,7 @@ let oldValue: any = isMultiSource
   : INITIAL_WATCHER_VALUE;
 ```
 
-`job` 任务用于执行监听的整体逻辑。而 `scheduler` 调度器对应了 `flush` 配置项，用于调度任务在合适的时机执行，主要源码为：
+`job` 任务用于执行监听的主体逻辑。而 `scheduler` 调度器对应了 `flush` 配置项，用于调度任务在合适的时机执行，主要源码为：
 
 ```ts
 let scheduler: EffectScheduler;
@@ -291,31 +291,43 @@ if (flush === "sync") {
 }
 ```
 
-有了 `job` 和 `scheduler`，源码中通过 `ReactiveEffect` 类创建了 `effect` `对象。ReactiveEffect` 是响应式核心类，内部的 `run` 方法会触发传入的函数执行（这里为 `getter`），并执行依赖收集；而 `stop` 方法会将副作用从相关数据源的依赖中删除。
+有了 `job` 和 `scheduler`，源码中通过 `ReactiveEffect` 类创建了 `effect` 实例对象。`ReactiveEffect` 是响应式核心类，内部的 `run` 方法会触发传入的函数执行（这里为 `getter`），并执行依赖收集；而 `stop` 方法会将副作用从相关数据源的依赖中删除。
 
 ```ts
 const effect = new ReactiveEffect(getter, NOOP, scheduler);
 ```
 
-当 `job` 执行时，如果是 watch，会先调用 `effect.run`（也就是 `getter`）执行依赖收集以及获取当前监听的值。
+当 `job` 执行时，如果是 watch，会先调用 `effect.run`（内部会执行 `getter`）执行依赖收集以及获取当前监听的值。
 
 然后进行是否触发变更的判断：
 
-- 如果 `deep === true`：那么数据源深层次的属性也会被监听，而 `job` 被触发必然是属性发生了变更（除了后续第一次手动触发）
-- 如果 `forceTrigger === true`：前面提到了数据源是 `shallowRef` 或 `Reactive` 时会标记 `forceTrigger`，因为使用 `shallowRef` 作为数据源时只有可能 `.value` 被替换才会触发副作用；而 `Reactive` 作为数据源时相当于设置了 `deep` 选项，对象深层次的变更也会触发副作用
+- 如果 `deep === true`：那必然是属性发生了变更（除了后续第一次手动触发），所以无需后续判断。
+- 如果 `forceTrigger === true`：前面提到了数据源是 `shallowRef` 或 `Reactive` 时会标记 `forceTrigger`，因为使用 `shallowRef` 作为数据源时只有可能 `.value` 被替换才会触发副作用；而 `Reactive` 作为数据源时相当于设置了 `deep` 选项，对象深层次的变更也会触发副作用，所以无需后续判断。
 - 上面两个判断不通过再比较新、旧值是否相等，如果是数组则遍历比较。比较使用的 `Object.is` 方法
 
 判断到值变更后，先判断 `cleanup` 是否存在并执行，再调用回调函数。调用回调函数时会将新值、旧值、`onCleanup` 一并作为参数传入。
 
-最后用本次获取的值更新 `oldValue`。
+最后用本次获取的值更新 `oldValue`。在 `doWatch` 函数的开头，还处理了开启 `once` 配置的情况。操作很简单就是将回调（`cb`）包装为执行后立即执行取消监听函数（`unwatch`）即可。
 
-如果是 watchEffect 则直接执行 `effect.run`（也就是 `getter`）方法，上面已经说过内部实现，这里不再重复。
+如果是 watchEffect 则直接执行 `effect.run`（内部会执行 `getter`）方法，上面已经说过内部实现，这里不再重复。
 
-另外 `job` 还标记了是否允许递归，也就是自身触发数据源变更时是否再次执行副作用函数。
+另外 `job` 还标记了是否允许递归，会在响应式相关逻辑中进行处理，表示自身触发数据源变更时是否再次执行副作用函数。
 
 主要源码为：
 
 ```ts
+// 判断是 watch 且开启了 once
+if (cb && once) {
+    const _cb = cb
+    // 包装回调
+    cb = (...args) => {
+      // 触发一次回调
+      _cb(...args)
+      // 然后立即结束监听
+      unwatch()
+    }
+  }
+
 const job: SchedulerJob = () => {
   if (!effect.active || !effect.dirty) {
     return;
@@ -361,9 +373,9 @@ job.allowRecurse = !!cb;
 
 主体逻辑创建完成后，开始初始化的执行：
 
-如果是 watch，开启了 `immediate` 是直接运行 `job`，否则仅调用 `effect.run` 触发依赖收集和记录初始 `oldValue` 值
+如果是 watch，开启了 `immediate` 时直接运行 `job`，否则仅调用 `effect.run` 触发依赖收集和记录初始 `oldValue` 值。
 
-如果是 watchEffect，直接调用 `effect.run` 触发依赖收集
+如果是 watchEffect，直接调用 `effect.run` 触发依赖收集。
 
 主要源码为：
 
@@ -399,21 +411,27 @@ return unwatch;
 
 `watch` 与 `watchEffect` 在底层都是调用了 `doWatch` 函数。
 
-`doWatch` 会创建访问依赖的函数 `getter`，对不同数据源的处理方式分别为：
+`doWatch` 会创建访问数据源的函数 `getter`，对不同数据源的处理方式分别为：
 
-- `Ref` 返回 `.value` 值
-- `Reactive` 直接返回数据源，但是在开启 `deep` 时会递归访问每一个深层次属性，未开启 deep 时仅访问第一层属性
-- 函数执行后返回返回值
-- 数组遍历后对每一个成员按照上面三种方式处理，返回处理后的数组
+- `Ref` 返回 `.value` 值。
+- `Reactive` 直接返回数据源，但是在开启 `deep` 时会递归访问每一个深层次属性，未开启 `deep` 时仅访问第一层属性。
+- 函数执行后返回返回值。
+- 数组遍历后对每一个成员按照上面三种方式处理，返回处理后的数组。
+
+再创建 `cleanup` 变量和 `onCleanup` 函数，后续执行时会将 `onCleanup` 函数作为参数传递给监听回调，这样可以通过 `onCleanup` 接收清理副作用的函数并赋值给 `cleanup` 变量，便可以判断 `cleanup` 是否存在然后执行。
 
 再根据 `getter` 创建任务函数 `job`，内部分别处理 `watch` 和 `watchEffect` 的执行逻辑：
 
-- `watch` 先执行 `effect.run` 获取数据源值，根据 `deep`、`forceTrigger`、`hasChanged` 三个条件判断值是否发生表更。若变更先判断并执行 `cleanup`，再将新值、旧值、`onCleanup` 作为参数传入回调并执行
-- `watchEffect` 直接调用` effect.run` 方法（也就是封装的 `getter` 方法），内部会先判断并执行 `cleanup`，再将 `onCleanup` 函数作为参数传入副作用函数并执行
+- `watch` 先执行 `effect.run` 获取数据源值，根据 `deep`、`forceTrigger`、`hasChanged` 三个条件判断值是否发生表更。若变更先判断并执行 `cleanup`，再将新值、旧值、`onCleanup` 作为参数传入回调并执行。
+- `watchEffect` 直接调用` effect.run` 方法（内部会运行封装的 `getter` 方法），先判断并执行 `cleanup`，再将 `onCleanup` 函数作为参数传入副作用函数并执行。
 
-根据配置选项 `flush` 会创建不同的调度器 `scheduler`，如果为 `sync` 直接立即执行 `job`，如果为 `post` 或默认的 `pre` 会调用相应的调度方法再合适的时机执行
+根据配置选项 `flush` 会创建不同的调度器 `scheduler`，如果为 `sync` 直接立即执行 `job`，如果为 `post` 或默认的 `pre` 会调用相应的调度方法在合适的时机执行。
 
-有了 `getter` 和 `scheduler` 之后，使用响应式核心类 `ReactiveEffect` 创建 `effect` `对象。doWatch` 内会进行初始化运行：
+如果是 `watch` 方法且开启了 `once` 选项，会将回调函数包装一层，在执行一次回调后立即执行取消监听方法。
+
+有了 `getter` 和 `scheduler` 之后，使用响应式核心类 `ReactiveEffect` 创建 `effect` 对象。`doWatch` 内会进行初始化运行：
 
 - `watch` 如果开启了 `immediate` 则执行 `job`（内部会执行 `effect.run`），未开启则执行 `effect.run`。`effect.run` 执行时会将 `effect` 副作用添加到每个数据源的依赖中，这样数据源变更时便可以触发副作用执行，也就完成了 `watch` 回调执行。
 - `watchEffect` 直接执行 `effect.run` 方法，这回使副作用函数中每个响应式值都添加 `effect` 副作用，这样响应式值变更时就会触发副作用函数的重新运行。
+
+最后返回 `unwatch` 方法，内部是调用 `effect.stop` 来清除过期副作用。
