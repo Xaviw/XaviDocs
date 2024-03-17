@@ -1,4 +1,4 @@
-# `vue` 中的 `v-if` 和 `v-for`
+# vue 中的 v-if 和 v-for
 
 vue 中有一个经典的面试题：**`v-if` 和 `v-for` 能够一起使用吗？**
 

@@ -1,4 +1,4 @@
-# `vue` 中的 `watch` 和 `watchEffect`
+# vue 中的 watch 和 watchEffect
 
 vue 提供了 `watch` 方法，可以监听值的变更，在变更时触发回调。vue3 中又新增了 `watchEffect` 方法，可以不指定监听的值，而是在回调中直接使用，方法会自动收集使用到的依赖，并在依赖更改时重新执行。
 

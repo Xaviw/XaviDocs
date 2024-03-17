@@ -1,31 +1,31 @@
-# Axios源码解析
+# Axios 源码解析
 
-## 认识Axios
+## 认识 Axios
 
-> 阅读源码前先熟悉库实际的使用方式以及各种API有助于找到阅读的切入点，[官方中文文档](https://axios-http.com/zh/docs/intro)
+> 阅读源码前先熟悉库实际的使用方式以及各种 API 有助于找到阅读的切入点，[官方中文文档](https://axios-http.com/zh/docs/intro)
 
-axios库基于核心类`Axios`，在库中默认导出了一个名为`axios`的实例对象，并传入了基础配置`defaults`
+axios 库基于核心类`Axios`，在库中默认导出了一个名为`axios`的实例对象，并传入了基础配置`defaults`
 
 使用中所有的操作通常基于默认导出的实例对象`axios`实现。当然也可以自己导入`Axios`类，手动定义全部配置后新建实例使用
 
-基础API有：
+基础 API 有：
 
 1. **instance.defaults**
-   
+
    设置实例的基础参数，与初始化实例时的`defaultConfig`合并，作为该实例的参数
 
 2. **instance.interceptors**
-   
+
    配置实例拦截器
 
 3. **instance.request(config)**
-   
-   发起请求的核心API，`instance()`，`instance.post()`，`instance.get()`等方法都是基于此核心方法包装而来
 
-   传入的config会与实例参数再次合并，作为实际请求参数
+   发起请求的核心 API，`instance()`，`instance.post()`，`instance.get()`等方法都是基于此核心方法包装而来
+
+   传入的 config 会与实例参数再次合并，作为实际请求参数
 
 4. **instance.create(config)**
-   
+
    基于当前实例对象创建新的实例对象，`config`与当前实例参数合并作为新实例的参数
 
 ## 认识源码
@@ -34,41 +34,42 @@ axios库基于核心类`Axios`，在库中默认导出了一个名为`axios`的�
 
 **深入理解建议对照源码以及官方文档阅读**
 
-axios源码分支中有`0.x`，`1.x`(默认)，`2.x`，查看`tags`可以看到发版记录。截至发文最新版本为`v1.3.3`，也就是基于的`1.x`分支中的源码
+axios 源码分支中有`0.x`，`1.x`(默认)，`2.x`，查看`tags`可以看到发版记录。截至发文最新版本为`v1.3.3`，也就是基于的`1.x`分支中的源码
 
 ```
 git clone --depth 1 https://github.com/axios/axios.git
 ```
 
-> --depth 1 也就是只下载最近一次commit的分支，忽略历史记录，能加快下载速度。因为github网络原因clone可能会失败，可以多次尝试或者在[github仓库](https://github.com/axios/axios)中下载zip压缩包
+> --depth 1 也就是只下载最近一次 commit 的分支，忽略历史记录，能加快下载速度。因为 github 网络原因 clone 可能会失败，可以多次尝试或者在[github 仓库](https://github.com/axios/axios)中下载 zip 压缩包
 
 ### 上手
 
-项目使用中安装好axios后，第一步是需要导入：
+项目使用中安装好 axios 后，第一步是需要导入：
 
 ```js
-import axios from 'axios'
+import axios from "axios";
 ```
 
 此时模块查找顺序为：
+
 - 当前文件层级下的`node_modules`
 - 当前文件层级下的同名文件夹，此处即为名为`axios`的文件夹
 - 找到了`node_modules`或同名文件夹后查找内部是否有`packages.json`
-- 有``packages.json``且`main`属性指向的路径存在，则从路径对应的文件中尝试导入
+- 有`packages.json`且`main`属性指向的路径存在，则从路径对应的文件中尝试导入
 - 没有`packages.json`或`main`属性错误，则尝试查找`index`文件并从中导入
 - 如果都没找到，则按同样的规则在上层目录中依次查找，直到路径错误
 
-实际项目中通过`npm`等工具安装，则会在项目根目录node_modules中找到axios目录，并通过`packages.json` -> `main`属性找到库入口为`index.js`文件
+实际项目中通过`npm`等工具安装，则会在项目根目录 node_modules 中找到 axios 目录，并通过`packages.json` -> `main`属性找到库入口为`index.js`文件
 
 ![源码入口](../../images/前端系列/源码阅读-Axios源码解析-1.png)
 
-源码阅读中同理，需要从入口`index.js`文件看起。可以看到`index`中导入了`axios`并解构出API后再次统一导出，我们便可以通过快捷键跳转方法内部（VSCode默认按住alt键后单击）阅读具体的实现。常用快捷键还包括`alt + 左右方向键`切换跳转记录
+源码阅读中同理，需要从入口`index.js`文件看起。可以看到`index`中导入了`axios`并解构出 API 后再次统一导出，我们便可以通过快捷键跳转方法内部（VSCode 默认按住 alt 键后单击）阅读具体的实现。常用快捷键还包括`alt + 左右方向键`切换跳转记录
 
-> 在目录`index`文件中统一收集方法并导出是一种实用技巧，例如工具目录utils将各类型工具子目录中的方法统一导出后，引入只需要写`import {xxx} from '@/utils'`。可以降低路径记忆负担，增加效率
+> 在目录`index`文件中统一收集方法并导出是一种实用技巧，例如工具目录 utils 将各类型工具子目录中的方法统一导出后，引入只需要写`import {xxx} from '@/utils'`。可以降低路径记忆负担，增加效率
 
-## Axios类
+## Axios 类
 
-axios的一切操作始于原始类`Axios`(lib/core/Axios.js)，其中的逻辑比较简单：
+axios 的一切操作始于原始类`Axios`(lib/core/Axios.js)，其中的逻辑比较简单：
 
 1. 将传入的配置存入实例对象的`defaults`属性中
 2. 在实例对象`interceptors`属性中初始化基础的`request`、`response`拦截器管理对象
@@ -78,19 +79,19 @@ axios的一切操作始于原始类`Axios`(lib/core/Axios.js)，其中的逻辑�
 
 最核心的部分是`request`的实现方式
 
-## request实现
+## request 实现
 
 ### 一、合并参数
 
-axios支持两种调用方法（实例对象如何作为函数调用会在后续源码中提到）：
+axios 支持两种调用方法（实例对象如何作为函数调用会在后续源码中提到）：
 
 ```js
 axios({
-  method: 'get',
-  url: '/user/12345',
+  method: "get",
+  url: "/user/12345",
 });
 
-axios('/user/12345');
+axios("/user/12345");
 ```
 
 所以`request`方法第一步需要检查参数格式，并合并出后续通用的参数：
@@ -116,7 +117,7 @@ request(configOrUrl, config) {
 
 得到实际参数后，解构出了`transitional, paramsSerializer, headers`
 
-`transitional`无法在官方文档提供的参数中找到，但通过搜索能在 `README.md` 546行中找到说明，这是一个兼容老版本的过渡选项，之后可能会被移除。其作用是定义JSON解析的规则，包括JSON解析错误是否忽略；是否强制通过JSON转换响应；是否修改请求超时抛出的错误。源码中通过`validator.assertOptions`方法检查了该参数属性是否正确
+`transitional`无法在官方文档提供的参数中找到，但通过搜索能在 `README.md` 546 行中找到说明，这是一个兼容老版本的过渡选项，之后可能会被移除。其作用是定义 JSON 解析的规则，包括 JSON 解析错误是否忽略；是否强制通过 JSON 转换响应；是否修改请求超时抛出的错误。源码中通过`validator.assertOptions`方法检查了该参数属性是否正确
 
 <hr />
 
@@ -163,42 +164,42 @@ request(configOrUrl, config) {
 
 > 在`axios 2.x`中此属性已简化为`{indexes: xxx}`，默认`null`对应`arrayFormat`值的`repeat`，`false`对应`brackets`，`true`对应`indices`
 
-### 三、计算headers
+### 三、计算 headers
 
-`headers`即自定义请求头，在lib/defaults/index.js中定义的默认headers为：
+`headers`即自定义请求头，在 lib/defaults/index.js 中定义的默认 headers 为：
 
 ```js
 const DEFAULT_CONTENT_TYPE = {
-  'Content-Type': undefined
+  "Content-Type": undefined,
 };
 
 const defaults = {
-   // ...
-   headers: {
-      common: {
-         'Accept': 'application/json, text/plain, */*'
-      }
-  }
-}
+  // ...
+  headers: {
+    common: {
+      Accept: "application/json, text/plain, */*",
+    },
+  },
+};
 
-utils.forEach(['delete', 'get', 'head'], function forEachMethodNoData(method) {
+utils.forEach(["delete", "get", "head"], function forEachMethodNoData(method) {
   defaults.headers[method] = {};
 });
 
-utils.forEach(['post', 'put', 'patch'], function forEachMethodWithData(method) {
+utils.forEach(["post", "put", "patch"], function forEachMethodWithData(method) {
   defaults.headers[method] = utils.merge(DEFAULT_CONTENT_TYPE);
 });
 ```
 
 可以看到`common`作为公共请求头，定义了`Accept`。之后又分别为单独的请求方式定义了各自独有的配置对象
 
-> **merge是合并对象方法，在此处的作用相当于对象拷贝，避免直接赋值一个对象，互相影响**
+> **merge 是合并对象方法，在此处的作用相当于对象拷贝，避免直接赋值一个对象，互相影响**
 
 回到`Axios`类源码中的`headers`，定义了`contextHeaders`等于`common`合并请求方式独有的配置，之后删除了`headers`中包括`common`在内的请求方式独有配置
 
 **此时`contextHeaders`为默认配置中定义的属性，`headers`则为用户传入的属性**
 
-之后通过`AxiosHeaders.concat`静态方法将`headers`对象标准化。lib/core/AxiosHeaders.js中的代码较多，但拆分理解每个函数的作用后就能较为容易的读懂整体流程。而且库中函数命名非常直观，**通过命名就能知道函数作用是非常重要的**
+之后通过`AxiosHeaders.concat`静态方法将`headers`对象标准化。lib/core/AxiosHeaders.js 中的代码较多，但拆分理解每个函数的作用后就能较为容易的读懂整体流程。而且库中函数命名非常直观，**通过命名就能知道函数作用是非常重要的**
 
 ```js
 // AxiosHeaders.js
@@ -313,7 +314,7 @@ class AxiosHeaders {
 
 ### 四、处理拦截器
 
-前面提到了`Axios`类初始化时创建了基础的拦截器管理对象`new InterceptorManager()`，内部实现了简单的事件注册、注销机制，查看源码lib/core/interceptorManager.js：
+前面提到了`Axios`类初始化时创建了基础的拦截器管理对象`new InterceptorManager()`，内部实现了简单的事件注册、注销机制，查看源码 lib/core/interceptorManager.js：
 
 ```js
 class InterceptorManager {
@@ -328,7 +329,7 @@ class InterceptorManager {
       fulfilled,
       rejected,
       synchronous: options ? options.synchronous : false,
-      runWhen: options ? options.runWhen : null
+      runWhen: options ? options.runWhen : null,
     });
     return this.handlers.length - 1;
   }
@@ -368,20 +369,28 @@ const requestInterceptorChain = [];
 // 同步标记默认true
 let synchronousRequestInterceptors = true;
 // 调用内部遍历方法，跳过已取消的拦截器
-this.interceptors.request.forEach(function unshiftRequestInterceptors(interceptor) {
+this.interceptors.request.forEach(function unshiftRequestInterceptors(
+  interceptor
+) {
   // 有runWhen则执行，根据返回值判断该拦截器是否需要执行
-  if (typeof interceptor.runWhen === 'function' && interceptor.runWhen(config) === false) {
+  if (
+    typeof interceptor.runWhen === "function" &&
+    interceptor.runWhen(config) === false
+  ) {
     return;
   }
   // 只要有一个拦截器是异步的(默认异步)，则同步标记设为false
-  synchronousRequestInterceptors = synchronousRequestInterceptors && interceptor.synchronous;
+  synchronousRequestInterceptors =
+    synchronousRequestInterceptors && interceptor.synchronous;
   // 向请求拦截队列队首添加拦截器，也就是说请求拦截器是按添加顺序反向执行的，后添加的先执行
   requestInterceptorChain.unshift(interceptor.fulfilled, interceptor.rejected);
 });
 
 // 创建响应拦截队列
 const responseInterceptorChain = [];
-this.interceptors.response.forEach(function pushResponseInterceptors(interceptor) {
+this.interceptors.response.forEach(function pushResponseInterceptors(
+  interceptor
+) {
   // 向响应拦截队列队首添加拦截器，响应拦截器按添加顺序执行
   responseInterceptorChain.push(interceptor.fulfilled, interceptor.rejected);
 });
@@ -436,21 +445,24 @@ try {
 i = 0;
 len = responseInterceptorChain.length;
 while (i < len) {
-  promise = promise.then(responseInterceptorChain[i++], responseInterceptorChain[i++]);
+  promise = promise.then(
+    responseInterceptorChain[i++],
+    responseInterceptorChain[i++]
+  );
 }
 // 返回最终结果promise
 return promise;
 ```
 
-> axios的链式调用模式可以作为常规的前置处理、后置处理方式
+> axios 的链式调用模式可以作为常规的前置处理、后置处理方式
 
-上面的代码中需要着重注意下同步拦截器和异步拦截器的差异（需要理解Promise的执行逻辑）：
+上面的代码中需要着重注意下同步拦截器和异步拦截器的差异（需要理解 Promise 的执行逻辑）：
 
-- 异步拦截器中每一个环节的错误都可以由下一个拦截器的reject方法处理
-   
-   处理后返回的值会作为后续resolve方法的参数，所以极端情况下最后一个执行的请求拦截器出错后，因为请求方法的reject是undefined，所以会直接传递给第一个执行的响应拦截器的reject方法，这回导致实际请求被跳过，得到的结果是响应拦截器reject方法返回的（所以实际项目中往往都是层层传递错误，避免错误发生后仍resolve）
+- 异步拦截器中每一个环节的错误都可以由下一个拦截器的 reject 方法处理
 
-- 同步拦截器中的请求拦截环节只要出错就会终止请求，后续的实际请求和响应拦截环节是通过Promise链
+  处理后返回的值会作为后续 resolve 方法的参数，所以极端情况下最后一个执行的请求拦截器出错后，因为请求方法的 reject 是 undefined，所以会直接传递给第一个执行的响应拦截器的 reject 方法，这回导致实际请求被跳过，得到的结果是响应拦截器 reject 方法返回的（所以实际项目中往往都是层层传递错误，避免错误发生后仍 resolve）
+
+- 同步拦截器中的请求拦截环节只要出错就会终止请求，后续的实际请求和响应拦截环节是通过 Promise 链
 
 ### 五、发起请求
 
@@ -467,55 +479,55 @@ export default function dispatchRequest(config) {
 
   // 传入配置中的transformRequest转换请求参数
   // transformData内部实现并不复杂，可以自行查看
-  config.data = transformData.call(
-    config,
-    config.transformRequest
-  );
+  config.data = transformData.call(config, config.transformRequest);
 
-  if (['post', 'put', 'patch'].indexOf(config.method) !== -1) {
+  if (["post", "put", "patch"].indexOf(config.method) !== -1) {
     // setContentType源自介绍Headers中提到的buildAccessors方法
     // 所以这里相当于执行了AxiosHeaders.set('ContentType', 'application/x-www-form-urlencoded', false)
-    config.headers.setContentType('application/x-www-form-urlencoded', false);
+    config.headers.setContentType("application/x-www-form-urlencoded", false);
   }
   // 获取请求适配器，在下文中解读
   const adapter = adapters.getAdapter(config.adapter || defaults.adapter);
   // 使用适配器执行请求
-  return adapter(config).then(function onAdapterResolution(response) {
-    throwIfCancellationRequested(config);
-
-    // 调用config中的transformResponse处理响应
-    response.data = transformData.call(
-      config,
-      config.transformResponse,
-      response
-    );
-
-    response.headers = AxiosHeaders.from(response.headers);
-
-    return response;
-  }, function onAdapterRejection(reason) {
-    if (!isCancel(reason)) {
+  return adapter(config).then(
+    function onAdapterResolution(response) {
       throwIfCancellationRequested(config);
 
-      // Transform response data
-      if (reason && reason.response) {
-        reason.response.data = transformData.call(
-          config,
-          config.transformResponse,
-          reason.response
-        );
-        reason.response.headers = AxiosHeaders.from(reason.response.headers);
-      }
-    }
+      // 调用config中的transformResponse处理响应
+      response.data = transformData.call(
+        config,
+        config.transformResponse,
+        response
+      );
 
-    return Promise.reject(reason);
-  });
+      response.headers = AxiosHeaders.from(response.headers);
+
+      return response;
+    },
+    function onAdapterRejection(reason) {
+      if (!isCancel(reason)) {
+        throwIfCancellationRequested(config);
+
+        // Transform response data
+        if (reason && reason.response) {
+          reason.response.data = transformData.call(
+            config,
+            config.transformResponse,
+            reason.response
+          );
+          reason.response.headers = AxiosHeaders.from(reason.response.headers);
+        }
+      }
+
+      return Promise.reject(reason);
+    }
+  );
 }
 ```
 
 #### 2.adapters
 
-lib/adapters/adapters.js中定义了适配器的获取过程
+lib/adapters/adapters.js 中定义了适配器的获取过程
 
 ```js
 // 定义内置适配器对象
@@ -554,202 +566,250 @@ export default {
 
 #### 3.xhrAdapter
 
-`httpAdapter`是`node`环境中使用的请求方法，本文不做解读，内部封装与`xhr`类似。阅读之前需要先熟悉`XMLHttpRequest`，推荐阅读[现代JavaScript教程](https://zh.javascript.info/xmlhttprequest)中的文章
+`httpAdapter`是`node`环境中使用的请求方法，本文不做解读，内部封装与`xhr`类似。阅读之前需要先熟悉`XMLHttpRequest`，推荐阅读[现代 JavaScript 教程](https://zh.javascript.info/xmlhttprequest)中的文章
 
-代码中有用到`platform.isStandardBrowserEnv`，跳转源码可会发现`platform`只导出了`node`目录，又是怎么调用`browser`目录下api的呢。这里需要了解`packages.json`中的`browser`字段
+代码中有用到`platform.isStandardBrowserEnv`，跳转源码可会发现`platform`只导出了`node`目录，又是怎么调用`browser`目录下 api 的呢。这里需要了解`packages.json`中的`browser`字段
 
 前文介绍了`main`字段定义了整个包的入口文件，除此之外还有两个跟入口有关的字段：
 
-- `module`字段定义包ESM规范入口文件，browser环境与node环境均可使用
+- `module`字段定义包 ESM 规范入口文件，browser 环境与 node 环境均可使用
 
-- `browser`字段定义browser环境下的import路径对应的实际文件
+- `browser`字段定义 browser 环境下的 import 路径对应的实际文件
 
-因为axios在浏览器与服务端均可使用，所以`platform`默认导出node文件，再通过browser属性在浏览器环境下将导入修改为browser文件
+因为 axios 在浏览器与服务端均可使用，所以`platform`默认导出 node 文件，再通过 browser 属性在浏览器环境下将导入修改为 browser 文件
 
 ```js
 // 判断xhr是否可用
-const isXHRAdapterSupported = typeof XMLHttpRequest !== 'undefined';
+const isXHRAdapterSupported = typeof XMLHttpRequest !== "undefined";
 // 使用&&短路运算，当xhr不可用时前文的xhrAdapter=false，adapters的匹配循环中会匹配失败，进而匹配下一项
-export default isXHRAdapterSupported && function (config) {
-  return new Promise(function dispatchXhrRequest(resolve, reject) {
-    let requestData = config.data;
-    const requestHeaders = AxiosHeaders.from(config.headers).normalize();
-    const responseType = config.responseType;
-    let onCanceled;
-    // 设置done方法，在请求结束后停止取消请求功能
-    function done() {
-      if (config.cancelToken) {
-        config.cancelToken.unsubscribe(onCanceled);
-      }
-
-      if (config.signal) {
-        config.signal.removeEventListener('abort', onCanceled);
-      }
-    }
-    // 请求参数是FormData格式且为浏览器环境时，取消ContentType设置（浏览器会自动识别参数添加ContentType为JSON或FormData）
-    if (utils.isFormData(requestData) && (platform.isStandardBrowserEnv || platform.isStandardBrowserWebWorkerEnv)) {
-      requestHeaders.setContentType(false);
-    }
-
-    let request = new XMLHttpRequest();
-
-    // 后端鉴权参数，可以测试时使用（需要服务端鉴权规则符合下面代码的标准）
-    if (config.auth) {
-      const username = config.auth.username || '';
-      // unescape为JS自带解码API，现已废弃，推荐使用decodeURI或decodeURIComponent替代
-      // 将URI中的特殊字符转码\解码
-      const password = config.auth.password ? unescape(encodeURIComponent(config.auth.password)) : '';
-      // btoa是浏览器自带转base64 api，atob则能解码base64
-      requestHeaders.set('Authorization', 'Basic ' + btoa(username + ':' + password));
-    }
-    // 构建完整请求地址
-    const fullPath = buildFullPath(config.baseURL, config.url);
-    // 建立XHR请求，buildURL构建包括查询参数的完整链接
-    request.open(config.method.toUpperCase(), buildURL(fullPath, config.params, config.paramsSerializer), true);
-    // 设置超时时间，axios中默认为0，永不超时
-    request.timeout = config.timeout;
-
-    // 下面的代码调整了书写顺序，方便理解
-
-    // Remove Content-Type if data is undefined
-    requestData === undefined && requestHeaders.setContentType(null);
-
-    // 将config中的请求头添加到xhr对象
-    if ('setRequestHeader' in request) {
-      utils.forEach(requestHeaders.toJSON(), function setRequestHeader(val, key) {
-        request.setRequestHeader(key, val);
-      });
-    }
-
-    // 根据配置添加withCredentials
-    if (!utils.isUndefined(config.withCredentials)) {
-      request.withCredentials = !!config.withCredentials;
-    }
-
-    // 设置responseType
-    if (responseType && responseType !== 'json') {
-      request.responseType = config.responseType;
-    }
-
-    // 处理响应进度
-    if (typeof config.onDownloadProgress === 'function') {
-      request.addEventListener('progress', progressEventReducer(config.onDownloadProgress, true));
-    }
-
-    // 处理上传进度（判断兼容性）
-    if (typeof config.onUploadProgress === 'function' && request.upload) {
-      request.upload.addEventListener('progress', progressEventReducer(config.onUploadProgress));
-    }
-
-    // axios支持cancelToken(基于xhr.abort)，与signal(基于AbortController API)两种取消请求方式
-    // cancelToken现已弃用，不推荐使用，查看文档https://axios-http.com/zh/docs/cancellation
-    if (config.cancelToken || config.signal) {
-      // 两种方式通用的请求处理方法
-      onCanceled = cancel => {
-      // 请求不存在，证明请求已被处理过（处理事件结尾会设置request = null，包括出错、超时、已取消或onloadend已执行）
-        if (!request) { return; }
-        reject(!cancel || cancel.type ? new CanceledError(null, config, request) : cancel);
-        request.abort();
-        request = null;
-      };
-      // cancelToken基于发布订阅模式，后文会简答介绍
-      config.cancelToken && config.cancelToken.subscribe(onCanceled);
-      if (config.signal) {
-        // 判断取消是否已执行，执行取消或开始监听取消
-        config.signal.aborted ? onCanceled() : config.signal.addEventListener('abort', onCanceled);
-      }
-    }
-    // 正则获取请求协议，推荐使用上文介绍的正则分析工具理解内部实现
-    const protocol = parseProtocol(fullPath);
-    // 如果当前环境不支持此协议，返回错误
-    if (protocol && platform.protocols.indexOf(protocol) === -1) {
-      reject(new AxiosError('Unsupported protocol ' + protocol + ':', AxiosError.ERR_BAD_REQUEST, config));
-      return;
-    }
-    // 发送请求
-    request.send(requestData || null);
-
-    if ('onloadend' in request) {
-      // 如果onloadend可用，注册回调
-      request.onloadend = onloadend;
-    } else {
-      // onloadend不可用，监听状态
-      request.onreadystatechange = function handleLoad() {
-        if (!request || request.readyState !== 4) {
-          return;
+export default isXHRAdapterSupported &&
+  function (config) {
+    return new Promise(function dispatchXhrRequest(resolve, reject) {
+      let requestData = config.data;
+      const requestHeaders = AxiosHeaders.from(config.headers).normalize();
+      const responseType = config.responseType;
+      let onCanceled;
+      // 设置done方法，在请求结束后停止取消请求功能
+      function done() {
+        if (config.cancelToken) {
+          config.cancelToken.unsubscribe(onCanceled);
         }
 
-        // 此处处理readyState等于4，但status仍是0的情况
-        // 部分浏览器可能会因为使用了file协议而出现这种情况，即使请求是成功的
-        // 下面判断的是非file协议导致这种情况则return，因为file协议导致的情况下请求是成功的，可以继续执行
-        if (request.status === 0 && !(request.responseURL && request.responseURL.indexOf('file:') === 0)) {
-          return;
+        if (config.signal) {
+          config.signal.removeEventListener("abort", onCanceled);
         }
-        // readystate处理在onerror与ontimeout之前
-        // 所以推迟一轮事件循环，让onerror、ontimeout能被触发，之后再决定如何处理响应
-        setTimeout(onloadend);
-      };
-    }
-    // 无论请求是否成功均会触发XHR loadend事件
-    function onloadend() {
-      // 请求不存在，证明请求已被处理过（处理事件结尾会设置request = null，包括出错、超时、已取消或onloadend已执行）
-      if (!request) { return; }
-      // getAllResponseHeaders是xhr自带api，返回所有响应头
-      const responseHeaders = AxiosHeaders.from(
-        'getAllResponseHeaders' in request && request.getAllResponseHeaders()
+      }
+      // 请求参数是FormData格式且为浏览器环境时，取消ContentType设置（浏览器会自动识别参数添加ContentType为JSON或FormData）
+      if (
+        utils.isFormData(requestData) &&
+        (platform.isStandardBrowserEnv ||
+          platform.isStandardBrowserWebWorkerEnv)
+      ) {
+        requestHeaders.setContentType(false);
+      }
+
+      let request = new XMLHttpRequest();
+
+      // 后端鉴权参数，可以测试时使用（需要服务端鉴权规则符合下面代码的标准）
+      if (config.auth) {
+        const username = config.auth.username || "";
+        // unescape为JS自带解码API，现已废弃，推荐使用decodeURI或decodeURIComponent替代
+        // 将URI中的特殊字符转码\解码
+        const password = config.auth.password
+          ? unescape(encodeURIComponent(config.auth.password))
+          : "";
+        // btoa是浏览器自带转base64 api，atob则能解码base64
+        requestHeaders.set(
+          "Authorization",
+          "Basic " + btoa(username + ":" + password)
+        );
+      }
+      // 构建完整请求地址
+      const fullPath = buildFullPath(config.baseURL, config.url);
+      // 建立XHR请求，buildURL构建包括查询参数的完整链接
+      request.open(
+        config.method.toUpperCase(),
+        buildURL(fullPath, config.params, config.paramsSerializer),
+        true
       );
-      // 请求config中未设置responseType或者设置为text、json取responseText
-      // 其他情况取response，根据responseType可能返回ArrayBuffer、Blob、Document、Object或字符串
-      const responseData = !responseType || responseType === 'text' || responseType === 'json' ?
-        request.responseText : request.response;
-      // 整理需要返回的数据
-      const response = {
-        data: responseData,
-        status: request.status,
-        statusText: request.statusText,
-        headers: responseHeaders,
-        config,
-        request
-      };
-      // settle内部判断了validateStatus参数，来决定请求是resolve还是reject
-      // settle中的!response.status条件，对应上文中的file协议成功但status仍未0的情况（因为其余异常情况均已处理，会终止请求）
-      // 处理完成后执行done，删除“取消”监听
-      settle(function _resolve(value) {
-        resolve(value);
-        done();
-      }, function _reject(err) {
-        reject(err);
-        done();
-      }, response);
-      // 处理完成后删除request
-      request = null;
-    }
+      // 设置超时时间，axios中默认为0，永不超时
+      request.timeout = config.timeout;
 
-    // 此处省略取消请求处理、网络错误处理、超时处理、xsrf设置...
-  });
-}
+      // 下面的代码调整了书写顺序，方便理解
+
+      // Remove Content-Type if data is undefined
+      requestData === undefined && requestHeaders.setContentType(null);
+
+      // 将config中的请求头添加到xhr对象
+      if ("setRequestHeader" in request) {
+        utils.forEach(
+          requestHeaders.toJSON(),
+          function setRequestHeader(val, key) {
+            request.setRequestHeader(key, val);
+          }
+        );
+      }
+
+      // 根据配置添加withCredentials
+      if (!utils.isUndefined(config.withCredentials)) {
+        request.withCredentials = !!config.withCredentials;
+      }
+
+      // 设置responseType
+      if (responseType && responseType !== "json") {
+        request.responseType = config.responseType;
+      }
+
+      // 处理响应进度
+      if (typeof config.onDownloadProgress === "function") {
+        request.addEventListener(
+          "progress",
+          progressEventReducer(config.onDownloadProgress, true)
+        );
+      }
+
+      // 处理上传进度（判断兼容性）
+      if (typeof config.onUploadProgress === "function" && request.upload) {
+        request.upload.addEventListener(
+          "progress",
+          progressEventReducer(config.onUploadProgress)
+        );
+      }
+
+      // axios支持cancelToken(基于xhr.abort)，与signal(基于AbortController API)两种取消请求方式
+      // cancelToken现已弃用，不推荐使用，查看文档https://axios-http.com/zh/docs/cancellation
+      if (config.cancelToken || config.signal) {
+        // 两种方式通用的请求处理方法
+        onCanceled = (cancel) => {
+          // 请求不存在，证明请求已被处理过（处理事件结尾会设置request = null，包括出错、超时、已取消或onloadend已执行）
+          if (!request) {
+            return;
+          }
+          reject(
+            !cancel || cancel.type
+              ? new CanceledError(null, config, request)
+              : cancel
+          );
+          request.abort();
+          request = null;
+        };
+        // cancelToken基于发布订阅模式，后文会简答介绍
+        config.cancelToken && config.cancelToken.subscribe(onCanceled);
+        if (config.signal) {
+          // 判断取消是否已执行，执行取消或开始监听取消
+          config.signal.aborted
+            ? onCanceled()
+            : config.signal.addEventListener("abort", onCanceled);
+        }
+      }
+      // 正则获取请求协议，推荐使用上文介绍的正则分析工具理解内部实现
+      const protocol = parseProtocol(fullPath);
+      // 如果当前环境不支持此协议，返回错误
+      if (protocol && platform.protocols.indexOf(protocol) === -1) {
+        reject(
+          new AxiosError(
+            "Unsupported protocol " + protocol + ":",
+            AxiosError.ERR_BAD_REQUEST,
+            config
+          )
+        );
+        return;
+      }
+      // 发送请求
+      request.send(requestData || null);
+
+      if ("onloadend" in request) {
+        // 如果onloadend可用，注册回调
+        request.onloadend = onloadend;
+      } else {
+        // onloadend不可用，监听状态
+        request.onreadystatechange = function handleLoad() {
+          if (!request || request.readyState !== 4) {
+            return;
+          }
+
+          // 此处处理readyState等于4，但status仍是0的情况
+          // 部分浏览器可能会因为使用了file协议而出现这种情况，即使请求是成功的
+          // 下面判断的是非file协议导致这种情况则return，因为file协议导致的情况下请求是成功的，可以继续执行
+          if (
+            request.status === 0 &&
+            !(request.responseURL && request.responseURL.indexOf("file:") === 0)
+          ) {
+            return;
+          }
+          // readystate处理在onerror与ontimeout之前
+          // 所以推迟一轮事件循环，让onerror、ontimeout能被触发，之后再决定如何处理响应
+          setTimeout(onloadend);
+        };
+      }
+      // 无论请求是否成功均会触发XHR loadend事件
+      function onloadend() {
+        // 请求不存在，证明请求已被处理过（处理事件结尾会设置request = null，包括出错、超时、已取消或onloadend已执行）
+        if (!request) {
+          return;
+        }
+        // getAllResponseHeaders是xhr自带api，返回所有响应头
+        const responseHeaders = AxiosHeaders.from(
+          "getAllResponseHeaders" in request && request.getAllResponseHeaders()
+        );
+        // 请求config中未设置responseType或者设置为text、json取responseText
+        // 其他情况取response，根据responseType可能返回ArrayBuffer、Blob、Document、Object或字符串
+        const responseData =
+          !responseType || responseType === "text" || responseType === "json"
+            ? request.responseText
+            : request.response;
+        // 整理需要返回的数据
+        const response = {
+          data: responseData,
+          status: request.status,
+          statusText: request.statusText,
+          headers: responseHeaders,
+          config,
+          request,
+        };
+        // settle内部判断了validateStatus参数，来决定请求是resolve还是reject
+        // settle中的!response.status条件，对应上文中的file协议成功但status仍未0的情况（因为其余异常情况均已处理，会终止请求）
+        // 处理完成后执行done，删除“取消”监听
+        settle(
+          function _resolve(value) {
+            resolve(value);
+            done();
+          },
+          function _reject(err) {
+            reject(err);
+            done();
+          },
+          response
+        );
+        // 处理完成后删除request
+        request = null;
+      }
+
+      // 此处省略取消请求处理、网络错误处理、超时处理、xsrf设置...
+    });
+  };
 ```
 
 ### 六、取消请求
 
-推荐使用的`AbortController`是较新的浏览器原生API，可以在[MDN](https://developer.mozilla.org/zh-CN/docs/Web/API/AbortController)中详细了解，使用方法官网中也给出了详细例子，这里不再讲解
+推荐使用的`AbortController`是较新的浏览器原生 API，可以在[MDN](https://developer.mozilla.org/zh-CN/docs/Web/API/AbortController)中详细了解，使用方法官网中也给出了详细例子，这里不再讲解
 
-已弃用的`CancelToken`不再推荐使用，但其内部lib/cancel/CancelToken.js的实现方式仍值得学习。该API使用方式为：
+已弃用的`CancelToken`不再推荐使用，但其内部 lib/cancel/CancelToken.js 的实现方式仍值得学习。该 API 使用方式为：
 
 ```js
 const CancelToken = axios.CancelToken;
 const source = CancelToken.source();
 
-axios.get('xxx', { cancelToken: source.token })
+axios.get("xxx", { cancelToken: source.token });
 
-source.cancel('取消原因');
+source.cancel("取消原因");
 ```
 
 核心逻辑中的调用方式为：
 
 ```js
 // 订阅取消监听
-config.cancelToken.subscribe(onCanceled)
+config.cancelToken.subscribe(onCanceled);
 // 退订取消监听
 config.cancelToken.unsubscribe(onCanceled);
 ```
@@ -767,13 +827,13 @@ class CancelToken {
     });
     return {
       token,
-      cancel
+      cancel,
     };
   }
 
   constructor(executor) {
-    if (typeof executor !== 'function') {
-      throw new TypeError('executor must be a function.');
+    if (typeof executor !== "function") {
+      throw new TypeError("executor must be a function.");
     }
     // 创建用于触发取消的方法
     // Promise符合取消请求这种状态仅能改变依次的需求
@@ -784,7 +844,7 @@ class CancelToken {
     });
     const token = this;
     // source.cancel执行后触发
-    this.promise.then(cancel => {
+    this.promise.then((cancel) => {
       // cancel参数也就是取消原因
       if (!token._listeners) return;
       let i = token._listeners.length;
@@ -799,10 +859,10 @@ class CancelToken {
     // 作用是可以通过source.token.promise.then(xxx)注册事件，可以注册多个,注册的返回值是一个promise，且带有cancel属性用于取消注册
     // 注册的方法会在source.cancel()调用后执行，且先于请求的catch
     // 没有想到这个功能有什么作用，因为同样的功能在catch中也能实现，且更为直观。也没有查询到任何相关的说明，因为官方已经不推荐使用CancelToken，故不再纠结这里的用意了
-    this.promise.then = onfulfilled => {
+    this.promise.then = (onfulfilled) => {
       let _resolve;
       // 仅cancel触发时才会让onfulfilled执行
-      const promise = new Promise(resolve => {
+      const promise = new Promise((resolve) => {
         token.subscribe(resolve);
         _resolve = resolve;
       }).then(onfulfilled);
@@ -815,7 +875,9 @@ class CancelToken {
     // source方法中将executor参数赋给了cancel，所以取消请求实际调用的就是这里的cancel函数
     executor(function cancel(message, config, request) {
       // 取消已被调用过，忽略
-      if (token.reason) { return; }
+      if (token.reason) {
+        return;
+      }
       token.reason = new CanceledError(message, config, request);
       // 执行取消
       resolvePromise(token.reason);
@@ -855,33 +917,42 @@ class CancelToken {
 
 ```js
 // lib/core/Axios.js
-utils.forEach(['delete', 'get', 'head', 'options'], function forEachMethodNoData(method) {
-  Axios.prototype[method] = function(url, config) {
-    return this.request(mergeConfig(config || {}, {
-      method,
-      url,
-      data: (config || {}).data
-    }));
-  };
-});
+utils.forEach(
+  ["delete", "get", "head", "options"],
+  function forEachMethodNoData(method) {
+    Axios.prototype[method] = function (url, config) {
+      return this.request(
+        mergeConfig(config || {}, {
+          method,
+          url,
+          data: (config || {}).data,
+        })
+      );
+    };
+  }
+);
 // 可能提交表单的请求方式，扩展了`methodForm`的别名方法，会自动修改请求头
-utils.forEach(['post', 'put', 'patch'], function forEachMethodWithData(method) {
+utils.forEach(["post", "put", "patch"], function forEachMethodWithData(method) {
   function generateHTTPMethod(isForm) {
     return function httpMethod(url, data, config) {
-      return this.request(mergeConfig(config || {}, {
-        method,
-        headers: isForm ? {
-          'Content-Type': 'multipart/form-data'
-        } : {},
-        url,
-        data
-      }));
+      return this.request(
+        mergeConfig(config || {}, {
+          method,
+          headers: isForm
+            ? {
+                "Content-Type": "multipart/form-data",
+              }
+            : {},
+          url,
+          data,
+        })
+      );
     };
   }
 
   Axios.prototype[method] = generateHTTPMethod();
 
-  Axios.prototype[method + 'Form'] = generateHTTPMethod(true);
+  Axios.prototype[method + "Form"] = generateHTTPMethod(true);
 });
 ```
 
@@ -894,9 +965,9 @@ function createInstance(defaultConfig) {
   // 创建instance等于一个绑定this为当前实例的request函数，所以实例能直接当函数调用
   const instance = bind(Axios.prototype.request, context);
   // 拷贝原型属性到instance，包括request和各种扩展请求方法以及getUri方法
-  utils.extend(instance, Axios.prototype, context, {allOwnKeys: true});
+  utils.extend(instance, Axios.prototype, context, { allOwnKeys: true });
   // 拷贝实例属性到instance，也就是defaults和interceptors
-  utils.extend(instance, context, null, {allOwnKeys: true});
+  utils.extend(instance, context, null, { allOwnKeys: true });
   // 在instance上创建create方法
   instance.create = function create(instanceConfig) {
     // create创建的新实例会继承原实例的配置
@@ -916,66 +987,69 @@ export default function bind(fn, thisArg) {
 // b是源对象
 // c是提供给对象函数绑定的this参数
 // allOwnKeys表示是否遍历原型链中的属性
-const extend = (a, b, thisArg, {allOwnKeys}= {}) => {
+const extend = (a, b, thisArg, { allOwnKeys } = {}) => {
   // forEach是自定义的遍历方法，支持数组或对象
-  forEach(b, (val, key) => {
-    if (thisArg && isFunction(val)) {
-      a[key] = bind(val, thisArg);
-    } else {
-      a[key] = val;
-    }
-  }, {allOwnKeys});
+  forEach(
+    b,
+    (val, key) => {
+      if (thisArg && isFunction(val)) {
+        a[key] = bind(val, thisArg);
+      } else {
+        a[key] = val;
+      }
+    },
+    { allOwnKeys }
+  );
   return a;
-}
+};
 ```
 
 ## 工具函数
 
-axios源码中以函数式编程为主，创建了大量的工具函数。函数式编程有逻辑清晰、利于复用、利于Tree Shaking优化等优点。阅读、掌握这些工具函数能扩宽我们的编程思路，提高编程效率
+axios 源码中以函数式编程为主，创建了大量的工具函数。函数式编程有逻辑清晰、利于复用、利于 Tree Shaking 优化等优点。阅读、掌握这些工具函数能扩宽我们的编程思路，提高编程效率
 
 工具函数主要创建在 lib/utils.js 中，这里仅讲解一个较为实用的例子：
 
 ```js
-const {toString} = Object.prototype;
-const kindOf = (cache => thing => {
-    const str = toString.call(thing);
-    return cache[str] || (cache[str] = str.slice(8, -1).toLowerCase());
+const { toString } = Object.prototype;
+const kindOf = ((cache) => (thing) => {
+  const str = toString.call(thing);
+  return cache[str] || (cache[str] = str.slice(8, -1).toLowerCase());
 })(Object.create(null));
 
 /*-------------kindOf是一个立即执行函数，上面的代码等同于于：------------------*/
 // 创建没有原型的空对象用以缓存
-const cache = Object.create(null)
-const kindOf = thing => {
+const cache = Object.create(null);
+const kindOf = (thing) => {
   // 更准确的获取类型方法，返回 [object TypeName]
-  const str = Object.prototype.toString.call(thing)
+  const str = Object.prototype.toString.call(thing);
   // 有缓存直接返回
-  if(cache[str]) {
-    return cache[str]
+  if (cache[str]) {
+    return cache[str];
   } else {
     // 缓存TypeName部分的小写字符串，并返回
     // cache的意义就是省略了重复的slice().toLowerCase()操作
-    cache[str] = str.slice(8, -1).toLowerCase()
-    return cache[str]
+    cache[str] = str.slice(8, -1).toLowerCase();
+    return cache[str];
   }
-}
+};
 /*--------------------------------------------------------------------------*/
 // 接收任意type字符串后，返回一个校验的函数
 const kindOfTest = (type) => {
   type = type.toLowerCase();
-  return (thing) => kindOf(thing) === type
-}
+  return (thing) => kindOf(thing) === type;
+};
 // 在paramsSerializer逻辑中用到了这个方法，作用是判断传入的参数是不是原生URLSearchParams对象
-const isURLSearchParams = kindOfTest('URLSearchParams');
+const isURLSearchParams = kindOfTest("URLSearchParams");
 ```
-
 
 ## 总结
 
-阅读Axios源码，除了能理解这个经典请求库的执行逻辑之外，相信还可以增加对编程的一些思考：
+阅读 Axios 源码，除了能理解这个经典请求库的执行逻辑之外，相信还可以增加对编程的一些思考：
 
 - 灵活使用短路运算符、三目运算符、立即执行函数等语法适当简化代码
 - 参数需要严格判断类型，处理边界情况，并设置兜底的值，避免意外错误
-- 变量名需要见名知意，axios中甚至作为参数的函数都使用了具名函数
+- 变量名需要见名知意，axios 中甚至作为参数的函数都使用了具名函数
 - 运用函数式编程范式以及设计模式优化代码与逻辑（需要针对系统性学习）
 - 官方文档仍有更新不及时甚至出错的情况（特别是非官方的翻译文档），遇到问题可以尝试从源码中找答案
 - ......

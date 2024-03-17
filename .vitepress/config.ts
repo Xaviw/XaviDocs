@@ -8,7 +8,7 @@ export default defineConfig({
   base: "/XaviDocs/",
   // 忽略解析部分md文件（默认忽略node_modules），仅打包后生效，被忽略的文件不影响被其他文件导入
   srcExclude: [
-    "**/(README|TODO).md",
+    "**/(README).md",
     "(.vitepress|public|images|.guthub|components|snippets)/**/*.md",
   ],
   lastUpdated: true,
@@ -34,6 +34,31 @@ export default defineConfig({
     ],
   },
   themeConfig: {
+    nav: [
+      {
+        text: "前端系列",
+        link: "/前端系列/源码阅读/Axios源码解析",
+        activeMatch: "/前端系列/",
+      },
+      {
+        text: "工具系列",
+        link: "/工具系列/VitePress搭建/基础搭建",
+        activeMatch: "/工具系列/",
+      },
+      {
+        text: "好文分享",
+        items: [
+          {
+            text: "浏览器工作原理与实践",
+            link: "https://blog.poetries.top/browser-working-principle/guide/part1/lesson01.html",
+          },
+          {
+            text: "EcmaScript 6 入门教程",
+            link: "https://es6.ruanyifeng.com/#docs/intro",
+          },
+        ],
+      },
+    ],
     logo: "/logo.svg",
     outline: "deep",
     outlineTitle: "目录",

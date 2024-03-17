@@ -12,7 +12,7 @@ export { data };
 // createContentLoader会默认忽略'**/node_modules/**', '**/dist/**'
 export default createContentLoader(
   [
-    "!(.vitepress|public|images|.guthub|components|snippets)/**/!(Vuex源码解析|Vue静态资源处理|index|README|TODO).md",
+    "!(.vitepress|public|images|.guthub|components|snippets)/**/!(index|README).md",
   ],
   {
     includeSrc: true,
