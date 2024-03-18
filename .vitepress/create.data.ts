@@ -1,7 +1,7 @@
 import { createContentLoader, DefaultTheme } from "vitepress";
-import path from "path";
+import { basename, extname, sep, normalize } from "path";
 import { spawn } from "child_process";
-import fs from "fs";
+import { statSync } from "fs";
 import type { Feature } from "vitepress/dist/client/theme-default/components/VPFeatures.vue";
 
 // 避免导入时报错
@@ -19,29 +19,34 @@ export default createContentLoader(
     async transform(data) {
       const promises: Promise<any>[] = [];
 
-      data.forEach((item) => {
+      data.forEach(({ frontmatter, src, url }) => {
         // 用页面的一级标题作为文章标题（因为sidebar中可能是精简的标题）
         let title =
-          item.src?.match(/^#\s+(.*)[\n\r][\s\S]*/)?.[1] ||
-          path.basename(item.url).replace(path.extname(item.url), "");
+          src?.match(/^\s*#\s+(.*)\s*$/m)?.[1] ||
+          basename(url).replace(extname(url), "");
+
         // 标题可能用到了变量，需要替换
-        const matterTitle = title?.match(/\{\{\$frontmatter\.(\S+)\}\}/)?.[1];
-        if (matterTitle) {
-          title = item.frontmatter[matterTitle];
+        const regexp = /\{\{\s*\$frontmatter\.(\S+?)\s*\}\}/g;
+        let match;
+        while ((match = regexp.exec(title)) !== null) {
+          const replaceReg = new RegExp(
+            "\\{\\{\\s*\\$frontmatter\\." + match[1] + "\\s*\\}\\}",
+            "g"
+          );
+          title = title.replace(replaceReg, frontmatter[match[1]]);
         }
 
         // 链接去掉项目名
-        const link = path
-          .normalize(item.url)
-          .split(path.sep)
+        const link = normalize(url)
+          .split(sep)
           .filter((item) => item)
-          .join(path.sep);
+          .join(sep);
 
         // 获取发布时间
         const task = getGitTimestamp(link.replace(/\.html$/i, ".md")).then(
           (fileTimeInfo) => ({
             title,
-            details: item.src
+            details: src
               // 去除html标签
               ?.replace(/<[^>]+?>/g, "")
               // 去除frontmatter
@@ -108,26 +113,15 @@ function getGitTimestamp(filePath: string) {
         resolve([+new Date(output[output.length - 1]), +new Date(output[0])]);
       } else {
         // 没有提交记录时获取文件时间
-        const { birthtimeMs, ctimeMs } = fs.statSync(filePath);
-        resolve([birthtimeMs, ctimeMs]);
+        const { birthtimeMs, mtimeMs } = statSync(filePath);
+        resolve([birthtimeMs, mtimeMs]);
       }
     });
 
     child.on("error", () => {
       // 获取失败时使用文件时间
-      const { birthtimeMs, ctimeMs } = fs.statSync(filePath);
-      resolve([birthtimeMs, ctimeMs]);
+      const { birthtimeMs, mtimeMs } = statSync(filePath);
+      resolve([birthtimeMs, mtimeMs]);
     });
   });
-}
-
-// 使用正则提取sidebar中所有页面链接
-function getUrls(sidebar: DefaultTheme.Sidebar): string[] {
-  const result: string[] = [];
-  const regex = /"link":"([^"]*)"/g;
-  let matches: RegExpExecArray | null;
-  while ((matches = regex.exec(JSON.stringify(sidebar))) !== null) {
-    result.push(path.normalize(`${matches[1]}.md`));
-  }
-  return result;
 }

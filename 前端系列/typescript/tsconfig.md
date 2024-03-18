@@ -2,7 +2,7 @@
 sort: 14
 ---
 
-## tsconfig.json
+# tsconfig.json
 
 ## 简介
 
