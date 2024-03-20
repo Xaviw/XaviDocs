@@ -21,7 +21,7 @@
     "@types/node": "^20.6.0",
     "gray-matter": "^4.0.3",
     "vite": "^5.1.4",
-    "vite-plugin-vitepress-auto-nav": "^2.2.1",
+    "vite-plugin-vitepress-auto-nav": "^2.2.2",
     "vitepress": "1.0.0-rc.45",
     "vue": "^3.3.4"
   },

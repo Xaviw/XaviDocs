@@ -50,36 +50,39 @@ export default createContentLoader(
               // 去除html标签
               ?.replace(/<[^>]+?>/g, "")
               // 去除frontmatter
-              ?.replace(/^---[\s\S]*?---/, "")
+              .replace(/^---[\s\S]*?---/, "")
               // 去除标题
-              .replace(/^#+ [\S]+?\s/gm, "")
+              .replace(/^#+\s+.*?$/gm, "")
               // 去除引用
-              .replace(/^\> /gm, "")
+              .replace(/^\>/gm, "")
               // 只保留反引号内部内容
-              .replace(/`(\S+?)`/g, "$1")
+              .replace(/`(.+?)`/g, "$1")
               // 只保留加粗、倾斜符号中的内容
-              .replace(/\*{1,3}(\S+?)\*{1,3}/g, "$1")
+              .replace(/\*{1,3}(.+?)\*{1,3}/g, "$1")
               // 只保留跳转内容
-              .replace(/\[(\S+?)\]\(\S+?\)/g, "$1")
+              .replace(/\[(.+?)\]\(.+?\)/g, "$1")
               // 去除提示块
-              .replace(/^:::[\s\S]+?$/gm, "")
-              // 去除空白字符
+              .replace(/^:::.*$/gm, "")
+              // 统一空白字符为一个空格
               .replace(/\s/g, " ")
               // 仅保留可能显示的部分，减小数据大小
               .slice(0, 200),
             link,
-            // 显示更新时间
+            // linkText 可以显示更新时间
             // linkText: new Date(fileTimeInfo[1]).toLocaleDateString(),
-            updateTime: fileTimeInfo[1],
+            // 存储时间信息用于排序
+            fileTimeInfo,
           })
         );
 
         promises.push(task);
       });
 
-      // 发布时间降序排列
       const pages = await Promise.all(promises);
-      return pages.sort((a, b) => b.updateTime - a.updateTime);
+      // 更新时间降序排列
+      return pages.sort((a, b) => b.fileTimeInfo[1] - a.fileTimeInfo[1]);
+      // 发布时间降序排列
+      // return pages.sort((a, b) => b.fileTimeInfo[0] - a.fileTimeInfo[0]);
     },
   }
 );
