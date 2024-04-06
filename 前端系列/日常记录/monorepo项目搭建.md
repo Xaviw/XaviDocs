@@ -1,5 +1,5 @@
 ---
-hide: true
+hide: false
 ---
 
 # monorepo 项目搭建
@@ -8,7 +8,7 @@ hide: true
 
 相对于普通的一个项目一个仓库（`multirepo`），最大的好处是项目间引用更便捷，关联包更新后无需经过打包、发布、安装新版本等步骤就能够直接使用。
 
-monorepo 有多种搭建方式，目前较为主流（`Vue3` 采用）的是使用 `pnpm` 搭建的方式。本文不是单纯的教程文，而是在 [`spatial-planning`](https://github.com/Xaviw/spatial-planning) 项目后对 `pnpm monorepo` 的一些理解。
+monorepo 有多种搭建方式，目前较为主流（`Vue3` 采用）的是使用 `pnpm` 搭建的方式。本文不是完整的教程文，而是在 [`spatial-planning`](https://github.com/Xaviw/spatial-planning) 项目后对 `pnpm monorepo` 的一些理解。
 
 ## 基础搭建
 
@@ -46,18 +46,16 @@ packages:
 上面的配置是指将根目录 `packages` 文件夹下的所有子文件夹都作为子项目。之后便可以创建子项目，创建后目录结构如下：
 
 ```
-D:.
-│   package.json
-│   pnpm-workspace.yaml
-│
-└───packages
-    ├───A
-    │       index.js
-    │       package.json
-    │
-    └───B
-            index.js
-            package.json
+monorepo-test
+├─ package.json
+├─ pnpm-workspace.yaml
+└─ packages
+   ├─ B
+   │  ├─ index.js
+   │  └─ package.json
+   └─ A
+      ├─ index.js
+      └─ package.json
 ```
 
 我们在 `B/index.js` 中导出一个变量：
@@ -66,7 +64,7 @@ D:.
 export const str = "this is B";
 ```
 
-此时在 A 中是不能直接导入 B 并使用的，需要先将 B 作为 A 的依赖。为了安装依赖我们先给两个子项目取一个合适的包名 `@mt/a` 和 `@mt/b`，之后便可以使用 pnpm 命令将 B 作为 A 的依赖：
+此时在 A 如果想导入 B 并使用，需要先将 B 作为 A 的依赖。为了安装依赖我们先给两个子项目取一个合适的包名 `@mt/a` 和 `@mt/b`，之后便可以使用 pnpm 命令将 B 作为 A 的依赖：
 
 ```sh
 # 根目录下执行
@@ -82,7 +80,6 @@ pnpm -F @mt/a add @mt/b
 ```js
 // A/index.js
 import { str } from "@mt/b";
-
 console.log(str);
 ```
 
@@ -92,7 +89,7 @@ node packages/A
 # 打印：this is B
 ```
 
-除了 `pnpm -F` 命令，pnpm monorepo 中常用的命令还包括：
+`pnpm -F` 命令是筛选（`filter`）具体的项目并在内部执行命令，除此之外 pnpm monorepo 中常用的命令还包括：
 
 ```sh
 # 在根目录中执行命令，安装、卸载等命令会操作根目录的 node_modules，子项目可以直接使用根 node_modules 中的依赖
@@ -106,9 +103,9 @@ pnpm -r [command]
 
 ## 项目构建
 
-我们知道 JS 世界的代码多种多样，有 `js`、`ts`、`jsx`、`vue` 文件等。如果 A 子包引入了 B 子包，但不能识别和使用 B 子包中的代码，那么 monorepo 也没有意义。
+我们知道 JS 世界的代码多种多样，有 `js`、`ts`、`jsx`、`vue` 文件等。而 monorepo 只是一种项目组织方式，项目间相互引用还是等同于包之间的引用。
 
-例如将上面 B 项目中的代码改为 TS 文件，此时由于 A 是一个 JS 项目，内部也没有处理 TS 文件的流程，所以无法正确使用，我们需要先将 B 项目打包后再使用。
+所以如果将上面 B 项目中的代码改为 TS 文件，由于 A 是一个 JS 项目便无法正确使用，此时需要先将 B 项目打包后再使用。
 
 可以使用 `rollup` 进行打包，为了处理 ts，还需要安装 `rollup-plugin-typescript2` 插件：
 
@@ -137,7 +134,7 @@ export default {
 ```json
 {
   "scripts": {
-    "build": "rollup -c"
+    "build": "rollup -c" // -c 指定配置文件，默认为 rollup.config
   }
 }
 ```
@@ -152,7 +149,7 @@ pnpm -F @mt/b build
 打包如果出现 `Error: Cannot find module @rollup/rollup-win32-x64-msvc.` 报错，尝试运行 `pnpm -F @mt/b add @rollup/rollup-win32-x64-msvc` 进行解决
 :::
 
-我们将运行 A 的语句写为命令：
+我们将运行 A 的语句也写为命令：
 
 ```json
 // packages/A/package.json
@@ -163,19 +160,21 @@ pnpm -F @mt/b build
 }
 ```
 
-打包完成后再次运行 `pnpm -F @mt/a start` 可以发现能够正常运行了。但如果每次 B 模块变动都需要进行打包再使用，在开发体验上也比 Multirepo 好不到哪去，我们可以借助 [`turbo`](https://turbo.build/repo/docs) 工具解决这个问题。
+打包完成后运行 `pnpm -F @mt/a start` 可以发现能够正常运行了。
 
-## 自动构建
+只是两个子项目时，手动执行打包再执行运行可能还能够接受。但当子项目变多，依赖关系变复杂时就体现不出 monorepo 的优势了。为了解决这个问题我们可以借助 `turbopack` 工具。
 
-turbo 工具可以帮我们自动处理依赖间的关系并且执行构建，内部还使用了缓存、并行构建等多种优化方式来提升构建效率。
+## 构建流水线
 
-首先需要安装 turbo：
+[`turbopack`](https://turbo.build/repo/docs) 基于 `Rust` 构建，使用高度优化的机器代码和低层级增量计算引擎，可以缓存到单个函数的级别。在快的基础上，`turbopack` 提供了 `pipeline` 定义功能，可以自定义项目间的依赖关系，然后交由工具自己处理构建流程。
+
+首先需要进行安装：
 
 ```sh
 pnpm -w add turbo -D
 ```
 
-之后在根目录插件 `turbo.json` 文件并写入如下内容作为配置文件：
+之后在根目录创建 `turbo.json` 文件并写入如下内容作为配置文件：
 
 ```json
 {
@@ -193,11 +192,19 @@ pnpm -w add turbo -D
 
 `start` 是 A 项目的启动命令，内部使用 `dependsOn` 命令声明了启动 A 需要依赖于 `build` 命令。
 
-因为之后 B 打包完成后 `start` 才能正确运行，所以在 `build` 前添加了 `^` 符号，这表示 `start` 命令需要在 `build` 运行结束后才能够执行。
+因为只有在 B 打包完成后 `start` 才能正确运行，所以在 `build` 前添加了 `^` 符号，这表示 `start` 命令需要在 `build` 运行结束后才能够执行。
 
-下面还声明了 `build` 命令为一个空对象，因为 turbo 需要在流水线中声明每一条语句的执行逻辑，所以用空对象表示 `build` 不需要依赖于任何其他命令。
+下面还声明了 `build` 命令为一个空对象，因为 turbopack 需要在流水线中声明每一条语句的执行逻辑，所以用空对象表示 `build` 不需要依赖于任何其他命令。
 
-完成上诉步骤后，我们先删除之前构建的 `packages/B/index.js` 文件，并用 turbo 命令执行 `start`：
+完成上诉步骤后，我们先删除之前构建的 `packages/B/index.js` 文件，然后在根 package.json 中添加一条 turbopack 启动命令并执行：
+
+```json
+{
+  "scripts": {
+    "ut"
+  }
+}
+```
 
 ```sh
 npx turbo run start
