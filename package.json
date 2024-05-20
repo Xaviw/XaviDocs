@@ -18,12 +18,12 @@
     "preview": "vitePress preview"
   },
   "devDependencies": {
-    "@types/node": "^20.6.0",
+    "@types/node": "^20.12.12",
     "gray-matter": "^4.0.3",
-    "vite": "^5.1.4",
-    "vite-plugin-vitepress-auto-nav": "^2.2.2",
-    "vitepress": "1.0.0-rc.45",
-    "vue": "^3.3.4"
+    "vite": "^5.2.11",
+    "vite-plugin-vitepress-auto-nav": "^2.3.1",
+    "vitepress": "1.2.0",
+    "vue": "^3.4.27"
   },
   "packageManager": "pnpm@8.15.4",
   "engines": {
