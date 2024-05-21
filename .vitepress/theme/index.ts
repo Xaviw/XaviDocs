@@ -1,9 +1,10 @@
-import type { Theme } from 'vitepress'
-import DefaultTheme from 'vitepress/theme'
-import Layout from '../../components/Layout.vue'
-import './customize.css'
+import type { Theme } from "vitepress";
+import DefaultTheme from "vitepress/theme";
+import Layout from "../../components/Layout.vue";
+import imgPreview from "hevue-img-preview";
+import Image from "./Image.vue";
+import "./customize.css";
 
-// export default DefaultTheme
 export default {
   ...DefaultTheme,
 
@@ -13,11 +14,15 @@ export default {
   // // 参数中的app是项目Vue3 App实例
   // // router是路由实例
   // // siteData是当前站点的元数据
-  // enhanceApp({ app, router, siteData }) {
-  //   // 可以在这里注册全局组件
-  //   // app.component('Comp', Comp)
+  enhanceApp({ app, router, siteData }) {
+    app.use(imgPreview, {
+      keyboard: true,
+      clickMaskCLose: true,
+      closeBtn: false,
+    });
+    app.component("Image", Image);
 
-  //   // 如果不是完全自定义主题,需要执行主题的默认行为
-  //   DefaultTheme.enhanceApp({ app, router, siteData })
-  // },
-} as Theme
+    // 如果不是完全自定义主题,需要执行主题的默认行为
+    DefaultTheme.enhanceApp({ app, router, siteData });
+  },
+} as Theme;
