@@ -1,7 +1,8 @@
 import type { Theme } from "vitepress";
 import DefaultTheme from "vitepress/theme";
 import Layout from "../../components/Layout.vue";
-import imgPreview from "hevue-img-preview";
+import "viewerjs/dist/viewer.css";
+import VueViewer from "v-viewer";
 import Image from "./Image.vue";
 import "./customize.css";
 
@@ -15,11 +16,7 @@ export default {
   // // router是路由实例
   // // siteData是当前站点的元数据
   enhanceApp({ app, router, siteData }) {
-    app.use(imgPreview, {
-      keyboard: true,
-      clickMaskCLose: true,
-      closeBtn: false,
-    });
+    app.use(VueViewer);
     app.component("Image", Image);
 
     // 如果不是完全自定义主题,需要执行主题的默认行为
