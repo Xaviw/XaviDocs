@@ -19,7 +19,7 @@ hide: true
 
 ## 安装 WSL
 
-> 后续的安装过程可能会因为国内网络原因失败，建议打开代理
+> 安装过程可能会因为国内网络原因失败，需要打开代理
 
 在管理员模式下打开 PowerShell 或命令提示符，执行：
 
@@ -29,9 +29,9 @@ wsl --install
 
 这会默认安装 Ubuntu，可以参照[官网介绍](https://learn.microsoft.com/zh-cn/windows/wsl/install#change-the-default-linux-distribution-installed)安装其他发行版
 
-安装完成后重启电脑，在开始菜单中打开 `Ubuntu`，打开后输入用户名和密码创建默认用户（会被视为管理员）
+安装完成后重启电脑，在开始菜单中打开 `Ubuntu`，打开后输入用户名和密码创建默认管理员用户
 
-之后可以通过命令升级包：
+之后通过命令升级系统中的包：
 
 ```shell
 sudo apt update && sudo apt upgrade
@@ -43,6 +43,38 @@ Windows Terminal 是更强大的命令行运行程序，支持多选项卡、多
 
 使用 Windows Terminal 配置 WSL 使用，能够得到更好的体验。安装和配置 Windows Terminal 可以参考[官方教程](https://learn.microsoft.com/zh-cn/windows/wsl/setup/environment#set-up-windows-terminal)
 
+安装完成后可以在 **设置 -> 启动 -> 默认配置文件**中将 Ubuntu 设置为默认启动
+
 ## 安装 zsh
 
 bash 是 Linux 中默认的命令行工具，zsh 是 bash 的扩展版本，具有更多的功能和更好看的外观，配合 oh-my-zsh 的插件，可以提供命令高亮、命令补全、git 快捷键等
+
+安装 zsh：
+
+```shell
+sudo apt install zsh
+```
+
+## WSL 使用 Windows 代理
+
+WSL2 的网络是连接自 Windows 的一个单独网络，所以无法直接使用到 Windows 中开启的代理，但是可以通过设置代理为 Windows IP + 代理端口号实现
+
+首先在代理软件中开启“允许来至局域网的连接”
+
+[!代理软件设置](../../images/工具系列/Windows+WSL搭建开发环境-1.png)
+
+“本机 sockets 端口”对应的端口号也就是 Windows 代理的端口号（图中是 10808，http 端口需要 +1，所以需要使用 10809）
+
+Windows IP 地址是可能变化的，可以利用上面提到的 WSL 网络连接自 Windows 这一点，从 `/etc/resolv.conf` 文件中获取
+
+之后通过 `code ~/.zshrc` 或 `vim ~/.zshrc` 在 zsh 配置中添加:
+
+```shell
+host_ip=$(cat /etc/resolv.conf | grep "nameserver" | cut -f 2 -d " ")
+proxy_port=10809
+alias proxy="all_proxy=http://$host_ip:$proxy_port"
+```
+
+配置后需要重启命令行或通过 `. ~/.zshrc` 命令刷新配置
+
+之后在需要代理的命令前添加 proxy 命令即可，可以通过 curl 命令测试
