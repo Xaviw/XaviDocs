@@ -1,7 +1,3 @@
----
-hide: true
----
-
 # Windows + WSL 搭建开发环境
 
 常听说 Mac 更适用于开发，主要是因为 Mac 既拥有 Windows 系统一样丰富的生产力软件，又拥有 Unix 系统一样好用的命令行等工具
