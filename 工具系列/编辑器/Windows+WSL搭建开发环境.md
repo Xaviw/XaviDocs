@@ -97,6 +97,12 @@ proxy curl www.google.com # 成功
 
 <Image alt="proxy测试" src="../../images/工具系列/Windows+WSL搭建开发环境-2.png" />
 
+如果还是无法正常使用代理，可能是因为防火墙的原因，可以在 Windows 命令行中以管理员身份执行：
+
+```shell
+New-NetFirewallRule -DisplayName "WSL" -Direction Inbound  -InterfaceAlias "vEthernet (WSL)"  -Action Allow
+```
+
 ## 安装 oh-my-zsh
 
 安装：
@@ -116,7 +122,7 @@ oh-my-zsh 支持插件机制，常用的插件包括:
 - `zsh-syntax-highlighting`：提供语法高亮功能
 - `zsh-autosuggestions`：根据历史命令提供建议
 
-git 和 z 插件已经自带，后两个插件可以通过以下命令安装：
+git 和 z 插件已经自带，其他自带插件可以通过 `ls ~/.oh-my-zsh/plugins` 命令查看，后两个插件可以通过以下命令安装：
 
 ```shell
 git clone --depth=1 https://github.com/zsh-users/zsh-syntax-highlighting.git ~/.oh-my-zsh/plugins/zsh-syntax-highlighting
@@ -135,6 +141,7 @@ git clone --depth=1 https://github.com/romkatv/powerlevel10k.git ~/.oh-my-zsh/cu
 插件与主题全部安装后需要通过 `code ~/.zshrc` 或 `vim ~/.zshrc` 修改配置文件中如下两条命令：
 
 ```shell
+# 或者其他喜欢的主题名称
 ZSH_THEME="powerlevel10k/powerlevel10k"
 
 plugins=(git z zsh-autosuggestions zsh-syntax-highlighting)
