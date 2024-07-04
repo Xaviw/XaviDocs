@@ -14,12 +14,13 @@ const props = withDefaults(
     width?: number | string;
   }>(),
   {
-    width: 200,
+    width: "auto",
   }
 );
 
 const cssWidth = computed(() => {
-  return typeof props.width === "string" ? props.width : props.width + "px";
+  const width = Number(props.width) || props.width;
+  return typeof width === "string" ? width : width + "px";
 });
 
 function preview() {
