@@ -29,7 +29,7 @@ const srcWiteBase = computed(() => {
 });
 
 function preview() {
-  api({ images: [props.src] });
+  api({ images: [srcWiteBase.value] });
 }
 </script>
 
