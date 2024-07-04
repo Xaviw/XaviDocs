@@ -1,4 +1,4 @@
-# Windows实用工具
+# Windows 实用工具
 
 ## 搜索工具-everything
 
@@ -6,11 +6,11 @@
 
 ## 多屏幕亮度调节-Twinkle Tray
 
-在Microsoft Store中下载，可以通过鼠标或快捷键调节多个屏幕的亮度
+在 Microsoft Store 中下载，可以通过鼠标或快捷键调节多个屏幕的亮度
 
 ## 文档工具-Wolai
 
-同国外比较出名的Notion，免费功能够用，[点击前往官网](https://www.wolai.com/)
+同国外比较出名的 Notion，免费功能够用，[点击前往官网](https://www.wolai.com/)
 
 或直接通过[我的邀请链接](https://www.wolai.com/signup?invitation=366TKSP)注册
 
@@ -31,9 +31,9 @@
 - Ctool - 开发常用工具，如进制转换、编解码等
 - 悬浮 - 置顶截图、软件窗口等
 - 知悉思维导图 - 免费的思维导图
-- 本地搜索 - 关联everything
-- 翻译 - 快速翻译（可能需要自行提供翻译API key，免费注册，可以搜索了解）
-- 起个变量名 - 中文转对应变量名格式英文（同样可能需要翻译API Key）
+- 本地搜索 - 关联 everything
+- 翻译 - 快速翻译（可能需要自行提供翻译 API key，免费注册，可以搜索了解）
+- 起个变量名 - 中文转对应变量名格式英文（同样可能需要翻译 API Key）
 - 颜色助手 - 选择常用颜色，可以设置快捷键快速取色
 - 密码管理器
 - 各种文档
@@ -41,22 +41,23 @@
 
 ## 截图、贴图-snipaste
 
-[点击前往官网](https://zh.snipaste.com/)，也可以用QQ、微信自带的功能替代
+[点击前往官网](https://zh.snipaste.com/)，也可以用 QQ、微信自带的功能替代
 
-## NODE版本管理工具-Volta
+## NODE 版本管理工具-Volta
 
-[点击前往官网](https://docs.volta.sh/guide/getting-started)，通过命令快速安装、切换NODE版本
+[点击前往官网](https://docs.volta.sh/guide/getting-started)，通过命令快速安装、切换 NODE 版本
 
-## Git可视化工具-SourceTree
+## Git 可视化工具-SourceTree
 
-[点击前往官网](https://www.sourcetreeapp.com/)，可视化操作git，提升效率，降低git难度
+[点击前往官网](https://www.sourcetreeapp.com/)，可视化操作 git，提升效率，降低 git 难度
 
 ## 录屏工具-ScreenToGif
 
-[点击前往官网](https://www.screentogif.com/)，体积小，支持录屏转GIF、APNG、MP4
+[点击前往官网](https://www.screentogif.com/)，体积小，支持录屏转 GIF、APNG、MP4
 
 ## 办公软件-ONLYOFFICE
-[点击前往官网](https://www.onlyoffice.com/zh/)，开源免费办公软件，基本能够平替MS Office
+
+[点击前往官网](https://www.onlyoffice.com/zh/)，开源免费办公软件，基本能够平替 MS Office
 
 - 支持下载软件或浏览器在线使用
 - 注册账号可以使用免费的云空间，支持多人在线协作
@@ -64,7 +65,8 @@
 - 可以集成进自身项目中，详情查看[官网介绍](https://www.onlyoffice.com/zh/developer-edition.aspx)
 
 提供功能包括：
-- 文件：存储和管理文档、工作表和幻灯片。编辑它们并与您的团队协作。在线创建和编辑具有专业外观的表单，让其他用户填写，将表单保存为PDF文件。
+
+- 文件：存储和管理文档、工作表和幻灯片。编辑它们并与您的团队协作。在线创建和编辑具有专业外观的表单，让其他用户填写，将表单保存为 PDF 文件。
 - 项目：计划活动，创建和分配任务，设定截止日期。
 - CRM：维护客户数据库，跟踪销售，创建发票。
 - 日历：使用可共享的日历安排会议并设置提醒事项。
@@ -72,22 +74,23 @@
 - 社区：创造你自己的社交网络和维护企业维基。
 - 讨论：与您的团队交换即时消息。
 
-## Windows自带能力
+## Windows 自带能力
 
 - 复制记录
 
-    快捷键`win + v`打开复制记录
+  快捷键`win + v`打开复制记录
 
 - 输入法功能（中文模式下）：
-    - u模式：输入u后可以跟笔划，或者uudw（单位符号）、uuxh（序号）、uuts（特殊字符）、uubd（标点）、uusx（数学符号）、uujh（几何符号）、uuzm（特殊字母）
-    - v模式：输入v后有使用示例，支持多种格式数字、日期、时间、公式输入
+
+  - u 模式：输入 u 后可以跟笔划，或者 uudw（单位符号）、uuxh（序号）、uuts（特殊字符）、uubd（标点）、uusx（数学符号）、uujh（几何符号）、uuzm（特殊字母）
+  - v 模式：输入 v 后有使用示例，支持多种格式数字、日期、时间、公式输入
 
 - 虚拟桌面
 
-    快捷键`win + Tab`可以切换或添加、删除虚拟桌面。此视图中右击窗口项可以设置在所有窗口上显示此窗口或此应用的窗口
+  快捷键`win + Tab`可以切换或添加、删除虚拟桌面。此视图中右击窗口项可以设置在所有窗口上显示此窗口或此应用的窗口
 
-    在同时操作多个任务时很实用，可以一个桌面一项任务
+  在同时操作多个任务时很实用，可以一个桌面一项任务
 
-    多显示器时建议配合如下任务栏设置使用，能够将图标显示在对应的显示器中，不合并利于快速切换
+  多显示器时建议配合如下任务栏设置使用，能够将图标显示在对应的显示器中，不合并利于快速切换
 
-    ![任务栏设置](../../images/工具系列/Windows工具-1.png)
+    <Image src="/Windows工具-1.png" alt="任务栏设置" />

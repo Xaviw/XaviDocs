@@ -1,10 +1,11 @@
 <template>
   <div class="previewable" @click="preview">
-    <img v-bind="$attrs" :src="src" :style="{ width: cssWidth }" />
+    <img v-bind="$attrs" :src="srcWiteBase" :style="{ width: cssWidth }" />
   </div>
 </template>
 
 <script setup lang="ts">
+import { withBase } from "vitepress";
 import { computed } from "vue";
 import { api } from "v-viewer";
 
@@ -21,6 +22,10 @@ const props = withDefaults(
 const cssWidth = computed(() => {
   const width = Number(props.width) || props.width;
   return typeof width === "string" ? width : width + "px";
+});
+
+const srcWiteBase = computed(() => {
+  return withBase(props.src);
 });
 
 function preview() {

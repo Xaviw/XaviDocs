@@ -1,6 +1,6 @@
-# JS模块化原理
+# JS 模块化原理
 
-JavaScript在设计之初并没有想到会用于实现复杂的功能，所以没有提供模块化功能。但在逐步的发展中，没有模块化暴露出了很严重的问题：
+JavaScript 在设计之初并没有想到会用于实现复杂的功能，所以没有提供模块化功能。但在逐步的发展中，没有模块化暴露出了很严重的问题：
 
 1. 命名冲突
 
@@ -12,24 +12,24 @@ JavaScript在设计之初并没有想到会用于实现复杂的功能，所以�
 
 <hr />
 
-为了解决这些问题，涌现过一系列的模块化方案，可以阅读[The Evolution of JavaScript Modularity](https://github.com/myshov/history-of-javascript/tree/master/4_evolution_of_js_modularity)或[译文](https://github.com/Yingkaixiang/evolution-of-js-modularity)了解JS模块化发展历史。本文仅介绍立即执行函数和如今使用的`CommonJS`、`ESModule`
+为了解决这些问题，涌现过一系列的模块化方案，可以阅读[The Evolution of JavaScript Modularity](https://github.com/myshov/history-of-javascript/tree/master/4_evolution_of_js_modularity)或[译文](https://github.com/Yingkaixiang/evolution-of-js-modularity)了解 JS 模块化发展历史。本文仅介绍立即执行函数和如今使用的`CommonJS`、`ESModule`
 
 ## 立即执行函数
 
 > 英文全称`Immediately Invoked Function Expression`，简称`IIFE`
 
-通过JS的函数作用域实现模块化是早期最为流行的一种方案，这也是为什么面试几乎必问闭包的原因，算是一种历史传承
+通过 JS 的函数作用域实现模块化是早期最为流行的一种方案，这也是为什么面试几乎必问闭包的原因，算是一种历史传承
 
 ```js
-;(function(){
+(function () {
   // 脚本逻辑
   // 函数内的变量在其他脚本中无法访问，不会造成作用域污染
-})()
+})();
 // 或者
-var someMethod = (function(){  })();
+var someMethod = (function () {})();
 ```
 
-这就实现了最为经典的模块化方案，其中第一个分号是因为通过`script`标签加载多个脚本时，前面的脚本可能没有写分号结尾，这就会导致JS解析为`(第一个脚本)()(第二个脚本)`的格式，也就是说第二个脚本的括号被当作了函数调用的括号
+这就实现了最为经典的模块化方案，其中第一个分号是因为通过`script`标签加载多个脚本时，前面的脚本可能没有写分号结尾，这就会导致 JS 解析为`(第一个脚本)()(第二个脚本)`的格式，也就是说第二个脚本的括号被当作了函数调用的括号
 
 后来这种以分号开头，结尾不写分号的立即执行函数格式成了很多程序员默认的规范写法
 
@@ -40,22 +40,24 @@ var someMethod = (function(){  })();
 ### 语法
 
 ::: code-group
+
 ```js [导出]
 module.exports = {
-  name: 'value'
-}
+  name: "value",
+};
 
 // 也可以直接使用exports
-exports.name = 'value'
+exports.name = "value";
 ```
 
 ```js [导入]
-const lib = require('./lib.js');
-console.log(lib.name) // 打印 value
+const lib = require("./lib.js");
+console.log(lib.name); // 打印 value
 
 // 对于不需要接收值的模块，可以只导入
-require('./lib.js')
+require("./lib.js");
 ```
+
 :::
 
 ### 原理
@@ -63,59 +65,62 @@ require('./lib.js')
 下面模拟一下`CommonJS`实现模块化的大致原理（仅帮助理解执行流程，与真正的实现方式有差异）。假设拥有如下两个模块：
 
 ::: code-group
-```js [index.js]
-const a = require('./a.js')
 
-console.log(a)
+```js [index.js]
+const a = require("./a.js");
+
+console.log(a);
 ```
 
 ```js [a.js]
-module.exports = 'a'
+module.exports = "a";
 ```
+
 :::
 
 可以将`CommonJS`看作是一个构建插件，会将上面的两个模块处理成如下的格式：
 
 ```js
 // Module类
-function Module(){
-  this.exports = {}
+function Module() {
+  this.exports = {};
   // 省略类初始化参数及其他初始化属性
 }
 // 设置缓存对象
-Module._cache = {}
+Module._cache = {};
 // 挂载原型方法require
-Module.prototype.require = function(path){
+Module.prototype.require = function (path) {
   // 1.计算绝对路径
-  var filename = 计算绝对路径
+  var filename = 计算绝对路径;
   // 2.判断是否有缓存
-  var cache = Module._cache[filename]
-  if(cache) {
-    return cache
+  var cache = Module._cache[filename];
+  if (cache) {
+    return cache;
   }
   // 3.判断是否内置模块
-  if(内置模块中存在filename) {
-    return 内置模块
+  if (内置模块中存在filename) {
+    return 内置模块;
   }
   // 4.生成模块实例，存入缓存
-  var module = new Module()
-  Module._cache[filename] = module
+  var module = new Module();
+  Module._cache[filename] = module;
   // 创建module.exports的引用，用于提供exports.key=value的简化写法
-  var exports = module.exports
+  var exports = module.exports;
   // 5.加载模块
-  var content = 读取脚本内容
-  // 6.执行模块
-  (function(content, exports, require, module) {
-    // 模块代码被包装到拥有exports、require、module的函数中执行
-    // 所以模块中能够直接使用这三个变量
-    // 通过module.exports=导出的对象也就存储到了该模块实例的exports属性中
-    // 其他模块再require该模块时，即可从第2步返回的缓存实例对象中获取exports
-    // eval是执行代码字符串的方法，参考https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/eval
-    eval(content)
-  })(content, module.exports, Module.prototype.require, module)
-}
+  var content = 读取脚本内容(
+    // 6.执行模块
+    function (content, exports, require, module) {
+      // 模块代码被包装到拥有exports、require、module的函数中执行
+      // 所以模块中能够直接使用这三个变量
+      // 通过module.exports=导出的对象也就存储到了该模块实例的exports属性中
+      // 其他模块再require该模块时，即可从第2步返回的缓存实例对象中获取exports
+      // eval是执行代码字符串的方法，参考https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/eval
+      eval(content);
+    }
+  )(content, module.exports, Module.prototype.require, module);
+};
 // 调用入口模块
-Module.prototype.require('./index.js')
+Module.prototype.require("./index.js");
 // 运行到入口中的require('./a.js')时，又会构建a.js的Module实例，并执行a.js代码
 // 整个过程是逐行的方式同步执行全部脚本
 ```
@@ -131,7 +136,7 @@ Module.prototype.require('./index.js')
 
 关于浅拷贝，可以根据这张图理解:
 
-![CommonJS模块化原理](../../images/前端系列/工程化-JS模块化原理-1.png)
+<Image src="/工程化-JS模块化原理-1.png" alt="CommonJS模块化原理" />
 
 ### 模块匹配规则
 
@@ -139,14 +144,16 @@ Module.prototype.require('./index.js')
 
 ```js
 // 例如json文件内容为：{"a":"a"}，被导入时就相当于
-module.exports = { "a": "a" }
+module.exports = { a: "a" };
 ```
+
 `CommonJS`模块解析策略中除了`.js`、`.json`、`.node`之外的扩展名，其他文件均会视为`js`文件进行处理
 
 未找到与传入路径完全匹配的模块时，会依次尝试添加`.js`、`.json`、`.node`扩展名进行匹配
 
-::: tip CommonJS详细的加载顺序为：
+::: tip CommonJS 详细的加载顺序为：
 使用相对或绝对路径导入时
+
 1. 判断是否有完全匹配路径的文件
 2. 依次尝试`.js`，`.json`，`.node`扩展名进行匹配（路径无扩展名则添加扩展名，路径本身有扩展名则修改扩展名）
 3. 尝试寻找同名文件夹（去掉扩展名）
@@ -162,17 +169,19 @@ module.exports = { "a": "a" }
 ### 循环加载规则
 
 ::: code-group
+
 ```js [a.js]
-var b = require('./b.js')
-console.log(b) // b
-module.exports = 'a'
+var b = require("./b.js");
+console.log(b); // b
+module.exports = "a";
 ```
 
 ```js [b.js]
-var a = require('./a.js')
-console.log(a) // {}
-module.exports = 'b'
+var a = require("./a.js");
+console.log(a); // {}
+module.exports = "b";
 ```
+
 :::
 
 当出现如上的循环引用时，`CommonJS`的处理比较特殊：
@@ -195,62 +204,62 @@ module.exports = 'b'
 
 ```js
 // 直接导出变量、函数，let、var同理
-export const key = value
+export const key = value;
 export function func() {}
 
 // 先声明变量再导出
-const key = value
-function func(){}
-export { key, func }
+const key = value;
+function func() {}
+export { key, func };
 
 // 导出重命名
-export { key as otherKey, func as otherFunc}
+export { key as otherKey, func as otherFunc };
 
 // 默认导出，一个模块只能有一个默认导出，具名导出可以有多个，且可以和默认导出同时拥有
-export default value
+export default value;
 ```
 
 导入:
 
 ```js
 // 导入非默认导出的变量
-import { key, func } from 'module'
+import { key, func } from "module";
 
 // 导入重命名
-import { key as otherKey, func as otherFunc} from 'module'
+import { key as otherKey, func as otherFunc } from "module";
 
 // 整体导入，通过obj.key、obj.func调用
-import * as obj from 'module'
+import * as obj from "module";
 
 // 导入默认导出的数据，name可以任意取
-import name from 'module'
+import name from "module";
 
 // 重命名默认导出
-import { default as otherName } from 'module'
+import { default as otherName } from "module";
 
 // 导入同时有默认导出和具名导出的数据
-import name, { key, func } from 'module'
+import name, { key, func } from "module";
 
 // 仅执行模块，而不获取任何变量
-import 'module'
+import "module";
 ```
 
 导出导入也支持复合写法，可以简化某些情况的书写：
 
 ```js
-export { foo, bar } from 'module';
+export { foo, bar } from "module";
 // 可以简单理解为
-import { foo, bar } from 'module';
+import { foo, bar } from "module";
 export { foo, bar };
 
 // 同样支持重命名和整体再导出
-export { foo as myFoo } from 'module';
-export * from 'module';
-export * as newName from 'module';
+export { foo as myFoo } from "module";
+export * from "module";
+export * as newName from "module";
 
 // 默认导出的再导出语法为
-export { default } from 'module'
-export { default as newName } from 'module'
+export { default } from "module";
+export { default as newName } from "module";
 ```
 
 浏览器中也已支持`ESModule`模块，采用异步加载的方式，等同于`script`添加了`defer`关键字，多个`ESModule script`标签同样会按照书写顺序加载和执行。也可以添加`async`关键字，这时候模块会在加载完成时立即执行
@@ -272,11 +281,12 @@ export { default as newName } from 'module'
 `ES6`模块化的思想是静态化，使编译时就能够确定模块间依赖关系，以及输入输出的变量，不同于`CommonJS`需要实际运行到那一行才能确定这些东西。静态化带来的好处是：
 
 - 静态分析可以帮助实现类型检验、`TreeShaking`等实用功能
-- 将来官方扩充API时，就不在必须做成全局属性，而可以通过提供模块的方式
+- 将来官方扩充 API 时，就不在必须做成全局属性，而可以通过提供模块的方式
 
 浏览器中的`ES`模块，通常采用只用`script`标签加载一个入口模块的方式，再通过模块间的依赖解析依次加载需要的模块。下面用一个简单的`Vue`项目例子，帮助理解`ES`模块解析的过程：
 
 ::: code-group
+
 ```html
 <!-- 省略其他代码 -->
 <html>
@@ -288,26 +298,27 @@ export { default as newName } from 'module'
 ```
 
 ```js [main.js]
-import { createApp } from 'vue'
-import App from './App.vue'
+import { createApp } from "vue";
+import App from "./App.vue";
 
-createApp(App)
+createApp(App);
 ```
 
 ```js [App.vue]
-import { h } from 'vue'
-import str from './config.js'
+import { h } from "vue";
+import str from "./config.js";
 // template模板形式的vue文件，实际上也是被解析为类似的render函数形式
 export default {
   render() {
-    return h('div', str)
-  }
-}
+    return h("div", str);
+  },
+};
 ```
 
 ```js [config.js]
-export default 'xxx'
+export default "xxx";
 ```
+
 :::
 
 在`HTML`代码解析完毕后，因为识别到`type="module"`，所以引擎会采用异步加载的方式，直接开始下载`main.js`文件
@@ -409,7 +420,7 @@ export default function(){ return 'a' };
 // [Function: default]
 ```
 
-### ES模块中加载CommonJS模块
+### ES 模块中加载 CommonJS 模块
 
 因为`CommonJS`是同步加载的，而`ES`模块内部支持顶层`await`导致不能被同步加载，所以`CommonJS`并不支持混用`ES`模块。但反过来同步的`CommonJS`代码是能被`ESModule`加载的
 
@@ -417,21 +428,21 @@ export default function(){ return 'a' };
 
 ```js
 // 报错
-import { method } from 'commonjs-package';
+import { method } from "commonjs-package";
 // 正确
-import packageMain from 'commonjs-package';
+import packageMain from "commonjs-package";
 const { method } = packageMain;
 // 也可以再次导出，使支持ES模块单个加载
-export { method }
+export { method };
 ```
 
 `NodeJS`的内置模块是支持指定加载的:
 
 ```js
 // 整体加载
-import EventEmitter from 'events';
+import EventEmitter from "events";
 // 加载指定的输出项
-import { readFile } from 'fs';
+import { readFile } from "fs";
 ```
 
 ## 动态加载函数-import()
@@ -439,20 +450,20 @@ import { readFile } from 'fs';
 因为`ES`模块采用软链接的方式，所以这些内存地址是只读的，也就是说无法直接修改导入的变量：
 
 ```js
-import { a } from 'a.js'
-a = 2 // Uncaught TypeError: Assignment to constant variable.
+import { a } from "a.js";
+a = 2; // Uncaught TypeError: Assignment to constant variable.
 ```
 
 为了弥补这个缺陷，在`ES2020`提案中引入了`import()`函数，支持动态加载模块，语法为：
 
 ```js
-import('./module.js')
+import("./module.js");
 // 上面提到的例子也就支持了
 if (x === 2) {
-  import('module');
+  import("module");
 }
-let varName = 'xxx'
-import(`${varName}Module.js`)
+let varName = "xxx";
+import(`${varName}Module.js`);
 ```
 
 能看出来，`vue`中的路由懒加载与`vite`中的模块动态加载便是用的`import`函数语法
@@ -460,20 +471,24 @@ import(`${varName}Module.js`)
 `import`函数会返回一个`Promise`对象，可以用在任何地方，包括`CommonJS`模块中。因为动态加载的原因，所以`import`函数与被加载模块没有静态链接关系，这点与`import`语句不同
 
 :::code-group
-```js [a.js]
-const name = require('./b.js')
 
-;(async function () {
-  const value = await import(`./${name}.mjs`)
-  console.log(value)
-})()
+```js [a.js]
+const name = require("./b.js");
+
+(async function () {
+  const value = await import(`./${name}.mjs`);
+  console.log(value);
+})();
 ```
+
 ```js [b.js]
-module.exports = 'c'
+module.exports = "c";
 ```
+
 ```js [c.mjs]
-export default 'ccccccc'
+export default "ccccccc";
 ```
+
 :::
 
 执行`node a.js`后会打印`[Module: null prototype] { default: 'ccccccc' }`

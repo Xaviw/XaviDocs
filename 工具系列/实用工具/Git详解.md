@@ -21,7 +21,9 @@ Git 是分布式代码托管的标杆，这里将提供如何学习 Git，以及
 
 - **在线学习**
 
-  - 有个很好的在线学习网站，推荐给大家： [https://learngitbranching.js.org/](https://learngitbranching.js.org/)![1](https://www.pdai.tech/images/tool-git-learn-1.png)
+  - 有个很好的在线学习网站，推荐给大家： [https://learngitbranching.js.org/](https://learngitbranching.js.org/)
+
+  <Image src="https://www.pdai.tech/images/tool-git-learn-1.png" alt="learngitbranching" />
 
 ## 常用小结
 
@@ -31,11 +33,11 @@ Git 是分布式代码托管的标杆，这里将提供如何学习 Git，以及
 
 #### 代码提交和同步代码
 
-![2](https://www.pdai.tech/images/git-four-areas.png)
+<Image src="https://www.pdai.tech/images/git-four-areas.png" />
 
 #### 代码撤销和撤销同步
 
-![3](https://www.pdai.tech/images/git-five-states.png)
+<Image src="https://www.pdai.tech/images/git-five-states.png" />
 
 ### Git 常用操作命令 - 代码提交和同步代码
 

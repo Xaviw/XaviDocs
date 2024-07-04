@@ -27,7 +27,7 @@ wsl --install
 
 安装完成后重启电脑，在开始菜单中打开 `Ubuntu`，打开后根据提示输入用户名和密码创建默认管理员用户
 
-<Image src="../../images/工具系列/Windows+WSL搭建开发环境-0.png" alt="创建管理员用户" />
+<Image src="/Windows+WSL搭建开发环境-0.png" alt="创建管理员用户" />
 
 之后通过命令升级系统中的包：
 
@@ -71,7 +71,7 @@ WSL2 的网络是连接自 Windows 的一个单独网络，所以无法直接使
 
 首先在代理软件中开启“允许来至局域网的连接”
 
-<Image alt="代理软件设置" src="../../images/工具系列/Windows+WSL搭建开发环境-1.png" />
+<Image src="/Windows+WSL搭建开发环境-1.png" alt="代理软件设置" />
 
 “本机 sockets 端口”对应的端口号也就是 Windows 代理的端口号（图中是 10808，http 端口需要 +1，所以需要使用 10809）
 
@@ -95,7 +95,7 @@ curl www.google.com # 失败
 proxy curl www.google.com # 成功
 ```
 
-<Image alt="proxy测试" src="../../images/工具系列/Windows+WSL搭建开发环境-2.png" />
+<Image src="/Windows+WSL搭建开发环境-2.png" alt="proxy测试" />
 
 如果还是无法正常使用代理，可能是因为防火墙的原因，可以在 Windows 命令行中以管理员身份执行：
 
@@ -113,7 +113,7 @@ proxy curl -fsSL https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/master
 
 安装完成后可以看到如下打印：
 
-<Image alt="oh-my-zsh" src="../../images/工具系列/Windows+WSL搭建开发环境-3.png" />
+<Image src="/Windows+WSL搭建开发环境-3.png" alt="oh-my-zsh" />
 
 oh-my-zsh 支持插件机制，常用的插件包括:
 
@@ -150,8 +150,8 @@ plugins=(git z zsh-autosuggestions zsh-syntax-highlighting)
 之后通过 `. ~/.zshrc` 命令刷新配置，即可看到进入了 powerlevel10k 主题的配置流程，按照指引一步步完成配置即可。
 
 <div style="display: flex; justify-content: center;">
-  <Image alt="powerlevel10k配置" src="../../images/工具系列/Windows+WSL搭建开发环境-4.png" style="margin-right: 2rem;" />
-  <Image alt="powerlevel10k" src="../../images/工具系列/Windows+WSL搭建开发环境-5.png" />
+  <Image src="/Windows+WSL搭建开发环境-4.png" alt="powerlevel10k配置" style="margin-right: 2rem;" />
+  <Image src="/Windows+WSL搭建开发环境-5.png" alt="powerlevel10k" />
 </div>
 
 ## 设置开发环境
