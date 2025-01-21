@@ -24,7 +24,6 @@ export default defineConfig({
 
           源码阅读: { sort: 0 },
           日常记录: { sort: 1 },
-          typescript: { sort: 2 },
           uniapp: { sort: 3 },
           工程化: { sort: 4 },
 
@@ -55,6 +54,10 @@ export default defineConfig({
           {
             text: "EcmaScript 6 入门教程",
             link: "https://es6.ruanyifeng.com/#docs/intro",
+          },
+          {
+            text: "TypeScript 教程",
+            link: "https://wangdoc.com/typescript/",
           },
         ],
       },
