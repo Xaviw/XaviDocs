@@ -1,5 +1,5 @@
 ---
-hide: false
+visible: true
 ---
 
 # monorepo 项目搭建

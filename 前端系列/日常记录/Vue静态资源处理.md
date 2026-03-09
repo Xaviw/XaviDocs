@@ -1,5 +1,5 @@
 ---
-hide: true
+visible: false
 ---
 
 # Vue 静态资源处理

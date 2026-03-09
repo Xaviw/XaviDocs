@@ -19,16 +19,15 @@ export default defineConfig({
   vite: {
     plugins: [
       AutoNav({
-        itemsSetting: {
-          前端系列: { sort: 0 },
-
-          源码阅读: { sort: 0 },
-          日常记录: { sort: 1 },
-          uniapp: { sort: 3 },
-          工程化: { sort: 4 },
-
-          VitePress搭建: { sort: 0 },
+        overrides: {
+          前端系列: { order: 0 },
+          源码阅读: { order: 0 },
+          日常记录: { order: 1 },
+          uniapp: { order: 3 },
+          工程化: { order: 4 },
+          VitePress搭建: { order: 0 },
         },
+        preferArticleTitle: true,
       }),
     ],
   },

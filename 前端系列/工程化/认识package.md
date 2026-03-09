@@ -1,5 +1,5 @@
 ---
-useArticleTitle: true
+preferArticleTitle: true
 ---
 
 # 认识 package.json
